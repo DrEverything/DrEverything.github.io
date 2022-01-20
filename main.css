@@ -1,7 +1,36 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    height: 1000px;
+    width: 1000px;
+    
+}
+
 h1 {
     color: aqua;
 }
 
-div#navBar {
+#navBar {
+    position: absolute;
+    display: grid;
+    height: 800px;
+    width: 800px;
+    justify-content: center;
+    align-content: space-around;
+    background-color: azure;
     color: brown;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.navButton {
+
 }
