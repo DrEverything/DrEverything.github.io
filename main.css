@@ -45,12 +45,12 @@ button.double {
     word-break: break-all;
 }
 
-.screen .previousOperand {
+.screen #previousOperand {
     color:rgba(255, 255, 255, .75);
     font-size: 1.5rem;
 }
 
-.screen .currentOperand {
+.screen #currentOperand {
     color:white;
     font-size: 2.5rem;
 }
