@@ -13,11 +13,10 @@ body {
     height: 50px;
     width: 50px;
     border-radius: 90%;
-    outline: solid 2px rgba(4, 4, 4, .8);
     right: 120px;
     top: 40px;
 }
 
 #profilePicture:hover {
-    box-shadow: 0px 0px 1px 5px rgba(128, 128, 128, 0.55);
+    box-shadow: 0px 0px 1px 3px rgba(128, 128, 128, 0.55);
 }
