@@ -8,3 +8,8 @@ body {
     background: linear-gradient(45deg, rgb(37, 196, 196) 0%, rgb(37, 166, 184) 35%, rgba(0,212,255,1) 100%);
 }
 
+#profilePicture {
+    position: absolute;
+    height: 400px;
+    width: 400px;
+}
