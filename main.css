@@ -5,18 +5,23 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(45deg, rgb(37, 196, 196) 0%, rgb(37, 166, 184) 35%, rgba(0,212,255,1) 100%);
+    background: rgb(233, 227, 227);
+}
+
+#navBar {
+    display: flex;
+    align-content: center;
+    justify-content: flex-end;
 }
 
 #profilePicture {
-    position: absolute;
+    margin: 20px;
     height: 50px;
     width: 50px;
     border-radius: 90%;
-    right: 120px;
-    top: 40px;
+    background-color: aquamarine;
 }
 
 #profilePicture:hover {
-    box-shadow: 0px 0px 1px 3px rgba(128, 128, 128, 0.55);
+    box-shadow: 0px 0px 1px 4px rgba(128, 128, 128, 0.55);
 }
