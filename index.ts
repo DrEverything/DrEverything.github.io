@@ -1,0 +1,1 @@
+(document.querySelector("h1") as HTMLElement).innerHTML = "Chrisddd";
