@@ -7,9 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allsim</title>
     <style>
-        canvas {
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
             height: 100%;
             width: 100%;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -21,10 +28,22 @@
         init().then(() => {
             console.log("WASM Loaded");
             canvas = document.querySelector("canvas");
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+            canvas.style.width = "100%";
+            canvas.style.height = "100%";
+            canvas.height = height;
+            canvas.width = width;
             window.onresize = () => {
-                canvas.height = window.innerHeight;
-                canvas.width = window.innerWidth;
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.height = height;
+                canvas.width = width;
             }
+            canvas.addEventListener('focus', function (event) {
+                event.preventDefault();
+                this.blur();  // Remove focus programmatically
+            });
         });
     </script>
 </body>
