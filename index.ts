@@ -15,7 +15,7 @@ const vsSource = `
     attribute vec4 aVertexPosition;
 
     void main(void) {
-        gl_Position = aVertexPosition;
+        gl_Position = vec4(aVertexPosition.xy, .0, 1.);
     }
 `;
 
@@ -24,7 +24,7 @@ const fsSource = `
     precision mediump float;
 
     void main(void) {
-        gl_FragColor = vec4(.0, 1.0, 1.0, 1.0);
+        gl_FragColor = vec4(.0, 1.0, 1.0, .5);
     }
 `;
 
@@ -81,16 +81,22 @@ if (!shaderProgram) {
 }
 
 gl.useProgram(shaderProgram);
+gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
 const vertexBuffer = gl.createBuffer();
 
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-const vertices = new Float32Array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0]);
+const vertices = new Float32Array([
+    -1.0, 1.0, // Top left
+    1.0, 1.0, // Top right
+    -1.0, -1.0, // Bottom left
+    1.0, -1.0 // Bottom right
+]);
 gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
 gl.enableVertexAttribArray(positionAttribute);
 gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 gl.clear(gl.COLOR_BUFFER_BIT);
-gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 2);
+gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
