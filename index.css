@@ -1,14 +1,10 @@
 body {
-    display: grid;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
 }
 
-body > * {
-    grid-area: 1 / 1;
-}
 
 header,
 footer {
@@ -27,6 +23,6 @@ section {
 }
 
 canvas {
-    height: 100vh;
+    height: 440px;
     width: 100%;
 }
