@@ -1,10 +1,6 @@
 var canvas = document.querySelector('canvas') as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-window.onresize = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
 
 // Vertex Shader
 const vsSource = `#version 300 es
