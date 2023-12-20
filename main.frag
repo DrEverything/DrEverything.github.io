@@ -5,10 +5,6 @@ uniform float iTime;
 uniform vec2 iResolution;
 out vec4 fragColor;
 
-float aaa(vec2 position, float radius) {
-  return step(radius, length(position - vec2(0.5)));
-}
-
 vec3 wave(vec2 uv) {
   float curve = .3 * sin((9.25 * uv.x) + (2. * iTime));
   float lineAShape =
@@ -17,21 +13,19 @@ vec3 wave(vec2 uv) {
          vec3(mix(vec3(.8, .2, .2), vec3(.5, .2, .2), lineAShape));
 }
 
+float plot(vec2 st, float pct) {
+  return smoothstep(pct - 0.02, pct, st.y) - smoothstep(pct, pct + 0.02, st.y);
+}
+
 void main(void) {
-  vec2 uv = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
+  vec2 st = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-  vec3 color = vec3(0.);
-  float color_w = 1.;
+  float y = pow(st.x, 2.);
 
-  color = wave(uv);
-  //   vec2 d = vec2(abs(uv.x-.1), abs(uv.y - .5)) - .3;
-  //   float square = length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
-  //   float circle = length(uv + .4) - .4;
-  //   float squareColor = step(square, 0.02);
+  vec3 color = vec3(y);
 
-  //   float circleColor = smoothstep(0., 0.9, circle);
+  float pct = plot(st, y);
+  color = (1.0 - pct) * color + pct * vec3(0.0, 1.0, 0.0);
 
-  //   color += vec3(squareColor, circleColor, 0.);
-
-  fragColor = vec4(color, color_w);
+  fragColor = vec4(color, 1.);
 }
