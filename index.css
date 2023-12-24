@@ -21,17 +21,10 @@ section {
     margin-bottom: 20px;
 }
 
-img {
+.my-project-img {
     height: 444px;
     width: 444px;
     border-radius: 8px;
     box-shadow: 7px 7px 33px;
-    margin-left: 5px;
-}
-
-canvas {
-    height: 444px;
-    width: 444px;
-    border-radius: 8px;
-    box-shadow: 7px 7px 33px;
+    margin-left: 11px;
 }
