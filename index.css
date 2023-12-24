@@ -3,9 +3,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
-    overflow: hidden;
 }
-
 
 header,
 footer {
@@ -25,5 +23,7 @@ section {
 
 canvas {
     height: 444px;
-    width: 100%;
+    width: 444px;
+    border-radius: 8px;
+    box-shadow: 7px 7px 33px;
 }

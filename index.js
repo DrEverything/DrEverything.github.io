@@ -7,7 +7,7 @@ Promise.all([vertPromise, fragPromise])
     .then(([vsSource, fsSource]) => {
     const gl = canvas.getContext('webgl2');
     if (!gl) {
-        console.error('Unable to initialize WebGL. Your browser may not support it.');
+        console.error('Unable to initialize WebGL2. Your browser may not support it.');
     }
     function compileShader(gl, source, type) {
         const shader = gl.createShader(type);
@@ -72,7 +72,7 @@ Promise.all([vertPromise, fragPromise])
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
     function GLDraw() {
-        time += 0.02;
+        time += 0.03;
         gl.uniform1f(iTimeLocation, time);
         gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
