@@ -1,9 +1,10 @@
 var canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-fetch("main.vert").then(async (vert) => {
-    const vsSource = await vert.text();
-    const fsSource = await (await fetch("main.frag")).text();
+const vertPromise = fetch("main.vert").then((vert) => vert.text());
+const fragPromise = fetch("main.frag").then((frag) => frag.text());
+Promise.all([vertPromise, fragPromise])
+    .then(([vsSource, fsSource]) => {
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL. Your browser may not support it.');
