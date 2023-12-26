@@ -1,14 +1,3 @@
-const canvases = [
-    document.querySelector('#wave') as HTMLCanvasElement,
-    document.querySelector('#another') as HTMLCanvasElement
-];
-
-const shaderPromises = [
-    fetch("main.vert").then((vert) => vert.text()),
-    fetch("wave.frag").then((frag) => frag.text()),
-    fetch("another.frag").then((frag) => frag.text()),
-];
-
 function compileShader(gl: WebGL2RenderingContext, source: string, type: GLenum): WebGLShader | null {
     const shader = gl.createShader(type);
     if (!shader) {
@@ -102,6 +91,17 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
 
     GLDraw();
 }
+
+const canvases = [
+    document.querySelector('#wave') as HTMLCanvasElement,
+    document.querySelector('#another') as HTMLCanvasElement
+];
+
+const shaderPromises = [
+    fetch("main.vert").then((vert) => vert.text()),
+    fetch("wave.frag").then((frag) => frag.text()),
+    fetch("another.frag").then((frag) => frag.text()),
+];
 
 Promise.all(shaderPromises)
     .then((shaders) => {
