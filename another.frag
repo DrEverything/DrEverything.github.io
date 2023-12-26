@@ -14,7 +14,7 @@ vec3 wave(vec2 uv) {
 }
 
 float plot(vec2 st, float pct) {
-  return smoothstep(pct - 0.01, pct, st.y) - smoothstep(pct, pct + 0.01, st.y);
+  return smoothstep(pct - 0.02, pct, st.y) - smoothstep(pct, pct + 0.02, st.y);
 }
 
 void main(void) {
