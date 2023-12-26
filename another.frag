@@ -20,7 +20,8 @@ float plot(vec2 st, float pct) {
 void main(void) {
   vec2 st = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-  float y = .3 * sin(4.5 * st.x + iTime);
+  //   float y = .3 * sin(4.5 * st.x + iTime);
+  float y = pow(st.x * .234 * sin(4.5 * st.x + iTime), 1.);
 
   vec3 color = vec3(y);
 
