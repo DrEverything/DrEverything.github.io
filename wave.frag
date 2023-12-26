@@ -25,7 +25,7 @@ void main(void) {
   vec3 color = vec3(y);
 
   float pct = plot(st, y);
-  color = pct * vec3(0.0, 1.0, 0.0) * sin(2.5 * st.x + iTime * 1.1);
+  color = pct * vec3(0.0, 1.0, 0.0) * sin(2.5 * st.x + iTime * 1.4);
 
   fragColor = vec4(color, 1.);
 }

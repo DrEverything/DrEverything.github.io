@@ -14,13 +14,13 @@ vec3 wave(vec2 uv) {
 }
 
 float plot(vec2 st, float pct) {
-  return smoothstep(pct - 0.02, pct, st.y) - smoothstep(pct, pct + 0.02, st.y);
+  // return smoothstep(pct - 0.02, pct, st.y) - smoothstep(pct, pct + 0.02, st.y);
+  return length(st) * pct;
 }
 
 void main(void) {
   vec2 st = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-  // float y = .3 * sin(4.5 * st.x + iTime);
   float y = pow((st.x + .5 * sin(9.5 * st.x + iTime * .9)) * .234 *
                     sin(4.5 * st.x + iTime * 1.1),
                 1.);
@@ -28,7 +28,7 @@ void main(void) {
   vec3 color = vec3(y);
 
   float pct = plot(st, y);
-  color = pct * vec3(0.0, 1.0, 1.0) * sin(1. * st.x + iTime * .8);
+  color = pct * vec3(0.0, 1.0, 1.0);
 
   fragColor = vec4(color, 1.);
 }
