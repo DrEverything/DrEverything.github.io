@@ -74,12 +74,12 @@ function initWebGL2(canvas, vsSource, fsSource) {
     GLDraw();
 }
 const canvases = [
-    document.querySelector('#wave'),
+    // document.querySelector('#wave') as HTMLCanvasElement,
     document.querySelector('#another')
 ];
 const shaderPromises = [
     fetch("main.vert").then((vert) => vert.text()),
-    fetch("wave.frag").then((frag) => frag.text()),
+    // fetch("wave.frag").then((frag) => frag.text()),
     fetch("another.frag").then((frag) => frag.text()),
 ];
 Promise.all(shaderPromises)
