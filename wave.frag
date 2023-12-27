@@ -59,8 +59,9 @@ void main(void) {
 
     // col = vec3(i) / 80.;
 
-    if (d < .001 || tdt > 100.)
+    if (d < .001 || tdt > 100.) {
       break;
+    }
   }
 
   // Coloring
