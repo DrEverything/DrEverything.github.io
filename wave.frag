@@ -31,9 +31,7 @@ float map(vec3 p) {
 
   vec3 q = p;
 
-  q = fract(p) - .5;
-
-  float box = sdBox(q, vec3(.2));
+  float box = sdBox(q, vec3(.5));
 
   float ground = p.y + .75;
 
