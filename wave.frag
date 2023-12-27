@@ -35,7 +35,7 @@ float map(vec3 p) {
 
   float ground = p.y + .75;
 
-  return smin(ground, smin(sphere, box, 2.), 1.);
+  return smin(ground, smin(sphere, box, 2.), .65);
 }
 
 void main(void) {
