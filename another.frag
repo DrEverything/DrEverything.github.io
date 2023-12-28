@@ -10,11 +10,6 @@ float smin(float a, float b, float k) {
   return mix(a, b, h) - k * h * (1.0 - h);
 }
 
-<<<<<<< HEAD
-float plot(vec2 st, float pct) {
-  // return smoothstep(pct - 0.02, pct, st.y) - smoothstep(pct, pct + 0.02, st.y);
-  return length(st) * pct;
-=======
 mat2 rot2D(float angle) {
   float s = sin(angle);
   float c = cos(angle);
@@ -68,29 +63,17 @@ float castRay(in vec3 ro, vec3 rd) {
     t = -1.;
   }
   return t;
->>>>>>> dev
 }
 
 void main(void) {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-<<<<<<< HEAD
-  float y = pow((st.x + .5 * sin(9.5 * st.x + iTime * .9)) * .234 *
-                    sin(4.5 * st.x + iTime * 1.1),
-                1.);
-=======
   vec3 ro = vec3(0, 0, 2.);
   vec3 rd = normalize(vec3(p, -1.));
->>>>>>> dev
 
   vec3 col = vec3(.6, .7, .8) - .5 * rd.y;
 
-<<<<<<< HEAD
-  float pct = plot(st, y);
-  color = pct * vec3(0.5, .6, .8);
-=======
   float t = castRay(ro, rd);
->>>>>>> dev
 
   if (t > 0.) {
     vec3 pos = ro + t * rd;

@@ -47,14 +47,9 @@ void main(void) {
 
   float tdt = 0.;
 
-<<<<<<< HEAD
-  float pct = plot(st, y);
-  color = pct * vec3(0.0, 1.0, 0.0) * sin(2.5 * st.x + iTime * 1.4);
-=======
   // Raymarching
   for (int i = 0; i < 80; i++) {
     vec3 p = ro + rd * tdt;
->>>>>>> dev
 
     float d = map(p);
 
