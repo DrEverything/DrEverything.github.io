@@ -26,12 +26,15 @@ float sdBox(vec3 p, vec3 b) {
 }
 
 float map(in vec3 pos) {
-  vec3 aa = vec3(pos.x + 2.6 * sin(iTime), pos.y, pos.z + .8 * sin(iTime));
-  float sphere = length(aa) - .45;
-  float box = sdBox(pos, vec3(.5));
+  vec3 aa = vec3(pos.x + 2.6 * sin(.1), pos.y, pos.z + .8 * sin(.0));
+  float rad =
+      .75 + .03 * sin(aa.x * 15.0 + iTime) * sin(aa.y * 15.0 + iTime) * sin(aa.z * 15.0 + iTime);
+  float sphere = length(aa) - rad;
+  sphere *= .5;
+  // float box = sdBox(pos, vec3(.5));
 
-  float ground = pos.y - (-0.5);
-  return smin(ground, smin(sphere, box, 2.), .1);
+  float ground = pos.y - (-0.78);
+  return smin(ground, sphere, .1);
 }
 
 vec3 calcNormal(in vec3 pos) {
@@ -65,10 +68,10 @@ float castRay(in vec3 ro, vec3 rd) {
 void main(void) {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-  vec3 ro = vec3(0, 0, 3.);
+  vec3 ro = vec3(0, 0, 2.);
   vec3 rd = normalize(vec3(p, -1.));
 
-  vec3 col = vec3(.6, .7, .8);
+  vec3 col = vec3(.6, .7, .8) - .5 * rd.y;
 
   float t = castRay(ro, rd);
 
