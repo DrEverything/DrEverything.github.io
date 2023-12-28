@@ -55,7 +55,7 @@ void main(void) {
 
     tdt += d;
 
-    if (d < .001 || tdt > 100.) {
+    if (d < .0001 || tdt > 100.) {
       break;
     }
   }
