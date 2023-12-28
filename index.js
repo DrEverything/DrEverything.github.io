@@ -35,8 +35,8 @@ function createShaderProgram(gl, vsSource, fsSource) {
     return program;
 }
 function initWebGL2(canvas, vsSource, fsSource) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL2. Your browser may not support it.');
