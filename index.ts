@@ -108,12 +108,9 @@ Promise.all(shaderPromises)
     .then((shaders) => {
         for (let i = 1; i < shaders.length; i++) {
             canvases[i - 1].addEventListener("click", function () {
-                console.log(animationIds.has(canvases[i - 1].id));
-
                 if (!animationIds.has(canvases[i - 1].id)) {
                     initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
                 }
-                console.log(`Hey from ${canvases[i - 1].id}`);
             })
             initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
         }
