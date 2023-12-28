@@ -27,8 +27,9 @@ float sdBox(vec3 p, vec3 b) {
 
 float map(in vec3 pos) {
   vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
-  float rad =
-      .75 + .05 * sin(aa.x * 15.0 + iTime) * sin(aa.y * 15.0 + iTime * .7) * sin(aa.z * 15.0 + iTime * .3);
+  float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
+                        sin(aa.y * 15.0 + iTime * .7) *
+                        sin(aa.z * 15.0 + iTime * .3);
   float sphere = length(aa) - rad;
   sphere *= .5;
   // float box = sdBox(pos, vec3(.5));
@@ -71,7 +72,8 @@ void main(void) {
   vec3 ro = vec3(0, 0, 2.);
   vec3 rd = normalize(vec3(p, -1.));
 
-  vec3 col = vec3(.6, .7, .8) - .5 * rd.y;
+  vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
+  col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
 
   float t = castRay(ro, rd);
 
