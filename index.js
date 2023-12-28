@@ -34,6 +34,7 @@ function createShaderProgram(gl, vsSource, fsSource) {
     }
     return program;
 }
+let animationIds = new Map();
 function initWebGL2(canvas, vsSource, fsSource) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
@@ -69,7 +70,7 @@ function initWebGL2(canvas, vsSource, fsSource) {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
         time += 0.03;
-        requestAnimationFrame(GLDraw);
+        animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
     GLDraw();
 }
@@ -84,7 +85,20 @@ const shaderPromises = [
 ];
 Promise.all(shaderPromises)
     .then((shaders) => {
-    for (var i = 1; i < shaders.length; i++) {
+    for (let i = 1; i < shaders.length; i++) {
+        canvases[i - 1].addEventListener("click", function () {
+            if (!animationIds.has(canvases[i - 1].id)) {
+                initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
+            }
+        });
         initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
     }
+    window.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            for (let id of animationIds.keys()) {
+                cancelAnimationFrame(animationIds.get(id));
+                animationIds.delete(id);
+            }
+        }
+    });
 });
