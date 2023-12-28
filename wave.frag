@@ -55,8 +55,6 @@ void main(void) {
 
     tdt += d;
 
-    // col = vec3(i) / 80.;
-
     if (d < .001 || tdt > 100.) {
       break;
     }
