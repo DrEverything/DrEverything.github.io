@@ -26,42 +26,24 @@ float sdBox(vec3 p, vec3 b) {
 }
 
 float map(vec3 p) {
-  vec3 spherePos = vec3(sin(iTime) * 3., 0, 1);
-  float sphere = sdSphere(p - spherePos, 1.);
-
-  vec3 q = p;
-
-  float box = sdBox(q, vec3(.5));
-
-  float ground = p.y + .75;
-
-  return smin(ground, smin(sphere, box, 2.), .65);
+  float sphere = sdSphere(p, .75 + .05 * sin(p.x * 15.0 + iTime) *
+                                       sin(p.y * 15.0 + iTime * .7) *
+                                       sin(p.z * 15.0 + iTime * .3));
+  return sphere;
 }
 
 void main(void) {
-  vec2 uv = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
+  vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-  vec3 ro = vec3(0, 0, -3);         // ray origin
-  vec3 rd = normalize(vec3(uv, 1)); // ray direction
-  vec3 col = vec3(0);
+  vec3 ro = vec3(0, 0, -2);         // ray origin
+  vec3 rd = normalize(vec3(p, 1.)); // ray direction
 
-  float tdt = 0.;
-
-  // Raymarching
   for (int i = 0; i < 80; i++) {
-    vec3 p = ro + rd * tdt;
-
-    float d = map(p);
-
-    tdt += d;
-
-    if (d < .0001 || tdt > 100.) {
-      break;
-    }
+    
   }
 
   // Coloring
-  col = vec3(tdt * .09);
+  vec3 col = vec3(.2);
 
   fragColor = vec4(col, 1);
 }
