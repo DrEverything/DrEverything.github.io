@@ -62,7 +62,7 @@ void main() {
   float triangle = sdEquilateralTriangle(p, .5 + .05 * sin(12. * p.x + iTime) *
                                                      sin(12. * p.y + iTime));
 
-  float y = sphere;
+  float y = smoothstep(0., 0.01, sphere);
 
   vec3 color = vec3(y);
 

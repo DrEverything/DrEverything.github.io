@@ -49,6 +49,11 @@ function initWebGL2(canvas, vsSource, fsSource) {
     }
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    window.addEventListener("resize", function () {
+        gl.canvas.width = canvas.clientWidth;
+        gl.canvas.height = canvas.clientHeight;
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    });
     const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);

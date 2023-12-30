@@ -20,9 +20,18 @@ section {
     margin-bottom: 20px;
 }
 
+#slowly {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
 .my-project-img {
-    height: 555px;
-    width: 555px;
+    height: 333px;
+    width: 333px;
     border-radius: 8px;
     box-shadow: 7px 7px 33px;
     margin: 5px;

@@ -48,6 +48,7 @@ let animationIds: Map<string, number> = new Map();
 function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: string) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+    
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL2. Your browser may not support it.');
@@ -61,6 +62,11 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
 
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    window.addEventListener("resize", function () {
+        gl.canvas.width = canvas.clientWidth;
+        gl.canvas.height = canvas.clientHeight;
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    })
 
     const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     const vertexBuffer = gl.createBuffer();
