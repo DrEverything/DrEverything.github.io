@@ -113,9 +113,7 @@ if (navigator.gpu) {
     if (!adapter) {
         console.error("No appropriate GPUAdapter found.");
     }
-    console.log(adapter)
     const device = await adapter.requestDevice();
-    console.log(device);
     canvases[0].width = canvases[0].clientWidth;
     canvases[0].height = canvases[0].clientHeight;
     const context = canvases[0].getContext("webgpu");
