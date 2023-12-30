@@ -3,6 +3,7 @@ precision mediump float;
 
 uniform float iTime;
 uniform vec2 iResolution;
+uniform vec2 iMouse;
 out vec4 fragColor;
 
 float smin(float a, float b, float k) {
@@ -56,7 +57,7 @@ float plot(vec2 st, float pct) {
 
 void main() {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
-  float sphere = length(p - .55) - .5 +
+  float sphere = length(p - iMouse) - .5 +
                  .05 * sin(15. * p.x + iTime) * sin(15. * p.y + iTime * 1.4);
   float box =
       sdBox2D(vec2(p.x - .45, p.y + .65),

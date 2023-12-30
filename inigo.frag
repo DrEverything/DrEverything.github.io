@@ -3,6 +3,7 @@ precision mediump float;
 
 uniform float iTime;
 uniform vec2 iResolution;
+uniform vec2 iMouse;
 out vec4 fragColor;
 
 float smin(float a, float b, float k) {
@@ -71,6 +72,12 @@ void main(void) {
 
   vec3 ro = vec3(0, 0, 2.);
   vec3 rd = normalize(vec3(p, -1.));
+  
+  vec2 m = iMouse * 1.5;
+  ro.yz *= rot2D(-m.y);
+  rd.yz *= rot2D(-m.y);
+  ro.xz *= rot2D(-m.x);
+  rd.xz *= rot2D(-m.x);
 
   vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
   col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));

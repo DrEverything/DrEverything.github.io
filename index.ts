@@ -62,11 +62,54 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
 
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    window.addEventListener("resize", function () {
+    canvas.addEventListener("resize", function () {
         gl.canvas.width = canvas.clientWidth;
         gl.canvas.height = canvas.clientHeight;
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     })
+    let isDragging = false;
+    let lastMousePosition = { x: 0, y: 0 };
+    let mouseDelta = { x: 0, y: 0 };
+    let accumulatedDelta = { x: 0, y: 0 };
+    function updateBuffer(e: MouseEvent) {
+        if (!isDragging) return;
+
+        let currentMousePosition = {
+            x: ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1,
+            y: 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2
+        };
+
+        // Calculate the delta
+        mouseDelta.x = currentMousePosition.x - lastMousePosition.x;
+        mouseDelta.y = currentMousePosition.y - lastMousePosition.y;
+
+        accumulatedDelta.x += mouseDelta.x;
+        accumulatedDelta.y += mouseDelta.y;
+
+        // Update lastMousePosition for the next move event
+        lastMousePosition = currentMousePosition;
+
+        gl.uniform2f(iMouseLocation, accumulatedDelta.x, accumulatedDelta.y);
+    }
+
+    canvas.addEventListener('mousedown', function (e) {
+        isDragging = true;
+        lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
+        lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
+        updateBuffer(e);
+    });
+
+    canvas.addEventListener('mousemove', updateBuffer);
+
+    canvas.addEventListener('mouseup', function () {
+        isDragging = false;
+    });
+
+    canvas.addEventListener('mouseleave', function () {
+        isDragging = false;
+    });
+
+
 
     const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     const vertexBuffer = gl.createBuffer();
@@ -81,14 +124,16 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
 
     let iTimeLocation = gl.getUniformLocation(shaderProgram, "iTime");
     let iResolutionLocation = gl.getUniformLocation(shaderProgram, "iResolution");
-    let time = 0.;
-
+    let iMouseLocation = gl.getUniformLocation(shaderProgram, "iMouse");
+    gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);
+    
+    
     gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
-
+    
+    let time = 0.;
     function GLDraw() {
         gl.uniform1f(iTimeLocation, time);
-        gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);
 
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
@@ -108,54 +153,41 @@ for (let canvas of canvases) {
     shaderPromises.push(fetch(`${canvas.id}.frag`).then((frag) => frag.text()))
 }
 
-if (navigator.gpu) {
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) {
-        console.error("No appropriate GPUAdapter found.");
-    }
-    const device = await adapter.requestDevice();
-    canvases[0].width = canvases[0].clientWidth;
-    canvases[0].height = canvases[0].clientHeight;
-    const context = canvases[0].getContext("webgpu");
-    const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-    context.configure({
-        device: device,
-        format: canvasFormat,
+Promise.all(shaderPromises)
+.then((shaders) => {
+        for (let i = 0; i < canvases.length; i++) {
+            initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
+        }
     });
-    const encoder = device.createCommandEncoder();
-    const pass = encoder.beginRenderPass({
-        colorAttachments: [{
-            view: context.getCurrentTexture().createView(),
-            loadOp: "clear",
-            storeOp: "store",
-        }]
-    });
-    pass.end();
-    const commandBuffer = encoder.finish();
-    device.queue.submit([commandBuffer]);
-    device.queue.submit([encoder.finish()]);
-} else {
-    console.error("WebGPU not supported on this browser.");
-    Promise.all(shaderPromises)
-        .then((shaders) => {
-            for (let i = 0; i < canvases.length; i++) {
-                canvases[i].addEventListener("click", function () {
-                    if (!animationIds.has(canvases[i].id)) {
-                        initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
-                    }
-                })
-                initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
-            }
-            
-            window.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') {
-                    for (let id of animationIds.keys()) {
-                        cancelAnimationFrame(animationIds.get(id));
-                        animationIds.delete(id);
-                    }
-                }
-            });
-        });
-}
-
+    
+// if (navigator.gpu) {
+//     const adapter = await navigator.gpu.requestAdapter();
+//     if (!adapter) {
+//         console.error("No appropriate GPUAdapter found.");
+//     } else {
+//         const device = await adapter.requestDevice();
+//         canvases[0].width = canvases[0].clientWidth;
+//         canvases[0].height = canvases[0].clientHeight;
+//         const context = canvases[0].getContext("webgpu");
+//         const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+//         context.configure({
+//             device: device,
+//             format: canvasFormat,
+//         });
+//         const encoder = device.createCommandEncoder();
+//         const pass = encoder.beginRenderPass({
+//             colorAttachments: [{
+//                 view: context.getCurrentTexture().createView(),
+//                 loadOp: "clear",
+//                 storeOp: "store",
+//             }]
+//         });
+//         pass.end();
+//         const commandBuffer = encoder.finish();
+//         device.queue.submit([commandBuffer]);
+//         device.queue.submit([encoder.finish()]);
+//     }
+// } else {
+//     console.error("WebGPU not supported on this browser.");
+// }
 export { }
