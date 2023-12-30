@@ -93,26 +93,24 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     GLDraw();
 }
 
-const canvases = [
-    document.querySelector('#wave') as HTMLCanvasElement,
-    document.querySelector('#another') as HTMLCanvasElement
+let canvases = document.querySelectorAll('canvas');
+let shaderPromises = [
+    fetch("main.vert").then((vert) => vert.text()),
 ];
 
-const shaderPromises = [
-    fetch("main.vert").then((vert) => vert.text()),
-    fetch("wave.frag").then((frag) => frag.text()),
-    fetch("another.frag").then((frag) => frag.text()),
-];
+for (let canvas of canvases) {
+    shaderPromises.push(fetch(`${canvas.id}.frag`).then((frag) => frag.text()))
+}
 
 Promise.all(shaderPromises)
     .then((shaders) => {
-        for (let i = 1; i < shaders.length; i++) {
-            canvases[i - 1].addEventListener("click", function () {
-                if (!animationIds.has(canvases[i - 1].id)) {
-                    initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
+        for (let i = 0; i < canvases.length; i++) {
+            canvases[i].addEventListener("click", function () {
+                if (!animationIds.has(canvases[i].id)) {
+                    initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
                 }
             })
-            initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
+            initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
         }
         
         window.addEventListener('keydown', function (event) {
