@@ -109,8 +109,6 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         isDragging = false;
     });
 
-
-
     const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -126,7 +124,6 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     let iResolutionLocation = gl.getUniformLocation(shaderProgram, "iResolution");
     let iMouseLocation = gl.getUniformLocation(shaderProgram, "iMouse");
     gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);
-    
     
     gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
@@ -190,4 +187,5 @@ Promise.all(shaderPromises)
 // } else {
 //     console.error("WebGPU not supported on this browser.");
 // }
+
 export { }
