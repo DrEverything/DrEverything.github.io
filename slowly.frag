@@ -56,19 +56,19 @@ float plot(vec2 st, float pct) {
 
 void main() {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
-  float sphere = length(p) - .5 +
+  float sphere = length(p - .55) - .5 +
                  .05 * sin(15. * p.x + iTime) * sin(15. * p.y + iTime * 1.4);
-  float box = sdBox2D(p, vec2(.5));
-  float triangle = sdEquilateralTriangle(p, .5 + .05 * sin(12. * p.x + iTime) *
-                                                     sin(12. * p.y + iTime));
+  float box =
+      sdBox2D(vec2(p.x - .45, p.y + .65),
+              vec2(.5 + .05 * sin(12. * p.x + iTime) * sin(12. * p.y + iTime)));
+  float triangle = sdEquilateralTriangle(vec2(p.x - .45, p.y + .65),
+                                         .5 + .05 * sin(12. * p.x + iTime) *
+                                                  sin(12. * p.y + iTime));
 
-  float y = smoothstep(0., 0.01, sphere);
+  float y =
+      smin(smoothstep(.0, 0.01, sphere), smoothstep(.0, .01, box), .76);
 
   vec3 color = vec3(y);
-
-  // Plot a line
-  float pct = plot(p, y);
-  color = (1.0 - pct) * color + pct * vec3(0.0, 1.0, 0.0);
 
   fragColor = vec4(color, 1.0);
 }
