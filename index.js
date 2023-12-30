@@ -86,6 +86,32 @@ let shaderPromises = [
 for (let canvas of canvases) {
     shaderPromises.push(fetch(`${canvas.id}.frag`).then((frag) => frag.text()));
 }
+// if (!navigator.gpu) {
+//     throw new Error("WebGPU not supported on this browser.");
+// }
+// const adapter = await navigator.gpu.requestAdapter();
+// if (!adapter) {
+//     throw new Error("No appropriate GPUAdapter found.");
+// }
+// const device = await adapter.requestDevice();
+// const context = canvases[0].getContext("webgpu");
+// const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+// context.configure({
+//     device: device,
+//     format: canvasFormat,
+// });
+// const encoder = device.createCommandEncoder();
+// const pass = encoder.beginRenderPass({
+//     colorAttachments: [{
+//         view: context.getCurrentTexture().createView(),
+//         loadOp: "clear",
+//         storeOp: "store",
+//     }]
+// });
+// pass.end();
+// const commandBuffer = encoder.finish();
+// device.queue.submit([commandBuffer]);
+// device.queue.submit([encoder.finish()]);
 Promise.all(shaderPromises)
     .then((shaders) => {
     for (let i = 0; i < canvases.length; i++) {
@@ -105,3 +131,4 @@ Promise.all(shaderPromises)
         }
     });
 });
+export {};
