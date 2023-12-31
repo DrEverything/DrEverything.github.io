@@ -25,7 +25,18 @@ float sdBox(vec3 p, vec3 b) {
   vec3 q = abs(p) - b;
   return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
+float terrainFunction(vec3 p) {
+  // Adjust these parameters to change the scale and height of the peaks and
+  // valleys
+  float scale = 1.3;  // Controls the frequency of the waves
+  float height = .99; // Controls the amplitude of the waves
 
+  // Simple terrain function using sine and cosine
+  float terrain = sin(p.x / scale) * cos(p.z / scale) * height;
+
+  // Adjust the y-coordinate of the position by the terrain height
+  return p.y - (-.8) - .2 * terrain;
+}
 float map(in vec3 pos) {
   vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
   float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
@@ -35,7 +46,9 @@ float map(in vec3 pos) {
   sphere *= .5;
   // float box = sdBox(pos, vec3(.5));
 
-  float ground = pos.y - (-0.78);
+  float ground = terrainFunction(pos);
+  ground *= .5;
+
   return smin(ground, sphere, .1);
 }
 
@@ -72,7 +85,7 @@ void main(void) {
 
   vec3 ro = vec3(0, 0, 2.);
   vec3 rd = normalize(vec3(p, -1.));
-  
+
   vec2 m = iMouse * 1.5;
   ro.yz *= rot2D(-m.y);
   rd.yz *= rot2D(-m.y);
