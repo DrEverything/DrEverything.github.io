@@ -36,8 +36,14 @@ function createShaderProgram(gl, vsSource, fsSource) {
 }
 let animationIds = new Map();
 function initWebGL2(canvas, vsSource, fsSource) {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    if (canvas.clientWidth < 500) {
+        canvas.width = canvas.clientWidth * 1.4;
+        canvas.height = canvas.clientHeight * 1.4;
+    }
+    else {
+        canvas.height = canvas.clientHeight;
+        canvas.width = canvas.clientWidth;
+    }
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL2. Your browser may not support it.');
