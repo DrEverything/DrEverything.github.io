@@ -28,7 +28,7 @@ float sdBox(vec3 p, vec3 b) {
 float terrainFunction(vec3 p) {
   // Adjust these parameters to change the scale and height of the peaks and
   // valleys
-  float scale = 1.3;  // Controls the frequency of the waves
+  float scale = .8;  // Controls the frequency of the waves
   float height = .99; // Controls the amplitude of the waves
 
   // Simple terrain function using sine and cosine
