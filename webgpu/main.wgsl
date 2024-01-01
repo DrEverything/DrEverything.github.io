@@ -5,7 +5,7 @@ struct VertexInput {
 
 struct VertexOutput {
   @builtin(position) pos: vec4f,
-  @location(0) cell: vec2f, // New line!
+  @location(0) cell: vec2f,
 };
 
 @group(0) @binding(0) var<uniform> grid: vec2f;
@@ -19,7 +19,7 @@ fn vertexMain(input: VertexInput) -> VertexOutput {
 
     var output: VertexOutput;
     output.pos = vec4f(gridPos, 0, 1);
-    output.cell = cell; // New line!
+    output.cell = cell;
     return output;
 }
 

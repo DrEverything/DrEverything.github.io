@@ -19,12 +19,11 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
     });
 
     const vertices = new Float32Array([
-        //   X,    Y,
-        -0.8, -0.8, // Triangle 1 (Blue)
+        -0.8, -0.8,
         0.8, -0.8,
         0.8, 0.8,
 
-        -0.8, -0.8, // Triangle 2 (Red)
+        -0.8, -0.8,
         0.8, 0.8,
         -0.8, 0.8,
     ]);
@@ -40,10 +39,10 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         attributes: [{
             format: "float32x2",
             offset: 0,
-            shaderLocation: 0, // Position, see vertex shader
+            shaderLocation: 0,
         }],
     };
-    // Create a uniform buffer that describes the grid.
+    
     const uniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
     const uniformBuffer = device.createBuffer({
         label: "Grid Uniforms",
