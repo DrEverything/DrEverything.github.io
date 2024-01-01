@@ -92,7 +92,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
                 view: context.getCurrentTexture().createView(),
                 loadOp: "clear",
                 storeOp: "store",
-                clearValue: { r: 0, g: 0, b: 0.4, a: 1 },
+                clearValue: { r: 0, g: 0, b: 0.1, a: 1 },
             }]
         });
 
