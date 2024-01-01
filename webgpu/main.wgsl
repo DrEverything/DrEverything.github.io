@@ -9,13 +9,17 @@ struct VertexOutput {
 };
 
 @group(0) @binding(0) var<uniform> grid: vec2f;
+@group(0) @binding(1) var<storage> cellState: array<u32>; // New!
 
 @vertex
-fn vertexMain(input: VertexInput) -> VertexOutput {
-    let i = f32(input.instance);
+fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -> VertexOutput {
+    let i = f32(instance);
     let cell = vec2f(i % grid.x, floor(i / grid.x));
+    let state = f32(cellState[instance]); // New line!
+
     let cellOffset = cell / grid * 2;
-    let gridPos = (input.pos + 1) / grid - 1 + cellOffset;
+  // New: Scale the position by the cell's active state.
+    let gridPos = (pos * state + 1) / grid - 1 + cellOffset;
 
     var output: VertexOutput;
     output.pos = vec4f(gridPos, 0, 1);
@@ -25,6 +29,6 @@ fn vertexMain(input: VertexInput) -> VertexOutput {
 
 @fragment
 fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-  let c = input.cell / grid;
-  return vec4f(c, 1-c.x, 1);
+    let c = input.cell / grid;
+    return vec4f(c, 1 - c.x, 1);
 }

@@ -10,7 +10,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
     let device = _device as GPUDevice;
     canvases[0].width = canvases[0].clientWidth;
     canvases[0].height = canvases[0].clientHeight;
-    
+
     const context = canvases[0].getContext("webgpu");
     const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
     context.configure({
@@ -42,22 +42,50 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
             shaderLocation: 0,
         }],
     };
-    
+
     const uniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
     const uniformBuffer = device.createBuffer({
         label: "Grid Uniforms",
         size: uniformArray.byteLength,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
-    device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
 
+    // Create an array representing the active state of each cell.
+    const cellStateArray = new Uint32Array(GRID_SIZE * GRID_SIZE);
+
+    // Create two storage buffers to hold the cell state.
+    const cellStateStorage = [
+        device.createBuffer({
+            label: "Cell State A",
+            size: cellStateArray.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        }),
+        device.createBuffer({
+            label: "Cell State B",
+            size: cellStateArray.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        })
+    ];
+
+    // Mark every third cell of the first grid as active.
+    for (let i = 0; i < cellStateArray.length; i += 3) {
+        cellStateArray[i] = 1;
+    }
+    device.queue.writeBuffer(cellStateStorage[0], 0, cellStateArray);
+
+    // Mark every other cell of the second grid as active.
+    for (let i = 0; i < cellStateArray.length; i++) {
+        cellStateArray[i] = i % 2;
+    }
+    device.queue.writeBuffer(cellStateStorage[1], 0, cellStateArray);
+    device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
     device.queue.writeBuffer(vertexBuffer, 0, vertices);
-    
+
     const cellShaderModule = device.createShaderModule({
         label: "Cell shader",
         code: shader as string
     });
-    
+
     const cellPipeline = device.createRenderPipeline({
         label: "Cell pipeline",
         layout: "auto",
@@ -74,40 +102,62 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
             }]
         }
     });
-    
-    const bindGroup = device.createBindGroup({
-        label: "Cell renderer bind group",
-        layout: cellPipeline.getBindGroupLayout(0),
-        entries: [{
-            binding: 0,
-            resource: { buffer: uniformBuffer }
-        }],
-    });
 
-    function webgpuDraw() {
+    const bindGroups = [
+        device.createBindGroup({
+            label: "Cell renderer bind group A",
+            layout: cellPipeline.getBindGroupLayout(0),
+            entries: [{
+                binding: 0,
+                resource: { buffer: uniformBuffer }
+            }, {
+                binding: 1,
+                resource: { buffer: cellStateStorage[0] }
+            }],
+        }),
+        device.createBindGroup({
+            label: "Cell renderer bind group B",
+            layout: cellPipeline.getBindGroupLayout(0),
+            entries: [{
+                binding: 0,
+                resource: { buffer: uniformBuffer }
+            }, {
+                binding: 1,
+                resource: { buffer: cellStateStorage[1] }
+            }],
+        })
+    ];
+
+    const UPDATE_INTERVAL = 200; // Update every 200ms (5 times/sec)
+    let step = 0; // Track how many simulation steps have been run
+
+    function updateGrid() {
+        step++; // Increment the step count
+
+        // Start a render pass 
         const encoder = device.createCommandEncoder();
         const pass = encoder.beginRenderPass({
             colorAttachments: [{
                 view: context.getCurrentTexture().createView(),
                 loadOp: "clear",
+                clearValue: { r: 0, g: 0, b: 0.4, a: 1.0 },
                 storeOp: "store",
-                clearValue: { r: 0, g: 0, b: 0.1, a: 1 },
             }]
         });
 
+        // Draw the grid.
         pass.setPipeline(cellPipeline);
+        pass.setBindGroup(0, bindGroups[step % 2]); // Updated!
         pass.setVertexBuffer(0, vertexBuffer);
-        pass.setBindGroup(0, bindGroup);
-
         pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
 
+        // End the render pass and submit the command buffer
         pass.end();
-        const commandBuffer = encoder.finish();
-        device.queue.submit([commandBuffer]);
         device.queue.submit([encoder.finish()]);
     }
-    
-    webgpuDraw();    
+
+    // Schedule updateGrid() to run repeatedly
+    setInterval(updateGrid, UPDATE_INTERVAL);
 });
 
 export { }
