@@ -3,6 +3,7 @@ let webgpuPromises = [
     fetch("main.wgsl").then((shader) => shader.text()),
     navigator.gpu.requestAdapter().then(async (adapter) => await adapter.requestDevice()).catch((e) => console.error("No appropriate GPUAdapter found.", e)),
 ];
+const GRID_SIZE = 16;
 Promise.all(webgpuPromises).then(([shader, _device]) => {
     let device = _device;
     canvases[0].width = canvases[0].clientWidth;
@@ -35,11 +36,19 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
                 shaderLocation: 0, // Position, see vertex shader
             }],
     };
+    // Create a uniform buffer that describes the grid.
+    const uniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
+    const uniformBuffer = device.createBuffer({
+        label: "Grid Uniforms",
+        size: uniformArray.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
+    device.queue.writeBuffer(vertexBuffer, 0, vertices);
     const cellShaderModule = device.createShaderModule({
         label: "Cell shader",
         code: shader
     });
-    device.queue.writeBuffer(vertexBuffer, /*bufferOffset=*/ 0, vertices);
     const cellPipeline = device.createRenderPipeline({
         label: "Cell pipeline",
         layout: "auto",
@@ -56,6 +65,14 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
                 }]
         }
     });
+    const bindGroup = device.createBindGroup({
+        label: "Cell renderer bind group",
+        layout: cellPipeline.getBindGroupLayout(0),
+        entries: [{
+                binding: 0,
+                resource: { buffer: uniformBuffer }
+            }],
+    });
     function webgpuDraw() {
         const encoder = device.createCommandEncoder();
         const pass = encoder.beginRenderPass({
@@ -68,7 +85,8 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         });
         pass.setPipeline(cellPipeline);
         pass.setVertexBuffer(0, vertexBuffer);
-        pass.draw(vertices.length / 2); // 6 vertices
+        pass.setBindGroup(0, bindGroup);
+        pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
         pass.end();
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
