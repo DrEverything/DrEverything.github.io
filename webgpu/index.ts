@@ -4,8 +4,8 @@ let webgpuPromises = [
     navigator.gpu.requestAdapter().then(async (adapter) => await adapter.requestDevice()).catch((e) => console.error("No appropriate GPUAdapter found.", e)),
 ];
 
-Promise.all(webgpuPromises).then(([shader, device]) => {
-    device = device as GPUDevice;
+Promise.all(webgpuPromises).then(([shader, _device]) => {
+    let device = _device as GPUDevice;
     canvases[0].width = canvases[0].clientWidth;
     canvases[0].height = canvases[0].clientHeight;
     const context = canvases[0].getContext("webgpu");
@@ -65,24 +65,28 @@ Promise.all(webgpuPromises).then(([shader, device]) => {
         }
     });
 
-    const encoder = device.createCommandEncoder();
-    const pass = encoder.beginRenderPass({
-        colorAttachments: [{
-            view: context.getCurrentTexture().createView(),
-            loadOp: "clear",
-            storeOp: "store",
-            clearValue: { r: 0, g: 0, b: 0.4, a: 1 },
-        }]
-    });
-    
-    pass.setPipeline(cellPipeline);
-    pass.setVertexBuffer(0, vertexBuffer);
-    pass.draw(vertices.length / 2); // 6 vertices
+    function webgpuDraw() {
+        const encoder = device.createCommandEncoder();
+        const pass = encoder.beginRenderPass({
+            colorAttachments: [{
+                view: context.getCurrentTexture().createView(),
+                loadOp: "clear",
+                storeOp: "store",
+                clearValue: { r: 0, g: 0, b: 0.4, a: 1 },
+            }]
+        });
 
-    pass.end();
-    const commandBuffer = encoder.finish();
-    device.queue.submit([commandBuffer]);
-    device.queue.submit([encoder.finish()]);
+        pass.setPipeline(cellPipeline);
+        pass.setVertexBuffer(0, vertexBuffer);
+        pass.draw(vertices.length / 2); // 6 vertices
+
+        pass.end();
+        const commandBuffer = encoder.finish();
+        device.queue.submit([commandBuffer]);
+        device.queue.submit([encoder.finish()]);
+    }
+    
+    webgpuDraw();    
 });
 
 export { }
