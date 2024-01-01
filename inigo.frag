@@ -25,24 +25,28 @@ float sdBox(vec3 p, vec3 b) {
   vec3 q = abs(p) - b;
   return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
-float terrainFunction(vec3 p) {
-  // Adjust these parameters to change the scale and height of the peaks and
-  // valleys
-  float scale = .8;  // Controls the frequency of the waves
-  float height = .99; // Controls the amplitude of the waves
-
-  // Simple terrain function using sine and cosine
-  float terrain = sin(p.x / scale) * cos(p.z / scale) * height;
-
-  // Adjust the y-coordinate of the position by the terrain height
-  return p.y - (-.8) - .2 * terrain;
+float sdEllipsoid(vec3 p, vec3 r) {
+  float k0 = length(p / r);
+  float k1 = length(p / (r * r));
+  return k0 * (k0 - 1.0) / k1;
+}
+float terrainFunction(vec3 pos) {
+  float fh = -.6 + .05 * (sin(2.0 * pos.x) + sin(2.0 * pos.z));
+  float d = pos.y - fh;
+  vec3 qos = pos;
+  float d2 = sdEllipsoid(qos, vec3(.7, 1., .7));
+  d = smin(d, d2, .3);
+  // if (d<res.x) res = vec2(d,1.);
+  // return res;
+  return d; 
+  // return p.y - (-.8) - .2 * terrain;
 }
 float map(in vec3 pos) {
   vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
   float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
                         sin(aa.y * 15.0 + iTime * .7) *
                         sin(aa.z * 15.0 + iTime * .3);
-  float sphere = length(aa) - rad;
+  float sphere = length(aa + vec3(2.3, -.9, .9)) - rad;
   sphere *= .5;
   // float box = sdBox(pos, vec3(.5));
 
