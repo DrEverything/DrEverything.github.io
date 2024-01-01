@@ -32,7 +32,7 @@ Promise.all(webgpuPromises).then(([shader, device]) => {
         usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
 
-    const vertexBufferLayout = {
+    const vertexBufferLayout: GPUVertexBufferLayout = {
         arrayStride: 8,
         attributes: [{
             format: "float32x2",
@@ -47,6 +47,23 @@ Promise.all(webgpuPromises).then(([shader, device]) => {
     });
 
     device.queue.writeBuffer(vertexBuffer, /*bufferOffset=*/0, vertices);
+    
+    const cellPipeline = device.createRenderPipeline({
+        label: "Cell pipeline",
+        layout: "auto",
+        vertex: {
+            module: cellShaderModule,
+            entryPoint: "vertexMain",
+            buffers: [vertexBufferLayout]
+        },
+        fragment: {
+            module: cellShaderModule,
+            entryPoint: "fragmentMain",
+            targets: [{
+                format: canvasFormat
+            }]
+        }
+    });
 
     const encoder = device.createCommandEncoder();
     const pass = encoder.beginRenderPass({
@@ -57,11 +74,15 @@ Promise.all(webgpuPromises).then(([shader, device]) => {
             clearValue: { r: 0, g: 0, b: 0.4, a: 1 },
         }]
     });
+    
+    pass.setPipeline(cellPipeline);
+    pass.setVertexBuffer(0, vertexBuffer);
+    pass.draw(vertices.length / 2); // 6 vertices
+
     pass.end();
     const commandBuffer = encoder.finish();
     device.queue.submit([commandBuffer]);
     device.queue.submit([encoder.finish()]);
-
 });
 
 export { }
