@@ -164,7 +164,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         }
     });
 
-    const UPDATE_INTERVAL = 200;
+    const UPDATE_INTERVAL = 100;
     let step = 0;
 
     function updateGrid() {
