@@ -165,7 +165,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
                 }]
         });
         pass.setPipeline(cellPipeline);
-        pass.setBindGroup(0, bindGroups[step % 2]); // Updated!
+        pass.setBindGroup(0, bindGroups[step % 2]);
         pass.setVertexBuffer(0, vertexBuffer);
         pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
         pass.end();
