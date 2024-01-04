@@ -30,8 +30,9 @@ section {
 }
 
 .my-project-img {
-    height: 444px;
-    width: 444px;
+    height: 530px;
+    width: 530px;
+    padding: 2px;
     border-radius: 8px;
     box-shadow: 7px 7px 33px;
     margin: 5px;

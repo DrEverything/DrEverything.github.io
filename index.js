@@ -36,8 +36,14 @@ function createShaderProgram(gl, vsSource, fsSource) {
 }
 let animationIds = new Map();
 function initWebGL2(canvas, vsSource, fsSource) {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    if (canvas.clientWidth < 500) {
+        canvas.width = canvas.clientWidth * 1.4;
+        canvas.height = canvas.clientHeight * 1.4;
+    }
+    else {
+        canvas.height = canvas.clientHeight;
+        canvas.width = canvas.clientWidth;
+    }
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL2. Your browser may not support it.');
@@ -49,6 +55,44 @@ function initWebGL2(canvas, vsSource, fsSource) {
     }
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    canvas.addEventListener("resize", function () {
+        gl.canvas.width = canvas.clientWidth;
+        gl.canvas.height = canvas.clientHeight;
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    });
+    let isDragging = false;
+    let lastMousePosition = { x: 0, y: 0 };
+    let mouseDelta = { x: 0, y: 0 };
+    let accumulatedDelta = { x: 0, y: 0 };
+    function updateBuffer(e) {
+        if (!isDragging)
+            return;
+        let currentMousePosition = {
+            x: ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1,
+            y: 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2
+        };
+        // Calculate the delta
+        mouseDelta.x = currentMousePosition.x - lastMousePosition.x;
+        mouseDelta.y = currentMousePosition.y - lastMousePosition.y;
+        accumulatedDelta.x += mouseDelta.x;
+        accumulatedDelta.y += mouseDelta.y;
+        // Update lastMousePosition for the next move event
+        lastMousePosition = currentMousePosition;
+        gl.uniform2f(iMouseLocation, accumulatedDelta.x, accumulatedDelta.y);
+    }
+    canvas.addEventListener('mousedown', function (e) {
+        isDragging = true;
+        lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
+        lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
+        updateBuffer(e);
+    });
+    canvas.addEventListener('mousemove', updateBuffer);
+    canvas.addEventListener('mouseup', function () {
+        isDragging = false;
+    });
+    canvas.addEventListener('mouseleave', function () {
+        isDragging = false;
+    });
     const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -61,12 +105,13 @@ function initWebGL2(canvas, vsSource, fsSource) {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     let iTimeLocation = gl.getUniformLocation(shaderProgram, "iTime");
     let iResolutionLocation = gl.getUniformLocation(shaderProgram, "iResolution");
-    let time = 0.;
+    let iMouseLocation = gl.getUniformLocation(shaderProgram, "iMouse");
+    gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);
     gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
+    let time = 0.;
     function GLDraw() {
         gl.uniform1f(iTimeLocation, time);
-        gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
         time += 0.03;
@@ -74,31 +119,17 @@ function initWebGL2(canvas, vsSource, fsSource) {
     }
     GLDraw();
 }
-const canvases = [
-    document.querySelector('#wave'),
-    document.querySelector('#another')
-];
-const shaderPromises = [
+let canvases = document.querySelectorAll('canvas');
+let shaderPromises = [
     fetch("main.vert").then((vert) => vert.text()),
-    fetch("wave.frag").then((frag) => frag.text()),
-    fetch("another.frag").then((frag) => frag.text()),
 ];
+for (let canvas of canvases) {
+    shaderPromises.push(fetch(`${canvas.id}.frag`).then((frag) => frag.text()));
+}
 Promise.all(shaderPromises)
     .then((shaders) => {
-    for (let i = 1; i < shaders.length; i++) {
-        canvases[i - 1].addEventListener("click", function () {
-            if (!animationIds.has(canvases[i - 1].id)) {
-                initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
-            }
-        });
-        initWebGL2(canvases[i - 1], shaders[0], shaders[i]);
+    for (let i = 0; i < canvases.length; i++) {
+        initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
     }
-    window.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            for (let id of animationIds.keys()) {
-                cancelAnimationFrame(animationIds.get(id));
-                animationIds.delete(id);
-            }
-        }
-    });
 });
+export {};
