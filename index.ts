@@ -161,5 +161,5 @@ Promise.all(shaderPromises)
             initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
         }
 });
-    
+
 export { }
