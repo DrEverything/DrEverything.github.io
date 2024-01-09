@@ -115,6 +115,9 @@ function initWebGL2(canvas, vsSource, fsSource) {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
         time += 0.03;
+        if (time > 2.) {
+            return;
+        }
         animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
     GLDraw();
