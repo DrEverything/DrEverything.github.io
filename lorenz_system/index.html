@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allsim</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        canvas {
+            padding: 2px;
+            border-radius: 8px;
+            box-shadow: 7px 7px 33px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+        let canvas;
+        import("./pkg/allsim.js").then((init) => {
+            init.default().then(() => {
+                console.log("WASM Loaded");
+                canvas = document.querySelector("canvas");
+                canvas.height = canvas.clientHeight;
+                canvas.width = canvas.clientWidth;
+                window.onresize = () => {
+                    canvas.height = canvas.clientHeight;
+                    canvas.width = canvas.clientWidth;
+                }
+            })
+        });
+        // init().then(() => {
+        //
+        // });
+    </script>
+</body>
+
+</html>
