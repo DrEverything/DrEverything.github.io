@@ -46,7 +46,7 @@ float map(in vec3 pos) {
   float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
                         sin(aa.y * 15.0 + iTime * .7) *
                         sin(aa.z * 15.0 + iTime * .3);
-  float sphere = length(aa + vec3(2.3, -.9, .9)) - rad;
+  float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
   sphere *= .5;
   // float box = sdBox(pos, vec3(.5));
 

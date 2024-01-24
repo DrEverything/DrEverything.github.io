@@ -6,7 +6,7 @@ const staticAssets = [
     '/favicon.ico',
 ];
 
-self.addEventListener('install', async e => {
+self.addEventListener('install', async (e: Event) => {
     const cache = await caches.open(cacheName);
     await cache.addAll(staticAssets);
 });
