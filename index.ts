@@ -61,7 +61,7 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         canvas.height = canvas.clientHeight;
         canvas.width = canvas.clientWidth;
     }
-    
+
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL2. Your browser may not support it.');
@@ -137,10 +137,10 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     let iResolutionLocation = gl.getUniformLocation(shaderProgram, "iResolution");
     let iMouseLocation = gl.getUniformLocation(shaderProgram, "iMouse");
     gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);
-    
+
     gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
-    
+
     let time = 0.;
     function GLDraw() {
         gl.uniform1f(iTimeLocation, time);
@@ -148,6 +148,7 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
         time += 0.03;
+        
         animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
 
@@ -164,10 +165,10 @@ for (let canvas of canvases) {
 }
 
 Promise.all(shaderPromises)
-.then((shaders) => {
+    .then((shaders) => {
         for (let i = 0; i < canvases.length; i++) {
             initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
         }
-});
+    });
 
 export { }

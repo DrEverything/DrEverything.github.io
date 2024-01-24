@@ -168,6 +168,9 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
     let step = 0;
 
     function updateGrid() {
+        if (step > 15) {
+            clearInterval(intervalId);
+        }
         step++;
         const encoder = device.createCommandEncoder();
 
@@ -181,7 +184,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
 
         computePass.end();
 
-        const pass = encoder.beginRenderPass({
+        const renderPass = encoder.beginRenderPass({
             colorAttachments: [{
                 view: context.getCurrentTexture().createView(),
                 loadOp: "clear",
@@ -190,16 +193,16 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
             }]
         });
 
-        pass.setPipeline(cellPipeline);
-        pass.setBindGroup(0, bindGroups[step % 2]);
-        pass.setVertexBuffer(0, vertexBuffer);
-        pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
+        renderPass.setPipeline(cellPipeline);
+        renderPass.setBindGroup(0, bindGroups[step % 2]);
+        renderPass.setVertexBuffer(0, vertexBuffer);
+        renderPass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
 
-        pass.end();
+        renderPass.end();
         device.queue.submit([encoder.finish()]);
     }
-
-    setInterval(updateGrid, UPDATE_INTERVAL);
+    
+    let intervalId = setInterval(updateGrid, UPDATE_INTERVAL);
 });
 
 export { }
