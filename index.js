@@ -42,6 +42,7 @@ function createShaderProgram(gl, vsSource, fsSource) {
     return program;
 }
 let animationIds = new Map();
+let drawFuctions = new Map();
 function initWebGL2(canvas, vsSource, fsSource) {
     if (canvas.clientWidth < 500) {
         canvas.width = canvas.clientWidth * 1.4;
@@ -125,6 +126,8 @@ function initWebGL2(canvas, vsSource, fsSource) {
         animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
     GLDraw();
+    cancelAnimationFrame(animationIds.get(canvas.id));
+    return GLDraw;
     // let intervalId = setInterval(GLDraw, 100);
 }
 let canvases = document.querySelectorAll('canvas');
@@ -137,7 +140,15 @@ for (let canvas of canvases) {
 Promise.all(shaderPromises)
     .then((shaders) => {
     for (let i = 0; i < canvases.length; i++) {
-        initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
+        drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
+        canvases[i].addEventListener("mouseenter", function (e) {
+            drawFuctions.get(canvases[i].id)();
+            console.log("mouse enter");
+        });
+        canvases[i].addEventListener("mouseleave", function (e) {
+            cancelAnimationFrame(animationIds.get(canvases[i].id));
+            console.log('mouse leave');
+        });
     }
 });
 export {};

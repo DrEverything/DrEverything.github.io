@@ -53,7 +53,8 @@ function createShaderProgram(gl: WebGL2RenderingContext, vsSource: string, fsSou
 }
 
 let animationIds: Map<string, number> = new Map();
-function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: string) {
+let drawFuctions: Map<string, () => void> = new Map();
+function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: string): () => void {
     if (canvas.clientWidth < 500) {
         canvas.width = canvas.clientWidth * 1.4;
         canvas.height = canvas.clientHeight * 1.4;
@@ -151,8 +152,11 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         
         animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
-
+    
     GLDraw();
+    cancelAnimationFrame(animationIds.get(canvas.id));
+
+    return GLDraw;
     // let intervalId = setInterval(GLDraw, 100);
 }
 
@@ -168,7 +172,15 @@ for (let canvas of canvases) {
 Promise.all(shaderPromises)
     .then((shaders) => {
         for (let i = 0; i < canvases.length; i++) {
-            initWebGL2(canvases[i], shaders[0], shaders[i + 1]);
+            drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
+            canvases[i].addEventListener("mouseenter", function (e) {
+                drawFuctions.get(canvases[i].id)();
+                console.log("mouse enter");
+            })
+            canvases[i].addEventListener("mouseleave", function (e) {
+                cancelAnimationFrame(animationIds.get(canvases[i].id));
+                console.log('mouse leave')
+            })
         }
     });
 
