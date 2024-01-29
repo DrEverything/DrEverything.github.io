@@ -41,7 +41,7 @@ float mandelbulb(in vec3 pos) {
   vec3 z = pos;
   float dr = 1.;
   float r;
-  float power = 3.;
+  float power = 4. + sin(iTime * .5);
 
   for (int i = 0; i < 10; i++) {
     r = length(z);
@@ -65,7 +65,7 @@ float map(in vec3 pos) {
   //                       sin(aa.z * 15.0 + iTime * .3);
   // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
   // sphere *= .5;
-  float mandelbulbS = mandelbulb(pos - vec3(.0, .6, .3));
+  float mandelbulbS = mandelbulb(pos - vec3(.0, .6, .0));
   mandelbulbS *= .5;
 
   // float ground = terrainFunction(pos);
@@ -105,15 +105,16 @@ float castRay(in vec3 ro, vec3 rd) {
 
 void main(void) {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
-
+  
+  float time = iTime * .5;
   vec3 ro = vec3(0, 0, 2.);
   vec3 rd = normalize(vec3(p, -1.));
 
   vec2 m = iMouse * 1.5;
   ro.yz *= rot2D(-m.y);
   rd.yz *= rot2D(-m.y);
-  ro.xz *= rot2D(-m.x);
-  rd.xz *= rot2D(-m.x);
+  ro.xz *= rot2D(-m.x + time);
+  rd.xz *= rot2D(-m.x + time);
 
   vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
   col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
