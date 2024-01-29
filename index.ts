@@ -197,20 +197,16 @@ Promise.all(shaderPromises)
             if (isMobile) {
                 canvases[i].addEventListener("touchstart", function (e) {
                     drawFuctions.get(canvases[i].id)();
-                    console.log("mouse enter");
                 })
                 canvases[i].addEventListener("touchend", function (e) {
                     cancelAnimationFrame(animationIds.get(canvases[i].id));
-                    console.log('mouse leave')
                 })
             } else {
                 canvases[i].addEventListener("mouseenter", function (e) {
                     drawFuctions.get(canvases[i].id)();
-                    console.log("mouse enter");
                 })
                 canvases[i].addEventListener("mouseleave", function (e) {
                     cancelAnimationFrame(animationIds.get(canvases[i].id));
-                    console.log('mouse leave')
                 })
             }
         }
