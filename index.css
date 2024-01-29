@@ -21,6 +21,11 @@ section {
     margin-bottom: 20px;
 }
 
+#inigo {
+    height: 900px;
+    width: 900px;
+}
+
 #slowly {
     width: 100vw;
     height: 100vh;

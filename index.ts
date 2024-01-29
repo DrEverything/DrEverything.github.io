@@ -149,10 +149,11 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
         time += 0.03;
         
-        animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
+        // animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
 
-    GLDraw();
+    // GLDraw();
+    let intervalId = setInterval(GLDraw, 500);
 }
 
 let canvases = document.querySelectorAll('canvas');
