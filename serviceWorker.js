@@ -10,9 +10,17 @@ self.addEventListener('install', async (e) => {
     await cache.addAll(staticAssets);
 });
 self.addEventListener('fetch', (e) => {
-    e.respondWith(cacheFirst(e.request));
+    e.respondWith(networkFirst(e.request));
 });
-async function cacheFirst(request) {
-    const cachedResponse = await caches.match(request);
-    return cachedResponse || fetch(request);
+async function networkFirst(request) {
+    try {
+        // Try to get the response from the network
+        const networkResponse = await fetch(request);
+        return networkResponse;
+    }
+    catch (error) {
+        // If the network request fails, try to get the response from the cache
+        const cachedResponse = await caches.match(request);
+        return cachedResponse || new Response('Not found', { status: 404 });
+    }
 }
