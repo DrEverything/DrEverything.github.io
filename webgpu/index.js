@@ -3,7 +3,7 @@ let webgpuPromises = [
     fetch("main.wgsl").then((shader) => shader.text()),
     navigator.gpu.requestAdapter().then(async (adapter) => await adapter.requestDevice()).catch((e) => console.error("No appropriate GPUAdapter found.", e)),
 ];
-const GRID_SIZE = 64;
+const GRID_SIZE = 80;
 const WORKGROUP_SIZE = 8;
 Promise.all(webgpuPromises).then(([shader, _device]) => {
     let device = _device;
