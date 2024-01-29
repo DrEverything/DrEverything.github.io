@@ -148,9 +148,9 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
     const UPDATE_INTERVAL = 100;
     let step = 0;
     function updateGrid() {
-        if (step > 15) {
-            clearInterval(intervalId);
-        }
+        // if (step > 15) {
+        //     clearInterval(intervalId);
+        // }
         step++;
         const encoder = device.createCommandEncoder();
         const computePass = encoder.beginComputePass();
