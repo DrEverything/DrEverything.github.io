@@ -31,29 +31,48 @@ float sdEllipsoid(vec3 p, vec3 r) {
   return k0 * (k0 - 1.0) / k1;
 }
 float terrainFunction(vec3 pos) {
-  float fh = -.6 + .05 * (sin(2.0 * pos.x) + sin(2.0 * pos.z));
+  float fh = -.9 + .05 * (sin(2.0 * pos.x) + sin(2.0 * pos.z));
   float d = pos.y - fh;
   vec3 qos = pos;
-  float d2 = sdEllipsoid(qos, vec3(.7, 1., .7));
-  d = smin(d, d2, .3);
-  // if (d<res.x) res = vec2(d,1.);
-  // return res;
-  return d; 
-  // return p.y - (-.8) - .2 * terrain;
+
+  return d;
+}
+float mandelbulb(in vec3 pos) {
+  vec3 z = pos;
+  float dr = 1.;
+  float r;
+  float power = 3.;
+
+  for (int i = 0; i < 10; i++) {
+    r = length(z);
+    if (r > 2.)
+      break;
+
+    float theta = acos(z.z / r) * power;
+    float phi = atan(z.y, z.x) * power;
+    float zr = pow(r, power);
+    dr = pow(r, power - 1.) * power * dr + 1.;
+
+    z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
+    z += pos;
+  }
+  return .5 * log(r) * r / dr;
 }
 float map(in vec3 pos) {
-  vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
-  float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
-                        sin(aa.y * 15.0 + iTime * .7) *
-                        sin(aa.z * 15.0 + iTime * .3);
-  float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
-  sphere *= .5;
-  // float box = sdBox(pos, vec3(.5));
+  // vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
+  // float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
+  //                       sin(aa.y * 15.0 + iTime * .7) *
+  //                       sin(aa.z * 15.0 + iTime * .3);
+  // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
+  // sphere *= .5;
+  float mandelbulbS = mandelbulb(pos - vec3(.0, .6, .3));
+  mandelbulbS *= .5;
 
-  float ground = terrainFunction(pos);
-  ground *= .5;
+  // float ground = terrainFunction(pos);
+  float ground = pos.y + .5;
+  // ground *= .5;
 
-  return smin(ground, sphere, .1);
+  return min(ground, mandelbulbS);
 }
 
 vec3 calcNormal(in vec3 pos) {
