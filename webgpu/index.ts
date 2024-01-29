@@ -4,7 +4,7 @@ let webgpuPromises = [
     navigator.gpu.requestAdapter().then(async (adapter) => await adapter.requestDevice()).catch((e) => console.error("No appropriate GPUAdapter found.", e)),
 ];
 
-const GRID_SIZE = 64;
+const GRID_SIZE = 80;
 const WORKGROUP_SIZE = 8;
 
 Promise.all(webgpuPromises).then(([shader, _device]) => {
@@ -168,9 +168,9 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
     let step = 0;
 
     function updateGrid() {
-        if (step > 15) {
-            clearInterval(intervalId);
-        }
+        // if (step > 15) {
+        //     clearInterval(intervalId);
+        // }
         step++;
         const encoder = device.createCommandEncoder();
 

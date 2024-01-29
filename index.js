@@ -125,6 +125,7 @@ function initWebGL2(canvas, vsSource, fsSource) {
         animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
     GLDraw();
+    // let intervalId = setInterval(GLDraw, 100);
 }
 let canvases = document.querySelectorAll('canvas');
 let shaderPromises = [

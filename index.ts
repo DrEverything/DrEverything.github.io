@@ -153,6 +153,7 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     }
 
     GLDraw();
+    // let intervalId = setInterval(GLDraw, 100);
 }
 
 let canvases = document.querySelectorAll('canvas');

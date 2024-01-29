@@ -1,5 +1,5 @@
 #version 300 es
-precision mediump float;
+precision highp float;
 
 uniform float iTime;
 uniform vec2 iResolution;
@@ -41,9 +41,9 @@ float mandelbulb(in vec3 pos) {
   vec3 z = pos;
   float dr = 1.;
   float r;
-  float power = 4. + sin(iTime * .5);
+  float power = 8. + iTime * .03;
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 15; i++) {
     r = length(z);
     if (r > 2.)
       break;
@@ -66,7 +66,7 @@ float map(in vec3 pos) {
   // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
   // sphere *= .5;
   float mandelbulbS = mandelbulb(pos - vec3(.0, .6, .0));
-  mandelbulbS *= .5;
+  // mandelbulbS *= .5;
 
   // float ground = terrainFunction(pos);
   float ground = pos.y + .5;
@@ -88,7 +88,7 @@ float castRay(in vec3 ro, vec3 rd) {
     vec3 pos = ro + t * rd;
 
     float h = map(pos);
-    if (h < .0001) {
+    if (h < .001) {
       break;
     }
 
@@ -106,15 +106,15 @@ float castRay(in vec3 ro, vec3 rd) {
 void main(void) {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
   
-  float time = iTime * .5;
-  vec3 ro = vec3(0, 0, 2.);
+  // float time = iTime * .5;
+  vec3 ro = vec3(0, .3, 1.7);
   vec3 rd = normalize(vec3(p, -1.));
 
   vec2 m = iMouse * 1.5;
-  ro.yz *= rot2D(-m.y);
-  rd.yz *= rot2D(-m.y);
-  ro.xz *= rot2D(-m.x + time);
-  rd.xz *= rot2D(-m.x + time);
+  ro.yz *= rot2D(-m.y - .2);
+  rd.yz *= rot2D(-m.y - .2);
+  ro.xz *= rot2D(-m.x - .4);
+  rd.xz *= rot2D(-m.x - .4);
 
   vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
   col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
@@ -129,11 +129,11 @@ void main(void) {
 
     vec3 sun_dir = normalize(vec3(.8, .4, .2));
     float sun_dif = clamp(dot(nor, sun_dir), 0.0, 1.0);
-    float sun_sha = step(castRay(pos + nor * .001, sun_dir), 0.);
+    // float sun_sha = step(castRay(pos + nor * .001, sun_dir), 0.);
     float sky_dif = clamp(.5 + .5 * dot(nor, vec3(0.0, 1.0, 0.0)), 0.0, 1.0);
     float bou_dif = clamp(.5 + .5 * dot(nor, vec3(0.0, -1.0, 0.0)), 0.0, 1.0);
 
-    col = mate * vec3(7., 4.5, 3.) * sun_dif * sun_sha;
+    col = mate * vec3(7., 4.5, 3.) * sun_dif;// * sun_sha;
     col += mate * vec3(.5, .8, 0.9) * sky_dif;
     col += mate * vec3(0.7, 0.3, 0.2) * bou_dif;
   }

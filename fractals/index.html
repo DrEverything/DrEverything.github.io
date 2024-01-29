@@ -6,18 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allsim</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            height: 100%;
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body id="wasm-example">
@@ -27,17 +16,14 @@
         init().then(() => {
             console.log("WASM Loaded");
             canvas = document.querySelector("canvas");
-            var width = window.innerWidth;
-            var height = window.innerHeight;
-            canvas.style.width = "100%";
-            canvas.style.height = "100%";
-            canvas.height = height;
-            canvas.width = width;
-            window.onresize = () => {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.height = height;
-                canvas.width = width;
+            canvas.style.width = "75vh";
+            canvas.style.height = "75vh";
+            canvas.classList += "my-project-img";
+            canvas.height = canvas.clientHeight;
+            canvas.width = canvas.clientWidth;
+            canvas.onresize = () => {
+                canvas.height = canvas.clientHeight;
+                canvas.width = canvas.clientWidth;
             }
             canvas.addEventListener('focus', function (event) {
                 event.preventDefault();

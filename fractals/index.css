@@ -6,21 +6,6 @@ body {
     width: 100vw;
 }
 
-header {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    text-align: center;
-}
-
-main {
-    padding: 20px;
-}
-
-section {
-    margin-bottom: 20px;
-}
-
 #inigo {
     height: 70vh;
     width: 70vh;
@@ -36,8 +21,8 @@ section {
 }
 
 .my-project-img {
-    height: 400px;
-    width: 400px;
+    height: 75vh;
+    width: 75vh;
     border-radius: 8px;
     box-shadow: 7px 7px 33px;
     margin: 5px;
