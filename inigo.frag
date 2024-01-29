@@ -41,7 +41,7 @@ float mandelbulb(in vec3 pos) {
   vec3 z = pos;
   float dr = 1.;
   float r;
-  float power = 8.;
+  float power = 8. + iTime * .03;
 
   for (int i = 0; i < 15; i++) {
     r = length(z);
