@@ -5,6 +5,7 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('Service Worker registration failed', err));
     });
 }
+const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(navigator.userAgent.toLowerCase());
 function compileShader(gl, source, type) {
     const shader = gl.createShader(type);
     if (!shader) {
@@ -88,19 +89,36 @@ function initWebGL2(canvas, vsSource, fsSource) {
         lastMousePosition = currentMousePosition;
         gl.uniform2f(iMouseLocation, accumulatedDelta.x, accumulatedDelta.y);
     }
-    canvas.addEventListener('mousedown', function (e) {
-        isDragging = true;
-        lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
-        lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
-        updateBuffer(e);
-    });
-    canvas.addEventListener('mousemove', updateBuffer);
-    canvas.addEventListener('mouseup', function () {
-        isDragging = false;
-    });
-    canvas.addEventListener('mouseleave', function () {
-        isDragging = false;
-    });
+    if (isMobile) {
+        // canvas.addEventListener('touchstart', function (e: TouchEvent) {
+        //     isDragging = true;
+        //     lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
+        //     lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
+        //     updateBuffer(e);
+        // });
+        // canvas.addEventListener('mousemove', updateBuffer);
+        // canvas.addEventListener('mouseup', function () {
+        //     isDragging = false;
+        // });
+        // canvas.addEventListener('mouseleave', function () {
+        //     isDragging = false;
+        // });
+    }
+    else {
+        canvas.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
+            lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
+            updateBuffer(e);
+        });
+        canvas.addEventListener('mousemove', updateBuffer);
+        canvas.addEventListener('mouseup', function () {
+            isDragging = false;
+        });
+        canvas.addEventListener('mouseleave', function () {
+            isDragging = false;
+        });
+    }
     const positionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -141,14 +159,22 @@ Promise.all(shaderPromises)
     .then((shaders) => {
     for (let i = 0; i < canvases.length; i++) {
         drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
-        canvases[i].addEventListener("mouseenter", function (e) {
-            drawFuctions.get(canvases[i].id)();
-            console.log("mouse enter");
-        });
-        canvases[i].addEventListener("mouseleave", function (e) {
-            cancelAnimationFrame(animationIds.get(canvases[i].id));
-            console.log('mouse leave');
-        });
+        if (isMobile) {
+            canvases[i].addEventListener("touchstart", function (e) {
+                drawFuctions.get(canvases[i].id)();
+            });
+            canvases[i].addEventListener("touchend", function (e) {
+                cancelAnimationFrame(animationIds.get(canvases[i].id));
+            });
+        }
+        else {
+            canvases[i].addEventListener("mouseenter", function (e) {
+                drawFuctions.get(canvases[i].id)();
+            });
+            canvases[i].addEventListener("mouseleave", function (e) {
+                cancelAnimationFrame(animationIds.get(canvases[i].id));
+            });
+        }
     }
 });
 export {};
