@@ -111,10 +111,10 @@ void main(void) {
   vec3 rd = normalize(vec3(p, -1.));
 
   vec2 m = iMouse * 1.5;
-  ro.yz *= rot2D(-m.y - .5);
-  rd.yz *= rot2D(-m.y - .5);
-  ro.xz *= rot2D(-m.x - .9);
-  rd.xz *= rot2D(-m.x - .9);
+  ro.yz *= rot2D(-m.y - .2);
+  rd.yz *= rot2D(-m.y - .2);
+  ro.xz *= rot2D(-m.x - .4);
+  rd.xz *= rot2D(-m.x - .4);
 
   vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
   col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));

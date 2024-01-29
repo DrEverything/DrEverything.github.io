@@ -59,7 +59,9 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         canvas.height = canvas.clientHeight * 1.4;
     } else {
         canvas.height = canvas.clientHeight;
-        canvas.width = canvas.clientHeight;
+        canvas.width = canvas.clientWidth;
+        // canvas.height = window.innerHeight * 0.7;
+        // canvas.width = window.innerHeight * 0.7;
     }
 
     const gl = canvas.getContext('webgl2');
