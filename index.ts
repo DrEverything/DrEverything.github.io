@@ -87,7 +87,7 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     let lastMousePosition = { x: 0, y: 0 };
     let mouseDelta = { x: 0, y: 0 };
     let accumulatedDelta = { x: 0, y: 0 };
-    function updateBuffer(e: MouseEvent) {
+    function updateBuffer(e: MouseEvent | Touch) {
         if (!isDragging) return;
 
         let currentMousePosition = {
@@ -109,22 +109,29 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     }
     
     if (isMobile) {
-        // canvas.addEventListener('touchstart', function (e: TouchEvent) {
-        //     isDragging = true;
-        //     lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
-        //     lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
-        //     updateBuffer(e);
-        // });
+        canvas.addEventListener('touchstart', function (e) {
+            e.preventDefault(); // Often useful to prevent default touch behaviors
+            isDragging = true;
+            const touch = e.touches[0];
+            lastMousePosition.x = ((touch.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
+            lastMousePosition.y = 1 - ((touch.clientY - canvas.offsetTop) / canvas.height) * 2;
+            updateBuffer(touch);
+        }, { passive: false });
 
-        // canvas.addEventListener('mousemove', updateBuffer);
+        canvas.addEventListener('touchmove', function (e) {
+            if (isDragging) {
+                e.preventDefault();
+                updateBuffer(e.touches[0]);
+            }
+        }, { passive: false });
 
-        // canvas.addEventListener('mouseup', function () {
-        //     isDragging = false;
-        // });
+        canvas.addEventListener('touchend', function () {
+            isDragging = false;
+        });
 
-        // canvas.addEventListener('mouseleave', function () {
-        //     isDragging = false;
-        // });
+        canvas.addEventListener('touchcancel', function () {
+            isDragging = false;
+        });
     } else {
         canvas.addEventListener('mousedown', function (e) {
             isDragging = true;
@@ -195,11 +202,13 @@ Promise.all(shaderPromises)
         for (let i = 0; i < canvases.length; i++) {
             drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
             if (isMobile) {
-                canvases[i].addEventListener("touchstart", function (e) {
-                    drawFuctions.get(canvases[i].id)();
-                })
-                canvases[i].addEventListener("touchend", function (e) {
-                    cancelAnimationFrame(animationIds.get(canvases[i].id));
+                canvases[i].addEventListener("click", function (e) {
+                    let id = animationIds.get(canvases[i].id);
+                    if (id) {
+                        cancelAnimationFrame(id);
+                    } else {
+                        drawFuctions.get(canvases[i].id)();
+                    }
                 })
             } else {
                 canvases[i].addEventListener("mouseenter", function (e) {
