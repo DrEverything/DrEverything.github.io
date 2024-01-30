@@ -202,21 +202,27 @@ Promise.all(shaderPromises)
         for (let i = 0; i < canvases.length; i++) {
             drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
             if (isMobile) {
-                canvases[i].addEventListener("touchstart", function (e) {
-                    let cId = canvases[i].id;
-                    let id = animationIds.get(cId);
-                    if (id) {
-                        cancelAnimationFrame(id);
-                        animationIds.delete(cId);
-                    } else {
-                        drawFuctions.get(cId)();
-                    }
-                })
-            } else {
-                canvases[i].addEventListener("mouseenter", function (e) {
+                // canvases[i].addEventListener("touchstart", function () {
+                //     let cId = canvases[i].id;
+                //     let id = animationIds.get(cId);
+                //     if (id) {
+                //         cancelAnimationFrame(id);
+                //         animationIds.delete(cId);
+                //     } else {
+                //         drawFuctions.get(cId)();
+                //     }
+                // })
+                canvases[i].addEventListener("touchstart", function () {
                     drawFuctions.get(canvases[i].id)();
                 })
-                canvases[i].addEventListener("mouseleave", function (e) {
+                canvases[i].addEventListener("touchend", function () {
+                    cancelAnimationFrame(animationIds.get(canvases[i].id));
+                })
+            } else {
+                canvases[i].addEventListener("mouseenter", function () {
+                    drawFuctions.get(canvases[i].id)();
+                })
+                canvases[i].addEventListener("mouseleave", function () {
                     cancelAnimationFrame(animationIds.get(canvases[i].id));
                 })
             }
