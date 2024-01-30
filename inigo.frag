@@ -65,14 +65,14 @@ float map(in vec3 pos) {
   //                       sin(aa.z * 15.0 + iTime * .3);
   // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
   // sphere *= .5;
-  float mandelbulbS = mandelbulb(pos - vec3(.0, .6, .0));
+  float mandelbulbS = mandelbulb(pos - vec3(.0, .25, .0));
   // mandelbulbS *= .5;
 
   // float ground = terrainFunction(pos);
-  float ground = pos.y + .5;
+  // float ground = pos.y + .5;
   // ground *= .5;
 
-  return min(ground, mandelbulbS);
+  return mandelbulbS;
 }
 
 vec3 calcNormal(in vec3 pos) {
@@ -117,7 +117,7 @@ void main(void) {
   rd.xz *= rot2D(-m.x - .4);
 
   vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
-  col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
+  // col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
 
   float t = castRay(ro, rd);
 
