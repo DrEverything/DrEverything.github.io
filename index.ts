@@ -73,11 +73,15 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
 
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    canvas.addEventListener("resize", function () {
-        gl.canvas.height = canvas.clientHeight * window.devicePixelRatio;
-        gl.canvas.width = canvas.clientWidth * window.devicePixelRatio;
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    })
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            gl.canvas.height = canvas.clientHeight * window.devicePixelRatio;
+            gl.canvas.width = canvas.clientWidth * window.devicePixelRatio;
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        }
+    });
+    resizeObserver.observe(canvas);
+
     let isDragging = false;
     let lastMousePosition = { x: 0, y: 0 };
     let mouseDelta = { x: 0, y: 0 };

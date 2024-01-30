@@ -65,7 +65,7 @@ float map(in vec3 pos) {
   //                       sin(aa.z * 15.0 + iTime * .3);
   // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
   // sphere *= .5;
-  float mandelbulbS = mandelbulb(pos - vec3(.0, .25, .0));
+  float mandelbulbS = mandelbulb(pos - vec3(.0, .0, .0));
   // mandelbulbS *= .5;
 
   // float ground = terrainFunction(pos);
@@ -107,7 +107,7 @@ void main(void) {
   vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
   
   // float time = iTime * .5;
-  vec3 ro = vec3(0, .3, 1.7);
+  vec3 ro = vec3(0, .0, 1.63);
   vec3 rd = normalize(vec3(p, -1.));
 
   vec2 m = iMouse * 1.5;
