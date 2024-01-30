@@ -184,8 +184,8 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     GLDraw();
     cancelAnimationFrame(animationIds.get(canvas.id));
 
-    return GLDraw;
     // let intervalId = setInterval(GLDraw, 100);
+    return GLDraw;
 }
 
 let canvases = document.querySelectorAll('canvas');
@@ -203,11 +203,13 @@ Promise.all(shaderPromises)
             drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
             if (isMobile) {
                 canvases[i].addEventListener("click", function (e) {
-                    let id = animationIds.get(canvases[i].id);
+                    let cId = canvases[i].id;
+                    let id = animationIds.get(cId);
                     if (id) {
                         cancelAnimationFrame(id);
+                        animationIds.delete(cId);
                     } else {
-                        drawFuctions.get(canvases[i].id)();
+                        drawFuctions.get(cId)();
                     }
                 })
             } else {
