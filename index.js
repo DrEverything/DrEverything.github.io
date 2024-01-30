@@ -90,19 +90,26 @@ function initWebGL2(canvas, vsSource, fsSource) {
         gl.uniform2f(iMouseLocation, accumulatedDelta.x, accumulatedDelta.y);
     }
     if (isMobile) {
-        // canvas.addEventListener('touchstart', function (e: TouchEvent) {
-        //     isDragging = true;
-        //     lastMousePosition.x = ((e.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
-        //     lastMousePosition.y = 1 - ((e.clientY - canvas.offsetTop) / canvas.height) * 2;
-        //     updateBuffer(e);
-        // });
-        // canvas.addEventListener('mousemove', updateBuffer);
-        // canvas.addEventListener('mouseup', function () {
-        //     isDragging = false;
-        // });
-        // canvas.addEventListener('mouseleave', function () {
-        //     isDragging = false;
-        // });
+        canvas.addEventListener('touchstart', function (e) {
+            e.preventDefault(); // Often useful to prevent default touch behaviors
+            isDragging = true;
+            const touch = e.touches[0];
+            lastMousePosition.x = ((touch.clientX - canvas.offsetLeft) / canvas.width) * 2 - 1;
+            lastMousePosition.y = 1 - ((touch.clientY - canvas.offsetTop) / canvas.height) * 2;
+            updateBuffer(touch);
+        }, { passive: false });
+        canvas.addEventListener('touchmove', function (e) {
+            if (isDragging) {
+                e.preventDefault();
+                updateBuffer(e.touches[0]);
+            }
+        }, { passive: false });
+        canvas.addEventListener('touchend', function () {
+            isDragging = false;
+        });
+        canvas.addEventListener('touchcancel', function () {
+            isDragging = false;
+        });
     }
     else {
         canvas.addEventListener('mousedown', function (e) {
@@ -145,8 +152,8 @@ function initWebGL2(canvas, vsSource, fsSource) {
     }
     GLDraw();
     cancelAnimationFrame(animationIds.get(canvas.id));
-    return GLDraw;
     // let intervalId = setInterval(GLDraw, 100);
+    return GLDraw;
 }
 let canvases = document.querySelectorAll('canvas');
 let shaderPromises = [
@@ -160,11 +167,16 @@ Promise.all(shaderPromises)
     for (let i = 0; i < canvases.length; i++) {
         drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
         if (isMobile) {
-            canvases[i].addEventListener("touchstart", function (e) {
-                drawFuctions.get(canvases[i].id)();
-            });
-            canvases[i].addEventListener("touchend", function (e) {
-                cancelAnimationFrame(animationIds.get(canvases[i].id));
+            canvases[i].addEventListener("click", function (e) {
+                let cId = canvases[i].id;
+                let id = animationIds.get(cId);
+                if (id) {
+                    cancelAnimationFrame(id);
+                    animationIds.delete(cId);
+                }
+                else {
+                    drawFuctions.get(cId)();
+                }
             });
         }
         else {
