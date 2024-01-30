@@ -202,7 +202,7 @@ Promise.all(shaderPromises)
         for (let i = 0; i < canvases.length; i++) {
             drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
             if (isMobile) {
-                document.body.innerHTML += "sdf";
+                document.body.innerHTML += "Mobile";
                 canvases[i].addEventListener("touchstart", function (e) {
                     let cId = canvases[i].id;
                     let id = animationIds.get(cId);
@@ -214,6 +214,7 @@ Promise.all(shaderPromises)
                     }
                 })
             } else {
+                document.body.innerHTML += "Not Mobile";
                 canvases[i].addEventListener("mouseenter", function (e) {
                     drawFuctions.get(canvases[i].id)();
                 })
