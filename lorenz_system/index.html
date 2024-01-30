@@ -11,17 +11,19 @@
 
 <body>
     <script type="module">
-        let canvas;
-        import("./pkg/allsim.js").then((init) => {
-            init.default().then(() => {
+            import init from "/lorenz_system/pkg/allsim.js";
+            let canvas;
+            init().then(() => {
                 console.log("WASM Loaded");
-                let canvas = document.querySelector("canvas");
-                canvas.classList += "my-project-img"
-            })
-        });
-        // init().then(() => {
-        //
-        // });
+                canvas = document.querySelector("canvas");
+                canvas.style.width = "75vh";
+                canvas.style.height = "75vh";
+                canvas.classList += "my-project-img";
+                // canvas.addEventListener('focus', function (event) {
+                //     event.preventDefault();
+                //     this.blur();
+                // });
+            });
     </script>
 </body>
 

@@ -19,12 +19,6 @@
             canvas.style.width = "75vh";
             canvas.style.height = "75vh";
             canvas.classList += "my-project-img";
-            canvas.height = canvas.clientHeight;
-            canvas.width = canvas.clientWidth;
-            canvas.onresize = () => {
-                canvas.height = canvas.clientHeight;
-                canvas.width = canvas.clientWidth;
-            }
             canvas.addEventListener('focus', function (event) {
                 event.preventDefault();
                 this.blur();
