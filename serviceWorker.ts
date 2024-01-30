@@ -11,11 +11,11 @@ self.addEventListener('install', async (e) => {
     await cache.addAll(staticAssets);
 });
 
-self.addEventListener('fetch', (e) => {
+self.addEventListener('fetch', (e: FetchEvent) => {
     e.respondWith(networkFirst(e.request));
 });
 
-async function networkFirst(request) {
+async function networkFirst(request: Request) {
     try {
         // Try to get the response from the network
         const networkResponse = await fetch(request);
