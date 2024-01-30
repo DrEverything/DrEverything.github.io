@@ -57,13 +57,8 @@ function createShaderProgram(gl: WebGL2RenderingContext, vsSource: string, fsSou
 let animationIds: Map<string, number> = new Map();
 let drawFuctions: Map<string, () => void> = new Map();
 function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: string): () => void {
-    if (canvas.clientWidth < 500) {
-        canvas.width = canvas.clientWidth * 1.4;
-        canvas.height = canvas.clientHeight * 1.4;
-    } else {
-        canvas.height = canvas.clientHeight;
-        canvas.width = canvas.clientWidth;
-    }
+    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+    canvas.width = canvas.clientWidth * window.devicePixelRatio;
 
     const gl = canvas.getContext('webgl2');
     if (!gl) {
@@ -79,8 +74,8 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     canvas.addEventListener("resize", function () {
-        gl.canvas.width = canvas.clientWidth;
-        gl.canvas.height = canvas.clientHeight;
+        gl.canvas.height = canvas.clientHeight * window.devicePixelRatio;
+        gl.canvas.width = canvas.clientWidth * window.devicePixelRatio;
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     })
     let isDragging = false;
@@ -107,7 +102,7 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
 
         gl.uniform2f(iMouseLocation, accumulatedDelta.x, accumulatedDelta.y);
     }
-    
+
     if (isMobile) {
         canvas.addEventListener('touchstart', function (e) {
             e.preventDefault(); // Often useful to prevent default touch behaviors
@@ -177,10 +172,10 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
         time += 0.03;
-        
+
         animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
     }
-    
+
     GLDraw();
     cancelAnimationFrame(animationIds.get(canvas.id));
 

@@ -45,14 +45,8 @@ function createShaderProgram(gl, vsSource, fsSource) {
 let animationIds = new Map();
 let drawFuctions = new Map();
 function initWebGL2(canvas, vsSource, fsSource) {
-    if (canvas.clientWidth < 500) {
-        canvas.width = canvas.clientWidth * 1.4;
-        canvas.height = canvas.clientHeight * 1.4;
-    }
-    else {
-        canvas.height = canvas.clientHeight;
-        canvas.width = canvas.clientWidth;
-    }
+    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+    canvas.width = canvas.clientWidth * window.devicePixelRatio;
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         console.error('Unable to initialize WebGL2. Your browser may not support it.');
@@ -65,8 +59,8 @@ function initWebGL2(canvas, vsSource, fsSource) {
     gl.useProgram(shaderProgram);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     canvas.addEventListener("resize", function () {
-        gl.canvas.width = canvas.clientWidth;
-        gl.canvas.height = canvas.clientHeight;
+        gl.canvas.height = canvas.clientHeight * window.devicePixelRatio;
+        gl.canvas.width = canvas.clientWidth * window.devicePixelRatio;
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     });
     let isDragging = false;
