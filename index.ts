@@ -202,7 +202,7 @@ Promise.all(shaderPromises)
         for (let i = 0; i < canvases.length; i++) {
             drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
             if (isMobile) {
-                canvases[i].addEventListener("click", function (e) {
+                canvases[i].addEventListener("touchstart", function (e) {
                     let cId = canvases[i].id;
                     let id = animationIds.get(cId);
                     if (id) {
