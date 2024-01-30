@@ -9,8 +9,8 @@ const WORKGROUP_SIZE = 8;
 
 Promise.all(webgpuPromises).then(([shader, _device]) => {
     let device = _device as GPUDevice;
-    canvases[0].width = canvases[0].clientWidth;
-    canvases[0].height = canvases[0].clientHeight;
+    canvases[0].height = canvases[0].clientHeight * window.devicePixelRatio;
+    canvases[0].width = canvases[0].clientWidth * window.devicePixelRatio;
 
     const context = canvases[0].getContext("webgpu");
     const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -18,6 +18,13 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         device: device,
         format: canvasFormat,
     });
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            context.canvas.height = canvases[0].clientHeight * window.devicePixelRatio;
+            context.canvas.width = canvases[0].clientWidth * window.devicePixelRatio;
+        }
+    });
+    resizeObserver.observe(canvases[0]);
 
     const vertices = new Float32Array([
         -0.8, -0.8,
@@ -201,7 +208,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         renderPass.end();
         device.queue.submit([encoder.finish()]);
     }
-    
+
     let intervalId = setInterval(updateGrid, UPDATE_INTERVAL);
 });
 
