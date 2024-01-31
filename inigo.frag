@@ -39,7 +39,7 @@ float terrainFunction(vec3 pos) {
 }
 float mandelbulb(in vec3 pos) {
   vec3 z = pos;
-  float dr = 1. + abs(sin(iTime) * 2.);
+  float dr = 1. + abs(sin(iTime) * .5);
   float r;
   float power = 8. + iTime * .05;
 
