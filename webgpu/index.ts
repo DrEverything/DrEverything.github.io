@@ -1,4 +1,6 @@
 let canvases = document.querySelectorAll('canvas');
+canvases[0].style.height = "75vh";
+canvases[0].style.width = "75vh";
 let webgpuPromises = [
     fetch("main.wgsl").then((shader) => shader.text()),
     navigator.gpu.requestAdapter().then(async (adapter) => await adapter.requestDevice()).catch((e) => console.error("No appropriate GPUAdapter found.", e)),
