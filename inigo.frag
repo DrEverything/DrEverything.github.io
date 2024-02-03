@@ -136,7 +136,7 @@ void main(void) {
 
     col = mate * vec3(7., 4.5, 3.) * sun_dif;// * sun_sha;
     col += mate * vec3(.5, .8, 0.9) * sky_dif;
-    col += mate * vec3(0.7, 0.3, 0.2) * bou_dif;
+    // col += mate * vec3(0.7, 0.3, 0.2) * bou_dif;
   }
 
   col = pow(col, vec3(.4545));
