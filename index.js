@@ -6,6 +6,18 @@ if ('serviceWorker' in navigator) {
     });
 }
 const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(navigator.userAgent.toLowerCase());
+import init from "./pkg/allsim.js";
+init().then(() => {
+    console.log("WASM Loaded");
+    let canvases = document.querySelectorAll("canvas");
+    for (var canvas of canvases) {
+        if (canvas.id != "inigo") {
+            canvas.style.width = "75vh";
+            canvas.style.height = "auto";
+            canvas.className += "my-project-img";
+        }
+    }
+});
 function compileShader(gl, source, type) {
     const shader = gl.createShader(type);
     if (!shader) {
@@ -152,13 +164,14 @@ function initWebGL2(canvas, vsSource, fsSource) {
     // let intervalId = setInterval(GLDraw, 100);
     return GLDraw;
 }
-let canvases = document.querySelectorAll('canvas');
+let canvases = [document.querySelector('#inigo')];
 let shaderPromises = [
     fetch("main.vert").then((vert) => vert.text()),
+    fetch(`inigo.frag`).then((frag) => frag.text())
 ];
-for (let canvas of canvases) {
-    shaderPromises.push(fetch(`${canvas.id}.frag`).then((frag) => frag.text()));
-}
+// for (let canvas of canvases) {
+//     shaderPromises.push(fetch(`${canvas.id}.frag`).then((frag) => frag.text()))
+// }
 Promise.all(shaderPromises)
     .then((shaders) => {
     for (let i = 0; i < canvases.length; i++) {
@@ -191,4 +204,3 @@ Promise.all(shaderPromises)
         }
     }
 });
-export {};
