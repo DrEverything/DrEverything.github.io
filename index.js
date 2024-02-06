@@ -9,14 +9,6 @@ const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/
 import init from "./pkg/allsim.js";
 init().then(() => {
     console.log("WASM Loaded");
-    let canvases = document.querySelectorAll("canvas");
-    for (var canvas of canvases) {
-        if (canvas.id != "inigo") {
-            canvas.style.width = "75vh";
-            canvas.style.height = "auto";
-            canvas.className += "my-project-img";
-        }
-    }
 });
 function compileShader(gl, source, type) {
     const shader = gl.createShader(type);
