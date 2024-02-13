@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "files": [
     "allsim_bg.wasm",
-    "allsim.js"
+    "allsim.js",
+    "allsim.d.ts"
   ],
   "module": "allsim.js",
+  "types": "allsim.d.ts",
   "sideEffects": [
     "./snippets/*"
   ]
