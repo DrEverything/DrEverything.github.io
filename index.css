@@ -27,8 +27,9 @@ canvas {
 }
 
 .my-project-img {
-    height: 400px;
-    width: 400px;
+    width: 50vh;
+    height: auto;
+    aspect-ratio: 1 / 1;
     max-width: calc(100% - 12px);
     max-height: calc(100% - 12px);
     border-radius: 8px;
