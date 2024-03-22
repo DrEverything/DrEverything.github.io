@@ -1,10 +1,10 @@
 struct VertexInput {
-  @location(0) pos: vec2f,
+    @location(0) pos: vec2f,
 }
 
 struct VertexOutput {
-  @builtin(position) clip_position: vec4f,
-  @location(0) position: vec2f,
+    @builtin(position) clip_position: vec4f,
+    @location(0) position: vec2f,
 }
 
 @vertex
@@ -23,7 +23,13 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
 }
 
 fn render(pos: vec2f) -> vec4f {
-  let circle = .4 * sin(time) + length(pos);
-  let s = vec3f(smoothstep(.0, 1.0, circle));
-  return vec4f(s, 1);
+    var p = pos;
+    p = fract(p) - 0.5;
+
+    var d = sin(length(p) * 8 + time) / 8.;
+    d = abs(d);
+    d = 0.02 / d;
+    d = fract(d * 2.);
+
+    return vec4(d, 0, 0, 1);
 }
