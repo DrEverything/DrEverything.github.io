@@ -15,7 +15,8 @@ fn vertexMain(input: VertexInput) -> VertexOutput {
     return output;
 }
 
-@group(0)@binding(0) var<uniform> time: f32;
+@group(0)@binding(0) var<uniform> size: vec2f;
+@group(0)@binding(1) var<uniform> time: f32;
 
 @fragment
 fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
@@ -23,7 +24,7 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
 }
 
 fn render(pos: vec2f) -> vec4f {
-    var p = pos;
+    var p = vec2(pos.x * (size.x / size.y), pos.y);
     p = fract(p) - 0.5;
 
     var d = sin(length(p) * 8 + time) / 8.;

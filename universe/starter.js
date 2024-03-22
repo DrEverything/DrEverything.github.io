@@ -13,13 +13,6 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         device: device,
         format: canvasFormat,
     });
-    const resizeObserver = new ResizeObserver(entries => {
-        for (let _ of entries) {
-            context.canvas.height = mainCanvas.clientHeight * window.devicePixelRatio;
-            context.canvas.width = mainCanvas.clientWidth * window.devicePixelRatio;
-        }
-    });
-    resizeObserver.observe(mainCanvas);
     const shaderModule = device.createShaderModule({
         label: "Shader",
         code: shader
@@ -48,18 +41,38 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
     device.queue.writeBuffer(vertexBuffer, 0, vertices);
     const uniformBuffers = [
         device.createBuffer({
+            label: "Size Buffer",
+            size: 8,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+        }),
+        device.createBuffer({
             label: "Time Buffer",
             size: 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
         })
     ];
-    let step = new Float32Array([0.0]);
-    device.queue.writeBuffer(uniformBuffers[0], 0, step);
+    let size = new Float32Array([context.canvas.width, context.canvas.height]);
+    device.queue.writeBuffer(uniformBuffers[0], 0, size);
+    let time = new Float32Array([0.0]);
+    device.queue.writeBuffer(uniformBuffers[1], 0, time);
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let _ of entries) {
+            context.canvas.height = mainCanvas.clientHeight * window.devicePixelRatio;
+            context.canvas.width = mainCanvas.clientWidth * window.devicePixelRatio;
+        }
+        let size = new Float32Array([context.canvas.width, context.canvas.height]);
+        device.queue.writeBuffer(uniformBuffers[0], 0, size);
+    });
+    resizeObserver.observe(mainCanvas);
     const bindGroupLayouts = [
         device.createBindGroupLayout({
             label: "Time buffer bind group layout",
             entries: [{
                     binding: 0,
+                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+                    buffer: {}
+                }, {
+                    binding: 1,
                     visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
                     buffer: {}
                 }]
@@ -73,6 +86,10 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
                 {
                     binding: 0,
                     resource: { buffer: uniformBuffers[0] }
+                },
+                {
+                    binding: 1,
+                    resource: { buffer: uniformBuffers[1] }
                 }
             ]
         })
@@ -82,7 +99,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         bindGroupLayouts: bindGroupLayouts,
     });
     const renderPipeline = device.createRenderPipeline({
-        label: "Cell pipeline",
+        label: "Render Pipeline",
         layout: pipelineLayout,
         vertex: {
             module: shaderModule,
@@ -97,9 +114,9 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
                 }]
         }
     });
-    const UPDATE_INTERVAL = 100;
+    // const UPDATE_INTERVAL = 100;
     function updateGrid() {
-        step[0] += 0.02;
+        time[0] += 0.02;
         const encoder = device.createCommandEncoder();
         const renderPass = encoder.beginRenderPass({
             colorAttachments: [{
@@ -115,7 +132,7 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         renderPass.draw(vertices.length / 2);
         renderPass.end();
         device.queue.submit([encoder.finish()]);
-        device.queue.writeBuffer(uniformBuffers[0], 0, step);
+        device.queue.writeBuffer(uniformBuffers[1], 0, time);
         requestAnimationFrame(updateGrid);
     }
     updateGrid();
