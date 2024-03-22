@@ -88,12 +88,6 @@ Promise.all(webgpuPromises).then(([shader, _device]) => {
         code: shader as string
     });
 
-    const computeShaderModule = device.createShaderModule({
-        label: "Cell shader",
-        code: `
-  `
-    });
-
     const bindGroupLayout = device.createBindGroupLayout({
         label: "Cell Bind Group Layout",
         entries: [{

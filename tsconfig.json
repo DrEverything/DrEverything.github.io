@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "ES2022",
         "types": [
-            // "@webgpu/types"
+            "@webgpu/types"
         ],
         "module": "ES2022",
         "lib": [

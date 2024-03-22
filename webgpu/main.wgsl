@@ -28,14 +28,14 @@ fn computeMain(@builtin(global_invocation_id) cell: vec3u) {
 
     // Conway's game of life rules:
     switch activeNeighbors {
-        case 2: {
+        case 2u: {
             cellStateOut[i] = cellStateIn[i];
         }
-        case 3: {
-            cellStateOut[i] = 1;
+        case 3u: {
+            cellStateOut[i] = 1u;
         }
         default: {
-            cellStateOut[i] = 0;
+            cellStateOut[i] = 0u;
         }
     }
 }
