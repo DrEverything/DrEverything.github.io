@@ -1,8 +1,8 @@
 const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(navigator.userAgent.toLowerCase());
-import init from "../pkg/allsim.js";
-init().then(() => {
-    console.log("WASM Loaded");
-});
+// import init from "./pkg/allsim.js";
+// init().then(() => {
+//   console.log("WASM Loaded");
+// });
 function compileShader(gl, source, type) {
     const shader = gl.createShader(type);
     if (!shader) {
@@ -189,3 +189,4 @@ Promise.all(shaderPromises)
         }
     }
 });
+export {};

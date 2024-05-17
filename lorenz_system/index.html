@@ -6,19 +6,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allsim</title>
-    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="../graphics_projects/index.css">
 </head>
 
 <body>
     <script type="module">
-        import init from "/pkg/allsim.js";
+        import init from "./pkg/allsim.js";
         let canvas;
         init().then(() => {
             console.log("WASM Loaded");
-            // canvas = document.querySelector("canvas");
-            // canvas.style.width = "75vh";
-            // canvas.style.height = "auto";
-            // canvas.classList += "my-project-img";
+            canvas = document.querySelector("canvas");
+            canvas.style.width = "75vh";
+            canvas.style.height = "auto";
+            canvas.classList += "my-project-img";
             // canvas.addEventListener('focus', function (event) {
             //     event.preventDefault();
             //     this.blur();
