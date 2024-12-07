@@ -1,145 +1,184 @@
 #version 300 es
 precision highp float;
 
+uniform float waveFrequency;
 uniform float iTime;
 uniform vec2 iResolution;
 uniform vec2 iMouse;
 out vec4 fragColor;
 
 float smin(float a, float b, float k) {
-  float h = clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
-  return mix(a, b, h) - k * h * (1.0 - h);
+    float h = clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
+    return mix(a, b, h) - k * h * (1.0 - h);
 }
 
 mat2 rot2D(float angle) {
-  float s = sin(angle);
-  float c = cos(angle);
-  return mat2(c, -s, s, c);
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat2(c, -s, s, c);
 }
 vec3 rot3D(vec3 p, vec3 axis, float angle) {
-  return mix(dot(axis, p) * axis, p, cos(angle)) + cross(axis, p) * sin(angle);
+    return mix(dot(axis, p) * axis, p, cos(angle)) + cross(axis, p) * sin(angle);
 }
 
-float sdSphere(vec3 p, float s) { return length(p) - s; }
+float sdSphere(vec3 p, float s) {
+    return length(p) - s;
+}
 float sdBox(vec3 p, vec3 b) {
-  vec3 q = abs(p) - b;
-  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
 float sdEllipsoid(vec3 p, vec3 r) {
-  float k0 = length(p / r);
-  float k1 = length(p / (r * r));
-  return k0 * (k0 - 1.0) / k1;
+    float k0 = length(p / r);
+    float k1 = length(p / (r * r));
+    return k0 * (k0 - 1.0) / k1;
 }
 float terrainFunction(vec3 pos) {
-  float fh = -.9 + .05 * (sin(2.0 * pos.x) + sin(2.0 * pos.z));
-  float d = pos.y - fh;
-  vec3 qos = pos;
+    float fh = -.9 + .05 * (sin(2.0 * pos.x) + sin(2.0 * pos.z));
+    float d = pos.y - fh;
+    vec3 qos = pos;
 
-  return d;
+    return d;
 }
 float mandelbulb(in vec3 pos) {
-  vec3 z = pos;
-  float dr = 1. + abs(sin(iTime) * .5);
-  float r;
-  float power = 8. + iTime * .05;
+    vec3 z = pos;
+    float dr = 1. + abs(sin(iTime) * .5);
+    float r;
+    float power = 8. + iTime * .05;
 
-  for (int i = 0; i < 15; i++) {
-    r = length(z);
-    if (r > 2.)
-      break;
+    for (int i = 0; i < 15; i++) {
+        r = length(z);
+        if (r > 2.)
+            break;
 
-    float theta = acos(z.z / r) * power;
-    float phi = atan(z.y, z.x) * power;
-    float zr = pow(r, power);
-    dr = pow(r, power - 1.) * power * dr + 1.;
+        float theta = acos(z.z / r) * power;
+        float phi = atan(z.y, z.x) * power;
+        float zr = pow(r, power);
+        dr = pow(r, power - 1.) * power * dr + 1.;
 
-    z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
-    z += pos;
-  }
-  return .5 * log(r) * r / dr;
+        z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
+        z += pos;
+    }
+    return .5 * log(r) * r / dr;
 }
 float map(in vec3 pos) {
-  // vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
-  // float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
-  //                       sin(aa.y * 15.0 + iTime * .7) *
-  //                       sin(aa.z * 15.0 + iTime * .3);
-  // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
-  // sphere *= .5;
-  float mandelbulbS = mandelbulb(pos - vec3(.0, .0, .0));
-  // mandelbulbS *= .5;
+    // vec3 aa = vec3(pos.x + 2.6 * sin(.0), pos.y, pos.z + .8 * sin(.0));
+    // float rad = .75 + .05 * sin(aa.x * 15.0 + iTime) *
+    //                       sin(aa.y * 15.0 + iTime * .7) *
+    //                       sin(aa.z * 15.0 + iTime * .3);
+    // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
+    // sphere *= .5;
+    // float mandelbulbS = mandelbulb(pos - vec3(.0, .0, .0));
+    // mandelbulbS *= .5;
 
-  // float ground = terrainFunction(pos);
-  // float ground = pos.y + .5;
-  // ground *= .5;
+    // float ground = terrainFunction(pos);
+    // float ground = pos.y + .5;
+    // ground *= .5;
 
-  return mandelbulbS;
+	// let sphere = sdSphere(pos, 5.5);
+
+    // return mandelbulbS;
+	return 0.0;
 }
 
 vec3 calcNormal(in vec3 pos) {
-  vec2 e = vec2(0.0001, 0.0);
-  return normalize(vec3(map(pos + e.xyy) - map(pos - e.xyy),
-                        map(pos + e.yxy) - map(pos - e.yxy),
-                        map(pos + e.yyx) - map(pos - e.yyx)));
+    vec2 e = vec2(0.0001, 0.0);
+    return normalize(vec3(map(pos + e.xyy) - map(pos - e.xyy),
+            map(pos + e.yxy) - map(pos - e.yxy),
+            map(pos + e.yyx) - map(pos - e.yyx)));
 }
 
 float castRay(in vec3 ro, vec3 rd) {
-  float t = 0.;
-  for (int i = 0; i < 80; i++) {
-    vec3 pos = ro + t * rd;
+    float t = 0.;
+    for (int i = 0; i < 80; i++) {
+        vec3 pos = ro + t * rd;
 
-    float h = map(pos);
-    if (h < .001) {
-      break;
+        float h = map(pos);
+        if (h < .001) {
+            break;
+        }
+
+        t += h;
+        if (t > 20.) {
+            break;
+        }
     }
-
-    t += h;
     if (t > 20.) {
-      break;
+        t = -1.;
     }
-  }
-  if (t > 20.) {
-    t = -1.;
-  }
-  return t;
+    return t;
 }
 
 void main(void) {
-  vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
-  
-  // float time = iTime * .5;
-  vec3 ro = vec3(0, .0, 1.63);
-  vec3 rd = normalize(vec3(p, -1.));
+    vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-  vec2 m = iMouse * 1.5;
-  ro.yz *= rot2D(m.y - .2);
-  rd.yz *= rot2D(m.y - .2);
-  ro.xz *= rot2D(m.x - .4);
-  rd.xz *= rot2D(m.x - .4);
+	float x = length(p) - .5 - .1 * sin(10.0 * p.x + iTime) * sin(10.0 * p.y + iTime);
 
-  // vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
-  // col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
-  vec3 col = vec3(.01);
+	// x = smoothstep(x+.01, x+.02, x);
 
-  float t = castRay(ro, rd);
+	fragColor = vec4(vec3(x), 1.0);
+}
 
-  if (t > 0.) {
-    vec3 pos = ro + t * rd;
-    vec3 nor = calcNormal(pos);
+void main2(void) {
+    vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
-    vec3 mate = vec3(.18);
+    // float time = iTime * .5;
+    vec3 ro = vec3(0, .0, 1.63);
+    vec3 rd = normalize(vec3(p, -1.));
 
-    vec3 sun_dir = normalize(vec3(.8, .4, .2));
-    float sun_dif = clamp(dot(nor, sun_dir), 0.0, 1.0);
-    // float sun_sha = step(castRay(pos + nor * .001, sun_dir), 0.);
-    float sky_dif = clamp(.5 + .5 * dot(nor, vec3(0.0, 1.0, 0.0)), 0.0, 1.0);
-    float bou_dif = clamp(.5 + .5 * dot(nor, vec3(0.0, -1.0, 0.0)), 0.0, 1.0);
+    vec2 m = iMouse * 1.5;
+    ro.yz *= rot2D(m.y - .2);
+    rd.yz *= rot2D(m.y - .2);
+    ro.xz *= rot2D(m.x - .4);
+    rd.xz *= rot2D(m.x - .4);
 
-    col = mate * vec3(7., 4.5, 3.) * sun_dif;// * sun_sha;
-    col += mate * vec3(.5, .8, 0.9) * sky_dif;
-    // col += mate * vec3(0.7, 0.3, 0.2) * bou_dif;
-  }
+    // vec3 col = vec3(.4, .75, 1.) - .7 * rd.y;
+    // col = mix(col, vec3(0.7, 0.75, 0.8), exp(-10.0 * rd.y));
+    vec3 col = vec3(.01);
 
-  col = pow(col, vec3(.4545));
+    float t = castRay(ro, rd);
 
-  fragColor = vec4(col, 1.);
+    if (t > 0.) {
+        vec3 pos = ro + t * rd;
+        vec3 nor = calcNormal(pos);
+
+        vec3 mate = vec3(.18);
+
+        vec3 sun_dir = normalize(vec3(.8, .4, .2));
+        float sun_dif = clamp(dot(nor, sun_dir), 0.0, 1.0);
+        // float sun_sha = step(castRay(pos + nor * .001, sun_dir), 0.);
+        float sky_dif = clamp(.5 + .5 * dot(nor, vec3(0.0, 1.0, 0.0)), 0.0, 1.0);
+        float bou_dif = clamp(.5 + .5 * dot(nor, vec3(0.0, -1.0, 0.0)), 0.0, 1.0);
+
+        col = mate * vec3(7., 4.5, 3.) * sun_dif; // * sun_sha;
+        col += mate * vec3(.5, .8, 0.9) * sky_dif;
+        // col += mate * vec3(0.7, 0.3, 0.2) * bou_dif;
+    }
+
+    col = pow(col, vec3(.4545));
+
+    fragColor = vec4(col, 1.);
+}
+
+void main1(void) {
+    vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
+
+    const float PI = 3.14159265359;
+
+    float wave = sin(p.x * waveFrequency + iTime) + // 440 Hz sine wave
+            0.5 * sin(p.y * waveFrequency * 1.5 + iTime); // 660 Hz sine wave
+            // 0.3 * sin(2. * PI * waveFrequency * 2. + iTime); // 880 Hz sine wave
+
+    float rad = .5;
+    float circle = length(p.y) - rad + .3 * wave;
+	// sin(iTime + p.x * 10.) * sin(iTime + p.y * 10.)
+
+    vec3 col = vec3(smoothstep(0.05, 0.1, circle));
+
+    // if (circle <= 0.) {
+    //     fragColor = vec4(col, 0.);
+    // } else {
+    //     fragColor = vec4(col, 1.);
+    // }
+	fragColor = vec4(col, 1.);
 }

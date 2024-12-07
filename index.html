@@ -2,51 +2,48 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hristos P - Portfolio</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" type="text/css" href="index.css">
-  <script src="index.js" type="module" defer></script>
-  <style>
-    a {
-      display: grid;
-      justify-items: center;
-      height: auto;
-      width: 500px;
-      border-radius: 8px;
-      box-shadow: 7px 7px 33px;
-    }
-    
-    a:hover {
-      box-shadow: 7px 7px 33px purple;
-    }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Hristos P - Portfolio</title>
+	<link rel="manifest" href="manifest.json">
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<script src="index.js" type="module" defer></script>
+	<style>
+		#graphics_projects {
+			display: grid;
+			justify-items: center;
+			height: auto;
+			width: 600px;
+			border-radius: 8px;
+			box-shadow: 7px 7px 33px;
+		}
 
-    a:active {
-      box-shadow: 7px 7px 33px red;
-    }
+		#graphics_projects > img {
+			height: 100%;
+			width: 100%;
+			object-fit: cover;
+			border-bottom-left-radius: 8px;
+			border-bottom-right-radius: 8px;
+		}
 
-    a img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
-    }
+		#graphics_projects,
+		#graphics_projects:hover,
+		#graphics_projects:focus,
+		#graphics_projects:active {
+			text-decoration: none;
+			font-style:
+				color: inherit;
+		}
 
-    a,
-    a:hover,
-    a:focus,
-    a:active {
-      text-decoration: none;
-      font-style: italic;
-      color: inherit;
-    }
-  </style>
+		body > * {
+			margin: 0 0 25px 0;
+		}
+	</style>
 </head>
 
 <body>
-  <a href="graphics_projects">
-    <h1>Projects with WebGL,<br> WebGPU(only in Chrome), <br>WebAssembly(made using Rust)</h1> <img src="assets/projects.png" alt="image of projects">
-  </a>
+	<a id="graphics_projects" href="graphics_projects">
+		<h1>Graphics Projects</h1> <img src="assets/projects.png" alt="image of projects">
+	</a>
+	<a id="easy_job" href="easy_job"><h1>EASY JOB</h1></a>
 </body>

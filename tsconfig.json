@@ -11,7 +11,7 @@
             "ES2022",
             "WebWorker"
         ],
-        "moduleResolution": "nodeNext"
+        // "moduleResolution": "nodeNext"
     },
     "watch": true,
 }
