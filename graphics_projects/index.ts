@@ -5,46 +5,6 @@ const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/
 //   console.log("WASM Loaded");
 // });
 
-function playSound(frequency: number, duration: number = 0.5): number[] {
-  // Create a new audio context
-  const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-  // Define parameters
-  const sampleRate = audioCtx.sampleRate;
-  const numChannels = 1;
-  const frameCount = sampleRate * duration;
-
-  // Create an empty audio buffer
-  const buffer = audioCtx.createBuffer(numChannels, frameCount, sampleRate);
-  // const data = buffer.getChannelData(0);
-  const data = [];
-
-  // Generate the sound by summing multiple sine waves
-  for (let i = 0; i < frameCount; i++) {
-    const t = i / sampleRate;
-    data[i] =
-      Math.sin(2 * Math.PI * frequency * t) + // 440 Hz sine wave
-      0.5 * Math.sin(2 * Math.PI * frequency * 1.5 * t) + // 660 Hz sine wave
-      0.3 * Math.sin(2 * Math.PI * frequency * 2 * t); // 880 Hz sine wave
-  }
-
-  // Normalize the data
-  const maxAmplitude = Math.max(...data.map(Math.abs));
-  for (let i = 0; i < frameCount; i++) {
-    data[i] /= maxAmplitude;
-  }
-
-  return data
-
-  // // Create a buffer source and play the sound
-  // const source = audioCtx.createBufferSource();
-  // source.buffer = buffer;
-  // source.connect(audioCtx.destination);
-  // source.start()
-}
-
-console.log(playSound(440.0));
-
 function compileShader(gl: WebGL2RenderingContext, source: string, type: GLenum): WebGLShader | null {
   const shader = gl.createShader(type);
   if (!shader) {
@@ -198,7 +158,6 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
   ]);
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-  let waveFrequency = gl.getUniformLocation(shaderProgram, "waveFrequency");
   let iTimeLocation = gl.getUniformLocation(shaderProgram, "iTime");
   let iResolutionLocation = gl.getUniformLocation(shaderProgram, "iResolution");
   let iMouseLocation = gl.getUniformLocation(shaderProgram, "iMouse");
@@ -212,35 +171,14 @@ function initWebGL2(canvas: HTMLCanvasElement, vsSource: string, fsSource: strin
     gl.uniform1f(iTimeLocation, time);
 
     gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
-
-    const noteFrequencies = {
-      'C4': 261.63,
-      'D4': 293.66,
-      'E4': 329.63,
-      'F4': 349.23,
-      'G4': 392.00,
-      'A4': 440.00,
-      'B4': 493.88,
-      'C5': 523.25,
-    };
-
-    for (let [note, frequency] of Object.entries(noteFrequencies)) {
-      const duration = 0.2;
-
-      gl.uniform1f(waveFrequency, frequency);
-
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
-      break
-    }
-
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
     time += 0.03;
 
     animationIds.set(canvas.id, requestAnimationFrame(GLDraw));
   }
 
-  GLDraw();
-  cancelAnimationFrame(animationIds.get(canvas.id));
+  // GLDraw();
+  // cancelAnimationFrame(animationIds.get(canvas.id));
 
   // let intervalId = setInterval(GLDraw, 100);
   return GLDraw;
@@ -261,31 +199,33 @@ Promise.all(shaderPromises)
     for (let i = 0; i < canvases.length; i++) {
       drawFuctions.set(canvases[i].id, initWebGL2(canvases[i], shaders[0], shaders[i + 1]));
       drawFuctions.get(canvases[i].id)();
-      // if (isMobile) {
-      //   // canvases[i].addEventListener("touchstart", function () {
-      //   //     let cId = canvases[i].id;
-      //   //     let id = animationIds.get(cId);
-      //   //     if (id) {
-      //   //         cancelAnimationFrame(id);
-      //   //         animationIds.delete(cId);
-      //   //     } else {
-      //   //         drawFuctions.get(cId)();
-      //   //     }
-      //   // })
-      //   canvases[i].addEventListener("touchstart", function() {
-      //     drawFuctions.get(canvases[i].id)();
-      //   })
-      //   canvases[i].addEventListener("touchend", function() {
-      //     cancelAnimationFrame(animationIds.get(canvases[i].id));
-      //   })
-      // } else {
-      //   canvases[i].addEventListener("mouseenter", function() {
-      //     drawFuctions.get(canvases[i].id)();
-      //   })
-      //   canvases[i].addEventListener("mouseleave", function() {
-      //     cancelAnimationFrame(animationIds.get(canvases[i].id));
-      //   })
-      // }
+      cancelAnimationFrame(animationIds.get(canvases[i].id));
+
+      if (isMobile) {
+        // canvases[i].addEventListener("touchstart", function () {
+        //     let cId = canvases[i].id;
+        //     let id = animationIds.get(cId);
+        //     if (id) {
+        //         cancelAnimationFrame(id);
+        //         animationIds.delete(cId);
+        //     } else {
+        //         drawFuctions.get(cId)();
+        //     }
+        // })
+        canvases[i].addEventListener("touchstart", function() {
+          drawFuctions.get(canvases[i].id)();
+        })
+        canvases[i].addEventListener("touchend", function() {
+          cancelAnimationFrame(animationIds.get(canvases[i].id));
+        })
+      } else {
+        canvases[i].addEventListener("mouseenter", function() {
+          drawFuctions.get(canvases[i].id)();
+        })
+        canvases[i].addEventListener("mouseleave", function() {
+          cancelAnimationFrame(animationIds.get(canvases[i].id));
+        })
+      }
     }
   });
 

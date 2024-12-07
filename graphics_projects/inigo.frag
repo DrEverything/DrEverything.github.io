@@ -1,7 +1,6 @@
 #version 300 es
 precision highp float;
 
-uniform float waveFrequency;
 uniform float iTime;
 uniform vec2 iResolution;
 uniform vec2 iMouse;
@@ -42,7 +41,7 @@ float terrainFunction(vec3 pos) {
 }
 float mandelbulb(in vec3 pos) {
     vec3 z = pos;
-    float dr = 1. + abs(sin(iTime) * .5);
+    float dr = .4;
     float r;
     float power = 8. + iTime * .05;
 
@@ -158,27 +157,4 @@ void main(void) {
     col = pow(col, vec3(.4545));
 
     fragColor = vec4(col, 1.);
-}
-
-void main1(void) {
-    vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
-
-    const float PI = 3.14159265359;
-
-    float wave = sin(p.x * waveFrequency + iTime) + // 440 Hz sine wave
-            0.5 * sin(p.y * waveFrequency * 1.5 + iTime); // 660 Hz sine wave
-            // 0.3 * sin(2. * PI * waveFrequency * 2. + iTime); // 880 Hz sine wave
-
-    float rad = .5;
-    float circle = length(p.y) - rad + .3 * wave;
-	// sin(iTime + p.x * 10.) * sin(iTime + p.y * 10.)
-
-    vec3 col = vec3(smoothstep(0.05, 0.1, circle));
-
-    // if (circle <= 0.) {
-    //     fragColor = vec4(col, 0.);
-    // } else {
-    //     fragColor = vec4(col, 1.);
-    // }
-	fragColor = vec4(col, 1.);
 }
