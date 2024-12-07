@@ -109,7 +109,7 @@ float castRay(in vec3 ro, vec3 rd) {
     return t;
 }
 
-void main(void) {
+void main2(void) {
     vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
 	float x = length(p) - .5 - .1 * sin(10.0 * p.x + iTime) * sin(10.0 * p.y + iTime);
@@ -119,7 +119,7 @@ void main(void) {
 	fragColor = vec4(vec3(x), 1.0);
 }
 
-void main2(void) {
+void main(void) {
     vec2 p = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
 
     // float time = iTime * .5;
