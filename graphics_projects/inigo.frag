@@ -68,8 +68,8 @@ float map(in vec3 pos) {
     //                       sin(aa.z * 15.0 + iTime * .3);
     // float sphere = length(aa + vec3(-.3, -.9, .1)) - rad;
     // sphere *= .5;
-    // float mandelbulbS = mandelbulb(pos - vec3(.0, .0, .0));
-    // mandelbulbS *= .5;
+    float mandelbulbS = mandelbulb(pos - vec3(.0, .0, .0));
+    mandelbulbS *= .5;
 
     // float ground = terrainFunction(pos);
     // float ground = pos.y + .5;
@@ -77,8 +77,8 @@ float map(in vec3 pos) {
 
 	// let sphere = sdSphere(pos, 5.5);
 
-    // return mandelbulbS;
-	return 0.0;
+    return mandelbulbS;
+	// return 0.0;
 }
 
 vec3 calcNormal(in vec3 pos) {
