@@ -1,5 +1,7 @@
 <script lang="ts">
-  import MRI from "./MRI.svelte";
+  import Healthcare from "./Healthcare.svelte";
+  import Food from "./Food.svelte";
 </script>
 
-<MRI />
+<Healthcare />
+<Food />
