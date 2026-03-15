@@ -1,4 +1,5 @@
 <script lang="ts">
+  let { something } = $props();
 </script>
 
-<h1>Food</h1>
+<h1>{something}</h1>
