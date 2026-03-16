@@ -44,6 +44,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@simplewebauthn/browser": "^13.3.0",
 		"d3-array": "^3.2.4",
 		"d3-axis": "^3.0.0",
 		"d3-color": "^3.1.0",

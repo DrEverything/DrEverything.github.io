@@ -1,7 +1,9 @@
 <script lang="ts">
   import Healthcare from "./Healthcare.svelte";
   import Food from "./Food.svelte";
+  import Login from "./Login.svelte";
   import { Input } from "$lib/components/ui/input";
+  import { Button } from "$lib/components/ui/button";
 
   interface FinancialEntry {
     id: string;
@@ -134,11 +136,9 @@
       recurring: true,
     },
   ]);
-
   let something = $state("Hristos");
 </script>
 
-<Healthcare />
+<Login />
 
-<Input type="text" bind:value={something} />
-<Food {something} />
+<Healthcare />
