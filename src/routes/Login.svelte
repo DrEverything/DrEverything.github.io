@@ -29,7 +29,6 @@
 
       const options = await startRes.json();
 
-      // FIX: Unwrap options.publicKey here
       const cred = await startRegistration({
         optionsJSON: options.publicKey,
       });
@@ -69,7 +68,6 @@
 
       const options = await startRes.json();
 
-      // FIX: Unwrap options.publicKey here as well
       const cred = await startAuthentication({
         optionsJSON: options.publicKey,
       });

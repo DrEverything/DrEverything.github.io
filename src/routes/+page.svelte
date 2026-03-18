@@ -2,6 +2,7 @@
   import Healthcare from "./Healthcare.svelte";
   import Food from "./Food.svelte";
   import Login from "./Login.svelte";
+  import Dashboard from "./Dashboard.svelte";
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
 
@@ -139,6 +140,8 @@
   let something = $state("Hristos");
 </script>
 
-<Login />
+<Dashboard />
 
-<Healthcare />
+<!-- <Login /> -->
+<!---->
+<!-- <Healthcare /> -->

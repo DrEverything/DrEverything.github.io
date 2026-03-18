@@ -1,0 +1,121 @@
+<script lang="ts">
+  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import AppSidebar from "$lib/components/app-sidebar.svelte";
+  import SiteHeader from "$lib/components/site-header.svelte";
+  import SectionCards from "$lib/components/section-cards.svelte";
+  import ChartAreaInteractive from "$lib/components/chart-area-interactive.svelte";
+  import DataTable from "$lib/components/data-table.svelte";
+
+  let data = [
+    {
+      id: 1,
+      header: "Cover page",
+      type: "Cover page",
+      status: "In Process",
+      target: "18",
+      limit: "5",
+      reviewer: "Eddie Lake",
+    },
+    {
+      id: 2,
+      header: "Table of contents",
+      type: "Table of contents",
+      status: "Done",
+      target: "29",
+      limit: "24",
+      reviewer: "Eddie Lake",
+    },
+    {
+      id: 3,
+      header: "Executive summary",
+      type: "Narrative",
+      status: "Done",
+      target: "10",
+      limit: "13",
+      reviewer: "Eddie Lake",
+    },
+    {
+      id: 4,
+      header: "Technical approach",
+      type: "Narrative",
+      status: "Done",
+      target: "27",
+      limit: "23",
+      reviewer: "Jamik Tashpulatov",
+    },
+    {
+      id: 5,
+      header: "Design",
+      type: "Narrative",
+      status: "In Process",
+      target: "2",
+      limit: "16",
+      reviewer: "Jamik Tashpulatov",
+    },
+    {
+      id: 6,
+      header: "Capabilities",
+      type: "Narrative",
+      status: "In Process",
+      target: "20",
+      limit: "8",
+      reviewer: "Jamik Tashpulatov",
+    },
+    {
+      id: 7,
+      header: "Integration with existing systems",
+      type: "Narrative",
+      status: "In Process",
+      target: "19",
+      limit: "21",
+      reviewer: "Jamik Tashpulatov",
+    },
+    {
+      id: 8,
+      header: "Innovation and Advantages",
+      type: "Narrative",
+      status: "Done",
+      target: "25",
+      limit: "26",
+      reviewer: "Assign reviewer",
+    },
+    {
+      id: 9,
+      header: "Overview of EMR's Innovative Solutions",
+      type: "Technical content",
+      status: "Done",
+      target: "7",
+      limit: "23",
+      reviewer: "Assign reviewer",
+    },
+    {
+      id: 10,
+      header: "Advanced Algorithms and Machine Learning",
+      type: "Narrative",
+      status: "Done",
+      target: "30",
+      limit: "28",
+      reviewer: "Assign reviewer",
+    },
+  ];
+</script>
+
+<Sidebar.Provider
+  style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);"
+>
+  <AppSidebar variant="inset" />
+  <Sidebar.Inset>
+    <SiteHeader />
+    <div class="flex flex-1 flex-col">
+      <div class="@container/main flex flex-1 flex-col gap-2">
+        <div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+          <SectionCards />
+          <div class="px-4 lg:px-6">
+            <ChartAreaInteractive />
+          </div>
+          <DataTable {data} />
+        </div>
+      </div>
+    </div>
+  </Sidebar.Inset>
+</Sidebar.Provider>
