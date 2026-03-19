@@ -1,73 +1,46 @@
-<script>
-  import { Input } from "$lib/components/ui/input";
-  import { Button } from "$lib/components/ui/button";
+<script lang="ts">
   import {
     startRegistration,
     startAuthentication,
   } from "@simplewebauthn/browser";
+  import { Button } from "$lib/components/ui/button";
+  import { Input } from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import * as Card from "$lib/components/ui/card";
+  import { Separator } from "$lib/components/ui/separator";
 
+  // const ORIGIN = "https://monada.foundation";
+  const ORIGIN = "http://localhost:3000";
+
+  // Modes: "login" | "register"
+  let mode = $state("login");
   let username = $state("");
   let message = $state("");
-
-  const ORIGIN = "https://monada.foundation";
-  // const ORIGIN = "http://localhost:3000";
-
-  async function registerPasskey() {
-    message = "Requesting registration...";
-    try {
-      const startRes = await fetch(`${ORIGIN}/api/auth/register/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
-
-      if (!startRes.ok) {
-        const err = await startRes.json();
-        message = `Start failed: ${err.error}`;
-        return;
-      }
-
-      const options = await startRes.json();
-
-      const cred = await startRegistration({
-        optionsJSON: options.publicKey,
-      });
-
-      const finishRes = await fetch(`${ORIGIN}/api/auth/register/finish`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, cred }),
-      });
-
-      if (finishRes.ok) {
-        message = "Passkey registered successfully! You can now log in.";
-      } else {
-        const err = await finishRes.json();
-        message = `Registration failed: ${err.error}`;
-      }
-    } catch (err) {
-      console.error(err);
-      message = "Registration was canceled or failed.";
-    }
-  }
+  let error = $state("");
+  let loading = $state(false);
 
   async function loginPasskey() {
-    message = "Requesting login...";
+    if (!username.trim()) {
+      error = "Please enter your email or username.";
+      return;
+    }
+    loading = true;
+    error = "";
+    message = "";
     try {
       const startRes = await fetch(`${ORIGIN}/api/auth/login/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username }),
+        credentials: "include",
       });
-
       if (!startRes.ok) {
-        const err = await startRes.json();
-        message = `Cannot login: ${err.error || "User not found"}`;
+        const err = await startRes.json().catch(() => ({}));
+        error = err.error ?? "No passkey found for that account.";
         return;
       }
 
       const options = await startRes.json();
-
       const cred = await startAuthentication({
         optionsJSON: options.publicKey,
       });
@@ -75,44 +48,163 @@
       const finishRes = await fetch(`${ORIGIN}/api/auth/login/finish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // JWT is set as an HttpOnly cookie by the server — we never touch it in JS
         body: JSON.stringify({ username, cred }),
+        credentials: "include",
       });
-
       if (finishRes.ok) {
-        const { access_token } = await finishRes.json();
-        localStorage.setItem("jwt", access_token);
-        message = "Logged in successfully!";
+        message = "Signed in!";
+        // TODO: redirect, e.g. goto("/dashboard")
       } else {
-        message = "Invalid passkey or server verification failed.";
+        error = "Passkey verification failed.";
       }
-    } catch (err) {
-      console.error(err);
-      message = "Login was canceled or failed.";
+    } catch (err: any) {
+      if (err.name === "NotAllowedError") {
+        error = "Sign-in was canceled.";
+      } else {
+        console.error(err);
+        error = "Something went wrong. Please try again.";
+      }
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function registerPasskey() {
+    if (!username.trim()) {
+      error = "Please enter an email or username.";
+      return;
+    }
+    loading = true;
+    error = "";
+    message = "";
+    try {
+      const startRes = await fetch(`${ORIGIN}/api/auth/register/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+        credentials: "include",
+      });
+      if (!startRes.ok) {
+        const err = await startRes.json().catch(() => ({}));
+        error = err.error ?? "Could not start registration.";
+        return;
+      }
+
+      const options = await startRes.json();
+      const cred = await startRegistration({ optionsJSON: options.publicKey });
+
+      const finishRes = await fetch(`${ORIGIN}/api/auth/register/finish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, cred }),
+        credentials: "include",
+      });
+      if (finishRes.ok) {
+        message = "Passkey created! You can now sign in.";
+        mode = "login";
+      } else {
+        const err = await finishRes.json().catch(() => ({}));
+        error = err.error ?? "Registration failed.";
+      }
+    } catch (err: any) {
+      if (err.name === "NotAllowedError") {
+        error = "Passkey creation was canceled.";
+      } else {
+        console.error(err);
+        error = "Something went wrong. Please try again.";
+      }
+    } finally {
+      loading = false;
+    }
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === "Enter") {
+      mode === "login" ? loginPasskey() : registerPasskey();
     }
   }
 </script>
 
-<main>
-  <h2>Passkey Auth</h2>
+<div class="flex min-h-svh items-center justify-center p-4">
+  <Card.Root class="w-full max-w-sm">
+    <Card.Header class="text-center">
+      <Card.Title class="text-2xl">
+        {mode === "login" ? "Welcome back" : "Create account"}
+      </Card.Title>
+      <Card.Description>
+        {mode === "login"
+          ? "Enter your email to sign in with your passkey."
+          : "Enter an email to create your passkey."}
+      </Card.Description>
+    </Card.Header>
 
-  <div>
-    <label for="username">Email / Username:</label>
-    <!-- Adding autocomplete="username webauthn" helps calm down Chrome extensions -->
-    <Input
-      id="username"
-      type="text"
-      bind:value={username}
-      placeholder="alice@example.com"
-      autocomplete="username webauthn"
-    />
-  </div>
+    <Card.Content class="space-y-4">
+      <div class="space-y-2">
+        <Label for="username">Email or username</Label>
+        <!--
+          autocomplete="username webauthn" lets the browser surface passkey
+          suggestions in its autofill dropdown as the user types.
+        -->
+        <Input
+          id="username"
+          type="text"
+          bind:value={username}
+          placeholder="alice@example.com"
+          autocomplete="username webauthn"
+          disabled={loading}
+          onkeydown={handleKeydown}
+        />
+      </div>
 
-  <div style="margin-top: 1rem;">
-    <Button onclick={registerPasskey}>Create Passkey</Button>
-    <Button onclick={loginPasskey}>Login with Passkey</Button>
-  </div>
+      {#if mode === "login"}
+        <Button class="w-full" onclick={loginPasskey} disabled={loading}>
+          {loading ? "Signing in…" : "Sign in with passkey"}
+        </Button>
 
-  {#if message}
-    <p style="margin-top: 1rem; font-weight: bold;">{message}</p>
-  {/if}
-</main>
+        <Separator />
+
+        <p class="text-center text-sm text-muted-foreground">
+          No account yet?{" "}
+          <button
+            class="underline underline-offset-4 hover:text-primary"
+            onclick={() => {
+              mode = "register";
+              error = "";
+              message = "";
+            }}
+          >
+            Create one
+          </button>
+        </p>
+      {:else}
+        <Button class="w-full" onclick={registerPasskey} disabled={loading}>
+          {loading ? "Creating passkey…" : "Create passkey"}
+        </Button>
+
+        <Separator />
+
+        <p class="text-center text-sm text-muted-foreground">
+          Already have a passkey?{" "}
+          <button
+            class="underline underline-offset-4 hover:text-primary"
+            onclick={() => {
+              mode = "login";
+              error = "";
+              message = "";
+            }}
+          >
+            Sign in
+          </button>
+        </p>
+      {/if}
+
+      {#if message}
+        <p class="text-center text-sm font-medium text-green-600">{message}</p>
+      {/if}
+      {#if error}
+        <p class="text-center text-sm font-medium text-destructive">{error}</p>
+      {/if}
+    </Card.Content>
+  </Card.Root>
+</div>

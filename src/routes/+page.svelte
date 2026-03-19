@@ -140,8 +140,8 @@
   let something = $state("Hristos");
 </script>
 
-<Dashboard />
+<!-- <Dashboard /> -->
 
-<!-- <Login /> -->
+<Login />
 <!---->
 <!-- <Healthcare /> -->
