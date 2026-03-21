@@ -8,6 +8,7 @@
   import { Label } from "$lib/components/ui/label";
   import * as Card from "$lib/components/ui/card";
   import { Separator } from "$lib/components/ui/separator";
+  import { goto } from "$app/navigation";
 
   // const ORIGIN = "https://monada.foundation";
   const ORIGIN = "http://localhost:3000";
@@ -55,6 +56,8 @@
       if (finishRes.ok) {
         message = "Signed in!";
         // TODO: redirect, e.g. goto("/dashboard")
+
+        goto("/dashboard");
       } else {
         error = "Passkey verification failed.";
       }
