@@ -1,96 +1,79 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import {
     startRegistration,
     startAuthentication,
+    browserSupportsWebAuthnAutofill,
   } from "@simplewebauthn/browser";
+  import { goto } from "$app/navigation";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import * as Card from "$lib/components/ui/card";
-  import { Separator } from "$lib/components/ui/separator";
-  import { goto } from "$app/navigation";
 
-  // const ORIGIN = "https://monada.foundation";
   const ORIGIN = "http://localhost:3000";
 
-  // Modes: "login" | "register"
-  let mode = $state("login");
-  let username = $state("");
-  let message = $state("");
+  type Step = "idle" | "register";
+  let step = $state<Step>("idle");
+  let email = $state("");
   let error = $state("");
   let loading = $state(false);
 
-  async function loginPasskey() {
-    if (!username.trim()) {
-      error = "Please enter your email or username.";
-      return;
-    }
-    loading = true;
-    error = "";
-    message = "";
+  // Fires silently on mount — arms the browser's passkey autofill picker.
+  // Returning users just touch their fingerprint, no typing needed.
+  onMount(async () => {
+    if (!(await browserSupportsWebAuthnAutofill())) return;
     try {
-      const startRes = await fetch(`${ORIGIN}/api/auth/login/start`, {
+      const res = await fetch(`${ORIGIN}/api/auth/login/start`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
         credentials: "include",
       });
-      if (!startRes.ok) {
-        const err = await startRes.json().catch(() => ({}));
-        error = err.error ?? "No passkey found for that account.";
-        return;
-      }
+      if (!res.ok) return;
 
-      const options = await startRes.json();
+      const { challenge_id, publicKey } = await res.json();
+
       const cred = await startAuthentication({
-        optionsJSON: options.publicKey,
+        optionsJSON: publicKey,
+        useBrowserAutofill: true,
       });
 
-      const finishRes = await fetch(`${ORIGIN}/api/auth/login/finish`, {
+      const finish = await fetch(`${ORIGIN}/api/auth/login/finish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // JWT is set as an HttpOnly cookie by the server — we never touch it in JS
-        body: JSON.stringify({ username, cred }),
+        body: JSON.stringify({ challenge_id, cred }),
         credentials: "include",
       });
-      if (finishRes.ok) {
-        message = "Signed in!";
-        // TODO: redirect, e.g. goto("/dashboard")
 
-        goto("/dashboard");
-      } else {
-        error = "Passkey verification failed.";
-      }
-    } catch (err: any) {
-      if (err.name === "NotAllowedError") {
-        error = "Sign-in was canceled.";
-      } else {
-        console.error(err);
-        error = "Something went wrong. Please try again.";
-      }
-    } finally {
-      loading = false;
+      if (finish.ok) goto("/dashboard");
+      else error = "Passkey verification failed.";
+    } catch {
+      // No passkey available — user stays on idle, can register
     }
-  }
+  });
 
-  async function registerPasskey() {
-    if (!username.trim()) {
-      error = "Please enter an email or username.";
+  // ── Registration ────────────────────────────────────────────────────────
+
+  async function register() {
+    if (!email.trim()) {
+      error = "Enter your email.";
       return;
     }
     loading = true;
     error = "";
-    message = "";
     try {
       const startRes = await fetch(`${ORIGIN}/api/auth/register/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ email }),
         credentials: "include",
       });
+
+      if (startRes.status === 409) {
+        error = "An account with that email already exists.";
+        return;
+      }
       if (!startRes.ok) {
-        const err = await startRes.json().catch(() => ({}));
-        error = err.error ?? "Could not start registration.";
+        error = "Could not start registration.";
         return;
       }
 
@@ -100,114 +83,88 @@
       const finishRes = await fetch(`${ORIGIN}/api/auth/register/finish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, cred }),
+        body: JSON.stringify({ email, cred }),
         credentials: "include",
       });
-      if (finishRes.ok) {
-        message = "Passkey created! You can now sign in.";
-        mode = "login";
-      } else {
-        const err = await finishRes.json().catch(() => ({}));
-        error = err.error ?? "Registration failed.";
-      }
+
+      if (finishRes.ok) goto("/dashboard");
+      else error = "Registration failed. Please try again.";
     } catch (err: any) {
-      if (err.name === "NotAllowedError") {
-        error = "Passkey creation was canceled.";
-      } else {
-        console.error(err);
-        error = "Something went wrong. Please try again.";
-      }
+      error =
+        err.name === "NotAllowedError"
+          ? "Passkey creation was canceled."
+          : "Something went wrong.";
     } finally {
       loading = false;
-    }
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === "Enter") {
-      mode === "login" ? loginPasskey() : registerPasskey();
     }
   }
 </script>
 
 <div class="flex min-h-svh items-center justify-center p-4">
   <Card.Root class="w-full max-w-sm">
-    <Card.Header class="text-center">
-      <Card.Title class="text-2xl">
-        {mode === "login" ? "Welcome back" : "Create account"}
-      </Card.Title>
-      <Card.Description>
-        {mode === "login"
-          ? "Enter your email to sign in with your passkey."
-          : "Enter an email to create your passkey."}
-      </Card.Description>
-    </Card.Header>
-
-    <Card.Content class="space-y-4">
-      <div class="space-y-2">
-        <Label for="username">Email or username</Label>
+    {#if step === "idle"}
+      <Card.Header class="text-center">
+        <Card.Title class="text-2xl">Welcome</Card.Title>
+        <Card.Description>
+          Sign in with your passkey, or create an account.
+        </Card.Description>
+      </Card.Header>
+      <Card.Content class="space-y-4">
         <!--
-          autocomplete="username webauthn" lets the browser surface passkey
-          suggestions in its autofill dropdown as the user types.
+          This hidden input is what the browser attaches the passkey
+          autofill picker to. It must exist in the DOM on mount.
         -->
-        <Input
-          id="username"
+        <input
           type="text"
-          bind:value={username}
-          placeholder="alice@example.com"
           autocomplete="username webauthn"
-          disabled={loading}
-          onkeydown={handleKeydown}
+          style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;"
+          tabindex="-1"
+          aria-hidden="true"
         />
-      </div>
-
-      {#if mode === "login"}
-        <Button class="w-full" onclick={loginPasskey} disabled={loading}>
-          {loading ? "Signing in…" : "Sign in with passkey"}
+        {#if error}
+          <p class="text-center text-sm text-destructive">{error}</p>
+        {/if}
+        <Button class="w-full" onclick={() => { step = "register"; error = ""; }}>
+          Create account
         </Button>
+      </Card.Content>
 
-        <Separator />
-
+    {:else if step === "register"}
+      <Card.Header class="text-center">
+        <Card.Title class="text-2xl">Create account</Card.Title>
+        <Card.Description>
+          Enter your email to create a passkey account.
+        </Card.Description>
+      </Card.Header>
+      <Card.Content class="space-y-4">
+        <div class="space-y-2">
+          <Label for="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            bind:value={email}
+            placeholder="alice@example.com"
+            autocomplete="email"
+            disabled={loading}
+            onkeydown={(e) => e.key === "Enter" && register()}
+          />
+        </div>
+        {#if error}
+          <p class="text-sm text-destructive text-center">{error}</p>
+        {/if}
+        <Button class="w-full" onclick={register} disabled={loading}>
+          {loading ? "Creating passkey…" : "Continue"}
+        </Button>
         <p class="text-center text-sm text-muted-foreground">
-          No account yet?{" "}
+          Already have a passkey?
           <button
             class="underline underline-offset-4 hover:text-primary"
-            onclick={() => {
-              mode = "register";
-              error = "";
-              message = "";
-            }}
-          >
-            Create one
-          </button>
-        </p>
-      {:else}
-        <Button class="w-full" onclick={registerPasskey} disabled={loading}>
-          {loading ? "Creating passkey…" : "Create passkey"}
-        </Button>
-
-        <Separator />
-
-        <p class="text-center text-sm text-muted-foreground">
-          Already have a passkey?{" "}
-          <button
-            class="underline underline-offset-4 hover:text-primary"
-            onclick={() => {
-              mode = "login";
-              error = "";
-              message = "";
-            }}
+            onclick={() => { step = "idle"; error = ""; }}
           >
             Sign in
           </button>
         </p>
-      {/if}
-
-      {#if message}
-        <p class="text-center text-sm font-medium text-green-600">{message}</p>
-      {/if}
-      {#if error}
-        <p class="text-center text-sm font-medium text-destructive">{error}</p>
-      {/if}
-    </Card.Content>
+      </Card.Content>
+    {/if}
   </Card.Root>
 </div>
