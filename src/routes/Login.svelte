@@ -11,20 +11,16 @@
   import { Label } from "$lib/components/ui/label";
   import * as Card from "$lib/components/ui/card";
 
-  const ORIGIN = "http://localhost:3000";
-
   type Step = "idle" | "register";
   let step = $state<Step>("idle");
   let email = $state("");
   let error = $state("");
   let loading = $state(false);
 
-  // Fires silently on mount — arms the browser's passkey autofill picker.
-  // Returning users just touch their fingerprint, no typing needed.
   onMount(async () => {
     if (!(await browserSupportsWebAuthnAutofill())) return;
     try {
-      const res = await fetch(`${ORIGIN}/api/auth/login/start`, {
+      const res = await fetch("/api/auth/login/start", {
         method: "POST",
         credentials: "include",
       });
@@ -37,7 +33,7 @@
         useBrowserAutofill: true,
       });
 
-      const finish = await fetch(`${ORIGIN}/api/auth/login/finish`, {
+      const finish = await fetch("/api/auth/login/finish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ challenge_id, cred }),
@@ -61,7 +57,7 @@
     loading = true;
     error = "";
     try {
-      const startRes = await fetch(`${ORIGIN}/api/auth/register/start`, {
+      const startRes = await fetch("/api/auth/register/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -80,7 +76,7 @@
       const options = await startRes.json();
       const cred = await startRegistration({ optionsJSON: options.publicKey });
 
-      const finishRes = await fetch(`${ORIGIN}/api/auth/register/finish`, {
+      const finishRes = await fetch("/api/auth/register/finish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, cred }),
