@@ -16,9 +16,17 @@
   let email = $state("");
   let error = $state("");
   let loading = $state(false);
+  let showRegister = $state(false);
 
   onMount(async () => {
-    if (!(await browserSupportsWebAuthnAutofill())) return;
+    if (!(await browserSupportsWebAuthnAutofill())) {
+      console.log("autofill not supported");
+      showRegister = true;
+      return;
+    }
+
+    console.log("autofill supported, arming...");
+
     try {
       const res = await fetch("/api/auth/login/start", {
         method: "POST",
@@ -28,10 +36,16 @@
 
       const { challenge_id, publicKey } = await res.json();
 
+      const autofillTimeout = setTimeout(() => {
+        showRegister = true;
+      }, 3000);
+
       const cred = await startAuthentication({
         optionsJSON: publicKey,
         useBrowserAutofill: true,
       });
+
+      clearTimeout(autofillTimeout);
 
       const finish = await fetch("/api/auth/login/finish", {
         method: "POST",
@@ -41,11 +55,39 @@
       });
 
       if (finish.ok) goto("/dashboard");
-      else error = "Passkey verification failed.";
-    } catch {
+      else showRegister = true; // login failed, show register
+    } catch (e) {
+      console.log("conditional UI caught:", e);
+      showRegister = true; // no passkey found, show register
       // No passkey available — user stays on idle, can register
     }
   });
+
+  async function login() {
+    loading = true;
+    error = "";
+    try {
+      const res = await fetch("/api/auth/login/start", {
+        method: "POST",
+        credentials: "include",
+      });
+      const { challenge_id, publicKey } = await res.json();
+      const cred = await startAuthentication({ optionsJSON: publicKey });
+      const finish = await fetch("/api/auth/login/finish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challenge_id, cred }),
+        credentials: "include",
+      });
+      if (finish.ok) goto("/dashboard");
+      else error = "Passkey verification failed.";
+    } catch (err: any) {
+      error =
+        err.name === "NotAllowedError" ? "Canceled." : "Something went wrong.";
+    } finally {
+      loading = false;
+    }
+  }
 
   // ── Registration ────────────────────────────────────────────────────────
 
@@ -102,7 +144,7 @@
       <Card.Header class="text-center">
         <Card.Title class="text-2xl">Welcome</Card.Title>
         <Card.Description>
-          Sign in with your passkey, or create an account.
+          Sign in with your passkey should start automatically!
         </Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
@@ -120,11 +162,23 @@
         {#if error}
           <p class="text-center text-sm text-destructive">{error}</p>
         {/if}
-        <Button class="w-full" onclick={() => { step = "register"; error = ""; }}>
-          Create account
-        </Button>
+        {#if showRegister}
+          <div class="space-y-2">
+            <Button
+              class="w-full"
+              onclick={() => {
+                step = "register";
+                error = "";
+              }}
+            >
+              Create account
+            </Button>
+            <Button class="w-full" variant="outline" onclick={login}>
+              Sign in with passkey
+            </Button>
+          </div>
+        {/if}
       </Card.Content>
-
     {:else if step === "register"}
       <Card.Header class="text-center">
         <Card.Title class="text-2xl">Create account</Card.Title>
@@ -155,7 +209,10 @@
           Already have a passkey?
           <button
             class="underline underline-offset-4 hover:text-primary"
-            onclick={() => { step = "idle"; error = ""; }}
+            onclick={() => {
+              step = "idle";
+              error = "";
+            }}
           >
             Sign in
           </button>
