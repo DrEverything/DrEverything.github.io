@@ -5,35 +5,27 @@
   import Dashboard from "./Dashboard.svelte";
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
+  import { onMount } from "svelte";
 
-  let activities = [
-    {
-      time: 60,
-      name: "Gym",
-    },
-    {
-      time: 0, // Zero means that time is decided on the spot or it is until task completion
-      name: "Kinetic App",
-    },
-    {
-      time: 90,
-      name: "Stretch & Talk",
-    },
-    {
-      time: 0,
-      name: "Home-Draw Laboratory Department",
-    },
-    {
-      time: 0,
-      name: "Clinic Crowdfunding Strategy",
-    },
-    {
-      time: 0,
-      name: "Crowd Interaction App",
-    },
-  ];
+  let auth = $state<"pending" | "yes" | "no">("pending");
 
-  let something = $state("Hristos");
+  onMount(async () => {
+    const res = await fetch(`/api/data/something`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (res.ok) {
+      auth = "yes";
+    } else {
+      auth = "no";
+    }
+  });
 </script>
 
-<Login />
+{#if auth === "pending"}
+  <!-- nothing, or a spinner -->
+{:else if auth === "yes"}
+  <Dashboard />
+{:else}
+  <Login />
+{/if}

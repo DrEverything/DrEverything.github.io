@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import {
     startRegistration,
     startAuthentication,
-    browserSupportsWebAuthnAutofill,
   } from "@simplewebauthn/browser";
   import { goto } from "$app/navigation";
   import { Button } from "$lib/components/ui/button";
@@ -11,85 +9,51 @@
   import { Label } from "$lib/components/ui/label";
   import * as Card from "$lib/components/ui/card";
 
-  type Step = "idle" | "register";
-  let step = $state<Step>("idle");
+  type View = "home" | "register";
+  let view = $state<View>("home");
   let email = $state("");
   let error = $state("");
   let loading = $state(false);
-  let showRegister = $state(false);
 
-  onMount(async () => {
-    if (!(await browserSupportsWebAuthnAutofill())) {
-      console.log("autofill not supported");
-      showRegister = true;
-      return;
+  async function post(path: string, body?: unknown) {
+    const res = await fetch(`/api/auth/${path}`, {
+      method: "POST",
+      credentials: "include",
+      ...(body
+        ? {
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          }
+        : {}),
+    });
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      throw Object.assign(new Error(json.error ?? res.statusText), {
+        status: res.status,
+      });
     }
 
-    console.log("autofill supported, arming...");
-
-    try {
-      const res = await fetch("/api/auth/login/start", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok) return;
-
-      const { challenge_id, publicKey } = await res.json();
-
-      const autofillTimeout = setTimeout(() => {
-        showRegister = true;
-      }, 3000);
-
-      const cred = await startAuthentication({
-        optionsJSON: publicKey,
-        useBrowserAutofill: true,
-      });
-
-      clearTimeout(autofillTimeout);
-
-      const finish = await fetch("/api/auth/login/finish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challenge_id, cred }),
-        credentials: "include",
-      });
-
-      if (finish.ok) goto("/dashboard");
-      else showRegister = true; // login failed, show register
-    } catch (e) {
-      console.log("conditional UI caught:", e);
-      showRegister = true; // no passkey found, show register
-      // No passkey available — user stays on idle, can register
-    }
-  });
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
 
   async function login() {
     loading = true;
     error = "";
     try {
-      const res = await fetch("/api/auth/login/start", {
-        method: "POST",
-        credentials: "include",
-      });
-      const { challenge_id, publicKey } = await res.json();
+      const { challenge_id, publicKey } = await post("login/start");
       const cred = await startAuthentication({ optionsJSON: publicKey });
-      const finish = await fetch("/api/auth/login/finish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challenge_id, cred }),
-        credentials: "include",
-      });
-      if (finish.ok) goto("/dashboard");
-      else error = "Passkey verification failed.";
+      await post("login/finish", { challenge_id, cred });
+      location.reload();
     } catch (err: any) {
       error =
-        err.name === "NotAllowedError" ? "Canceled." : "Something went wrong.";
+        err.name === "NotAllowedError"
+          ? "Cancelled."
+          : err.message || "Something went wrong.";
     } finally {
       loading = false;
     }
   }
-
-  // ── Registration ────────────────────────────────────────────────────────
 
   async function register() {
     if (!email.trim()) {
@@ -99,39 +63,19 @@
     loading = true;
     error = "";
     try {
-      const startRes = await fetch("/api/auth/register/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-        credentials: "include",
-      });
-
-      if (startRes.status === 409) {
-        error = "An account with that email already exists.";
-        return;
-      }
-      if (!startRes.ok) {
-        error = "Could not start registration.";
-        return;
-      }
-
-      const options = await startRes.json();
+      const options = await post("register/start", { email });
       const cred = await startRegistration({ optionsJSON: options.publicKey });
-
-      const finishRes = await fetch("/api/auth/register/finish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, cred }),
-        credentials: "include",
-      });
-
-      if (finishRes.ok) goto("/dashboard");
-      else error = "Registration failed. Please try again.";
+      await post("register/finish", { email, cred });
+      goto("/dashboard");
     } catch (err: any) {
+      if (err.status === 409) {
+        error = "Account already exists.";
+        return;
+      }
       error =
         err.name === "NotAllowedError"
-          ? "Passkey creation was canceled."
-          : "Something went wrong.";
+          ? "Passkey creation cancelled."
+          : err.message || "Something went wrong.";
     } finally {
       loading = false;
     }
@@ -140,51 +84,36 @@
 
 <div class="flex min-h-svh items-center justify-center p-4">
   <Card.Root class="w-full max-w-sm">
-    {#if step === "idle"}
+    {#if view === "home"}
       <Card.Header class="text-center">
-        <Card.Title class="text-2xl">Welcome</Card.Title>
-        <Card.Description>
-          Sign in with your passkey should start automatically!
-        </Card.Description>
+        <Card.Title class="text-2xl">Welcome to Monada</Card.Title>
+        <Card.Description>Sign in or create a passkey account.</Card.Description
+        >
       </Card.Header>
-      <Card.Content class="space-y-4">
-        <!--
-          This hidden input is what the browser attaches the passkey
-          autofill picker to. It must exist in the DOM on mount.
-        -->
-        <input
-          type="text"
-          autocomplete="username webauthn"
-          style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;"
-          tabindex="-1"
-          aria-hidden="true"
-        />
-        {#if error}
-          <p class="text-center text-sm text-destructive">{error}</p>
-        {/if}
-        {#if showRegister}
-          <div class="space-y-2">
-            <Button
-              class="w-full"
-              onclick={() => {
-                step = "register";
-                error = "";
-              }}
-            >
-              Create account
-            </Button>
-            <Button class="w-full" variant="outline" onclick={login}>
-              Sign in with passkey
-            </Button>
-          </div>
-        {/if}
+      <Card.Content class="space-y-3">
+        {#if error}<p class="text-center text-sm text-destructive">
+            {error}
+          </p>{/if}
+        <Button class="w-full" onclick={login} disabled={loading}>
+          {loading ? "Waiting for passkey…" : "Sign in with passkey"}
+        </Button>
+        <Button
+          class="w-full"
+          variant="outline"
+          onclick={() => {
+            view = "register";
+            error = "";
+          }}
+        >
+          Create account
+        </Button>
       </Card.Content>
-    {:else if step === "register"}
+    {:else}
       <Card.Header class="text-center">
         <Card.Title class="text-2xl">Create account</Card.Title>
-        <Card.Description>
-          Enter your email to create a passkey account.
-        </Card.Description>
+        <Card.Description
+          >Enter your email to register a passkey.</Card.Description
+        >
       </Card.Header>
       <Card.Content class="space-y-4">
         <div class="space-y-2">
@@ -199,9 +128,9 @@
             onkeydown={(e) => e.key === "Enter" && register()}
           />
         </div>
-        {#if error}
-          <p class="text-sm text-destructive text-center">{error}</p>
-        {/if}
+        {#if error}<p class="text-center text-sm text-destructive">
+            {error}
+          </p>{/if}
         <Button class="w-full" onclick={register} disabled={loading}>
           {loading ? "Creating passkey…" : "Continue"}
         </Button>
@@ -210,12 +139,10 @@
           <button
             class="underline underline-offset-4 hover:text-primary"
             onclick={() => {
-              step = "idle";
+              view = "home";
               error = "";
-            }}
+            }}>Sign in</button
           >
-            Sign in
-          </button>
         </p>
       </Card.Content>
     {/if}
