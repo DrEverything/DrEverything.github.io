@@ -1,10 +1,7 @@
 <script lang="ts">
-  import Healthcare from "./Healthcare.svelte";
-  import Food from "./Food.svelte";
   import Login from "./Login.svelte";
   import Dashboard from "./Dashboard.svelte";
-  import { Input } from "$lib/components/ui/input";
-  import { Button } from "$lib/components/ui/button";
+  import { Spinner } from "$lib/components/ui/spinner/index.js";
   import { onMount } from "svelte";
 
   let auth = $state<"pending" | "yes" | "no">("pending");
@@ -23,7 +20,9 @@
 </script>
 
 {#if auth === "pending"}
-  <!-- nothing, or a spinner -->
+  <div class="flex min-h-svh items-center justify-center">
+    <Spinner class="size-8" />
+  </div>
 {:else if auth === "yes"}
   <Dashboard />
 {:else}
