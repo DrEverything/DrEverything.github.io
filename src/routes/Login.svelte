@@ -85,11 +85,11 @@
 <div class="flex min-h-svh items-center justify-center p-4">
   <Card.Root class="w-full max-w-sm">
     {#if view === "home"}
-      <Card.Header class="text-center">
-        <Card.Title class="text-2xl">Welcome to Monada</Card.Title>
-        <Card.Description>Sign in or create a passkey account.</Card.Description
-        >
-      </Card.Header>
+      <!-- <Card.Header class="text-center"> -->
+      <!--   <Card.Title class="text-2xl">Welcome to Monada</Card.Title> -->
+      <!--   <Card.Description>Sign in or create a passkey account.</Card.Description -->
+      <!--   > -->
+      <!-- </Card.Header> -->
       <Card.Content class="space-y-3">
         {#if error}<p class="text-center text-sm text-destructive">
             {error}
