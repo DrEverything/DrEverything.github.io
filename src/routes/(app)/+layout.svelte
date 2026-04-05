@@ -61,7 +61,7 @@
   <Sidebar.Provider
     style="--sidebar-width: calc(var(--spacing) * 51); --header-height: calc(var(--spacing) * 10);"
   >
-    <AppSidebar variant="inset" {apps} {user} {navMain} {navSecondary} />
+    <AppSidebar class="select-none" variant="inset" {apps} {user} {navMain} {navSecondary} />
     <Sidebar.Inset>
       <SiteHeader />
       <div class="flex flex-1 flex-col">
