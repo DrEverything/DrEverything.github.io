@@ -7,7 +7,7 @@
   let auth = $state<"pending" | "yes" | "no">("pending");
 
   onMount(async () => {
-    const res = await fetch(`/api/data/something`, {
+    const res = await fetch(`/api/auth/check`, {
       method: "POST",
       credentials: "include",
     });
@@ -28,3 +28,4 @@
 {:else}
   <Login />
 {/if}
+
