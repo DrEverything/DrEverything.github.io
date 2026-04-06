@@ -8,6 +8,21 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import * as Card from "$lib/components/ui/card";
+  import { onMount } from "svelte";
+  import Spinner from "$lib/components/ui/spinner/spinner.svelte";
+
+  let status = $state<-1 | 0 | 1>(0);
+  onMount(async () => {
+    const res = await fetch("/api/auth/check", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (res.ok) {
+      goto("/");
+    } else {
+      status = -1;
+    }
+  });
 
   type View = "home" | "register";
   let view = $state<View>("home");
@@ -83,69 +98,75 @@
   }
 </script>
 
-<div class="flex min-h-svh items-center justify-center p-4">
-  <Card.Root class="w-full max-w-sm">
-    {#if view === "home"}
-      <!-- <Card.Header class="text-center"> -->
-      <!--   <Card.Title class="text-2xl">Welcome to Monada</Card.Title> -->
-      <!--   <Card.Description>Sign in or create a passkey account.</Card.Description -->
-      <!--   > -->
-      <!-- </Card.Header> -->
-      <Card.Content class="space-y-3">
-        {#if error}<p class="text-center text-sm text-destructive">
-            {error}
-          </p>{/if}
-        <Button class="w-full" onclick={login} disabled={loading}>
-          {loading ? "Waiting for passkey…" : "Sign in with passkey"}
-        </Button>
-        <Button
-          class="w-full"
-          variant="outline"
-          onclick={() => {
-            view = "register";
-            error = "";
-          }}
-        >
-          Create account
-        </Button>
-      </Card.Content>
-    {:else}
-      <Card.Header class="text-center">
-        <Card.Title class="text-2xl">Create account</Card.Title>
-        <Card.Description
-          >Enter your email to register a passkey.</Card.Description
-        >
-      </Card.Header>
-      <Card.Content class="space-y-4">
-        <div class="space-y-2">
-          <Label for="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            bind:value={email}
-            placeholder="alice@example.com"
-            autocomplete="email"
-            disabled={loading}
-            onkeydown={(e) => e.key === "Enter" && register()}
-          />
-        </div>
-        {#if error}<p class="text-center text-sm text-destructive">
-            {error}
-          </p>{/if}
-        <Button class="w-full" onclick={register} disabled={loading}>
-          {loading ? "Creating passkey…" : "Continue"}
-        </Button>
-        <p class="text-center text-sm text-muted-foreground">
-          Already have a passkey?
-          <button
-            class="underline underline-offset-4 hover:text-primary"
+{#if status === 0}
+  <div class="flex min-h-svh items-center justify-center">
+    <Spinner class="size-8" />
+  </div>
+{:else}
+  <div class="flex min-h-svh items-center justify-center p-4">
+    <Card.Root class="w-full max-w-sm">
+      {#if view === "home"}
+        <!-- <Card.Header class="text-center"> -->
+        <!--   <Card.Title class="text-2xl">Welcome to Monada</Card.Title> -->
+        <!--   <Card.Description>Sign in or create a passkey account.</Card.Description -->
+        <!--   > -->
+        <!-- </Card.Header> -->
+        <Card.Content class="space-y-3">
+          {#if error}<p class="text-center text-sm text-destructive">
+              {error}
+            </p>{/if}
+          <Button class="w-full" onclick={login} disabled={loading}>
+            {loading ? "Waiting for passkey…" : "Sign in with passkey"}
+          </Button>
+          <Button
+            class="w-full"
+            variant="outline"
             onclick={() => {
-              view = "home";
+              view = "register";
               error = "";
-            }}>Sign in</button
+            }}
           >
-        </p>
-      </Card.Content>
-    {/if}
-  </Card.Root>
-</div>
+            Create account
+          </Button>
+        </Card.Content>
+      {:else}
+        <Card.Header class="text-center">
+          <Card.Title class="text-2xl">Create account</Card.Title>
+          <Card.Description
+            >Enter your email to register a passkey.</Card.Description
+          >
+        </Card.Header>
+        <Card.Content class="space-y-4">
+          <div class="space-y-2">
+            <Label for="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              bind:value={email}
+              placeholder="alice@example.com"
+              autocomplete="email"
+              disabled={loading}
+              onkeydown={(e) => e.key === "Enter" && register()}
+            />
+          </div>
+          {#if error}<p class="text-center text-sm text-destructive">
+              {error}
+            </p>{/if}
+          <Button class="w-full" onclick={register} disabled={loading}>
+            {loading ? "Creating passkey…" : "Continue"}
+          </Button>
+          <p class="text-center text-sm text-muted-foreground">
+            Already have a passkey?
+            <button
+              class="underline underline-offset-4 hover:text-primary"
+              onclick={() => {
+                view = "home";
+                error = "";
+              }}>Sign in</button
+            >
+          </p>
+        </Card.Content>
+      {/if}
+    </Card.Root>
+  </div>
+{/if}
