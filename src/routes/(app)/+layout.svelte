@@ -3,9 +3,13 @@
   import AppSidebar from "$lib/components/app-sidebar.svelte";
   import SiteHeader from "$lib/components/site-header.svelte";
   import CompassIcon from "@tabler/icons-svelte/icons/compass";
-  import BrainIcon from "@tabler/icons-svelte/icons/brain";
-  import BuildingIcon from "@tabler/icons-svelte/icons/building";
-  import PlaneIcon from "@tabler/icons-svelte/icons/plane";
+  import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
+  // import BuildingIcon from "@tabler/icons-svelte/icons/building";
+  // import BrainIcon from "@tabler/icons-svelte/icons/brain";
+  import FolderIcon from "@tabler/icons-svelte/icons/folder";
+  import ChartBarIcon from "@tabler/icons-svelte/icons/chart-bar";
+  import SettingsIcon from "@tabler/icons-svelte/icons/settings";
+
   import ActivityIcon from "@tabler/icons-svelte/icons/activity";
 
   import { onMount } from "svelte";
@@ -42,14 +46,13 @@
   };
 
   let navMain: any[] = [
-    // { title: "Dashboard", url: "/",          icon: DashboardIcon },
-    // { title: "Projects",  url: "/projects",  icon: FolderIcon },
-    // { title: "Analytics", url: "/analytics", icon: ChartBarIcon },
+    { title: "Dashboard", url: "/", icon: DashboardIcon },
+    { title: "Projects", url: "/projects", icon: FolderIcon },
+    { title: "Analytics", url: "/analytics", icon: ChartBarIcon },
   ];
 
   let navSecondary: any[] = [
-    // { title: "Settings", url: "/settings", icon: SettingsIcon },
-    // { title: "Help",     url: "/help",     icon: HelpIcon },
+    { title: "Settings", url: "/settings", icon: SettingsIcon },
   ];
 </script>
 
@@ -59,9 +62,16 @@
   </div>
 {:else}
   <Sidebar.Provider
-    style="--sidebar-width: calc(var(--spacing) * 51); --header-height: calc(var(--spacing) * 10);"
+    style="--sidebar-width: calc(var(--spacing) * 41); --header-height: calc(var(--spacing) * 10);"
   >
-    <AppSidebar class="select-none" variant="inset" {apps} {user} {navMain} {navSecondary} />
+    <AppSidebar
+      class="select-none"
+      variant="inset"
+      {apps}
+      {user}
+      {navMain}
+      {navSecondary}
+    />
     <Sidebar.Inset>
       <SiteHeader />
       <div class="flex flex-1 flex-col">

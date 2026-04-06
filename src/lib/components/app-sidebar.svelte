@@ -1,10 +1,5 @@
 <script lang="ts">
-  import CompassIcon from "@tabler/icons-svelte/icons/compass";
   import ChevronDownIcon from "@tabler/icons-svelte/icons/chevron-down";
-  import BrainIcon from "@tabler/icons-svelte/icons/brain";
-  import BuildingIcon from "@tabler/icons-svelte/icons/building";
-  import PlaneIcon from "@tabler/icons-svelte/icons/plane";
-  import ActivityIcon from "@tabler/icons-svelte/icons/activity";
 
   import NavMain from "./nav-main.svelte";
   import NavSecondary from "./nav-secondary.svelte";
