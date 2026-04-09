@@ -32,7 +32,7 @@
   });
 
   const apps: any[] = [
-    { name: "Meridian", icon: CompassIcon, href: "/" },
+    { name: "Meridian", icon: CompassIcon, href: "/meridian" },
     { name: "Fitness", icon: ActivityIcon, href: "/fitness" },
     // { name: "Finance", icon: BuildingIcon, href: "/finance" },
     // { name: "Travel", icon: PlaneIcon, href: "/travel" },

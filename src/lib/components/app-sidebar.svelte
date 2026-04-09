@@ -11,6 +11,7 @@
   // import type { App } from "../../routes/(app)/+layout.svelte";
 
   import type { Component } from "svelte";
+    import { goto } from "$app/navigation";
   type App = {
     name: string;
     icon: Component;
@@ -73,7 +74,7 @@
   // let currentApp = $state(apps[0]);
 </script>
 
-<Sidebar.Root collapsible="offcanvas" {...restProps}>
+<Sidebar.Root collapsible="icon" {...restProps}>
   <Sidebar.Header>
     <Sidebar.Menu>
       <Sidebar.MenuItem>
@@ -92,7 +93,7 @@
           </DropdownMenu.Trigger>
           <DropdownMenu.Content class="w-48" align="start" sideOffset={4}>
             {#each apps as app, i}
-              <DropdownMenu.Item onclick={() => (currentIndex = i)}>
+              <DropdownMenu.Item onclick={() => {(currentIndex = i); goto(app.href)}}>
                 <app.icon class="size-4" />
                 {app.name}
               </DropdownMenu.Item>
