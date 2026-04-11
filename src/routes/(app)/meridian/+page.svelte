@@ -82,12 +82,12 @@
 
   // ── API helpers ───────────────────────────────────────────────────────────────
 
-  async function api(method: string, path: string, body?: unknown) {
+  async function api(path: string, body: unknown = {}) {
     const res = await fetch(`/api/data${path}`, {
-      method,
+      method: "POST",
       credentials: "include",
-      headers: body ? { "Content-Type": "application/json" } : {},
-      body: body ? JSON.stringify(body) : undefined,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
     if (!res.ok) throw new Error(await res.text());
     return res.json();
@@ -98,7 +98,7 @@
   async function loadProjects() {
     loading = true;
     try {
-      projects = await api("GET", "/projects/list");
+      projects = await api("/projects/list");
     } catch {
       toast.error("Failed to load projects");
     } finally {
@@ -121,10 +121,10 @@
   async function saveProject() {
     try {
       if (editingProject) {
-        await api("PUT", `/projects/${editingProject.project_id}`, projectForm);
+        await api("/projects/update", { project_id: editingProject.project_id, ...projectForm });
         toast.success("Project updated");
       } else {
-        await api("POST", "/projects/add", projectForm);
+        await api("/projects/add", projectForm);
         toast.success("Project created");
       }
       projectDialog = false;
@@ -136,7 +136,7 @@
 
   async function deleteProject(id: string) {
     try {
-      await api("DELETE", `/projects/${id}`);
+      await api("/projects/delete", { project_id: id });
       if (selectedProject?.project_id === id) {
         selectedProject = null;
         tasks = [];
@@ -158,7 +158,7 @@
   async function loadTasks(projectId: string) {
     tasksLoading = true;
     try {
-      tasks = await api("GET", `/tasks/list/${projectId}`);
+      tasks = await api("/tasks/list", { project_id: projectId });
     } catch {
       toast.error("Failed to load tasks");
     } finally {
@@ -199,10 +199,10 @@
         project_id: selectedProject!.project_id,
       };
       if (editingTask) {
-        await api("PUT", `/tasks/${editingTask.task_id}`, payload);
+        await api("/tasks/update", { task_id: editingTask.task_id, ...payload });
         toast.success("Task updated");
       } else {
-        await api("POST", "/tasks/add", payload);
+        await api("/tasks/add", payload);
         toast.success("Task added");
       }
       taskDialog = false;
@@ -214,7 +214,7 @@
 
   async function deleteTask(t: Task) {
     try {
-      await api("DELETE", `/tasks/${t.task_id}`);
+      await api("/tasks/delete", { task_id: t.task_id });
       toast.success("Task deleted");
       await loadTasks(t.project_id);
     } catch {
@@ -226,7 +226,7 @@
 
   async function loadIdeas() {
     try {
-      ideas = await api("GET", "/ideas/list");
+      ideas = await api("/ideas/list");
     } catch {
       toast.error("Failed to load ideas");
     }
@@ -247,10 +247,10 @@
   async function saveIdea() {
     try {
       if (editingIdea) {
-        await api("PUT", `/ideas/${editingIdea.idea_id}`, ideaForm);
+        await api("/ideas/update", { idea_id: editingIdea.idea_id, ...ideaForm });
         toast.success("Idea updated");
       } else {
-        await api("POST", "/ideas/add", ideaForm);
+        await api("/ideas/add", ideaForm);
         toast.success("Idea captured");
       }
       ideaDialog = false;
@@ -262,7 +262,7 @@
 
   async function deleteIdea(id: string) {
     try {
-      await api("DELETE", `/ideas/${id}`);
+      await api("/ideas/delete", { idea_id: id });
       toast.success("Idea deleted");
       await loadIdeas();
     } catch {
