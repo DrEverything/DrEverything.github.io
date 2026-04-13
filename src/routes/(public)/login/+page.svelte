@@ -18,7 +18,13 @@
       credentials: "include",
     });
     if (res.ok) {
-      goto("/");
+      let previousApp = localStorage.getItem("previousApp");
+
+      if (previousApp) {
+        goto(previousApp);
+      } else {
+        goto("/");
+      }
     } else {
       status = -1;
     }
@@ -59,8 +65,14 @@
       const { challenge_id, publicKey } = await post("login/start");
       const cred = await startAuthentication({ optionsJSON: publicKey });
       await post("login/finish", { challenge_id, cred });
-      goto("/");
-      // location.reload();
+
+      let previousApp = localStorage.getItem("previousApp");
+
+      if (previousApp) {
+        goto(previousApp);
+      } else {
+        goto("/");
+      }
     } catch (err: any) {
       error =
         err.name === "NotAllowedError"

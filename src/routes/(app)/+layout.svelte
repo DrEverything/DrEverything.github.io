@@ -62,7 +62,7 @@
   </div>
 {:else}
   <Sidebar.Provider
-    style="--sidebar-width: calc(var(--spacing) * 41); --header-height: calc(var(--spacing) * 10);"
+    style="--sidebar-width: calc(var(--spacing) * 45); --header-height: calc(var(--spacing) * 10);"
   >
     <AppSidebar
       class="select-none"

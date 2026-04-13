@@ -21,6 +21,7 @@
   import IconX from "@tabler/icons-svelte/icons/x";
   import IconClock from "@tabler/icons-svelte/icons/clock";
   import IconListCheck from "@tabler/icons-svelte/icons/list-check";
+  import Markdown from "./markdown.svelte";
 
   // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -114,14 +115,21 @@
 
   function openEditProject(p: Project) {
     editingProject = p;
-    projectForm = { name: p.name, description: p.description, status: p.status };
+    projectForm = {
+      name: p.name,
+      description: p.description,
+      status: p.status,
+    };
     projectDialog = true;
   }
 
   async function saveProject() {
     try {
       if (editingProject) {
-        await api("/projects/update", { project_id: editingProject.project_id, ...projectForm });
+        await api("/projects/update", {
+          project_id: editingProject.project_id,
+          ...projectForm,
+        });
         toast.success("Project updated");
       } else {
         await api("/projects/add", projectForm);
@@ -180,7 +188,9 @@
 
   function openEditTask(t: Task) {
     editingTask = t;
-    const d = t.due_at ? new Date(t.due_at * 1000).toISOString().slice(0, 10) : "";
+    const d = t.due_at
+      ? new Date(t.due_at * 1000).toISOString().slice(0, 10)
+      : "";
     taskForm = {
       name: t.name,
       description: t.description,
@@ -195,11 +205,16 @@
     try {
       const payload = {
         ...taskForm,
-        due_at: taskForm.due_at ? Math.floor(new Date(taskForm.due_at).getTime() / 1000) : 0,
+        due_at: taskForm.due_at
+          ? Math.floor(new Date(taskForm.due_at).getTime() / 1000)
+          : 0,
         project_id: selectedProject!.project_id,
       };
       if (editingTask) {
-        await api("/tasks/update", { task_id: editingTask.task_id, ...payload });
+        await api("/tasks/update", {
+          task_id: editingTask.task_id,
+          ...payload,
+        });
         toast.success("Task updated");
       } else {
         await api("/tasks/add", payload);
@@ -247,7 +262,10 @@
   async function saveIdea() {
     try {
       if (editingIdea) {
-        await api("/ideas/update", { idea_id: editingIdea.idea_id, ...ideaForm });
+        await api("/ideas/update", {
+          idea_id: editingIdea.idea_id,
+          ...ideaForm,
+        });
         toast.success("Idea updated");
       } else {
         await api("/ideas/add", ideaForm);
@@ -303,23 +321,49 @@
   onMount(loadProjects);
 </script>
 
+<Markdown
+  src={`
+# Hello
+
+Inline math: $E = mc^2$
+
+Block math:
+$$
+\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}
+$$
+`}
+/>
+
 <!-- ── Project Dialog ───────────────────────────────────────────────────────── -->
 <Dialog.Root bind:open={projectDialog}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>{editingProject ? "Edit Project" : "New Project"}</Dialog.Title>
+      <Dialog.Title
+        >{editingProject ? "Edit Project" : "New Project"}</Dialog.Title
+      >
       <Dialog.Description>
-        {editingProject ? "Update project details." : "Start a new project to organise your work."}
+        {editingProject
+          ? "Update project details."
+          : "Start a new project to organise your work."}
       </Dialog.Description>
     </Dialog.Header>
     <div class="flex flex-col gap-4 py-2">
       <div class="flex flex-col gap-1.5">
         <Label for="p-name">Name</Label>
-        <Input id="p-name" placeholder="Project name" bind:value={projectForm.name} />
+        <Input
+          id="p-name"
+          placeholder="Project name"
+          bind:value={projectForm.name}
+        />
       </div>
       <div class="flex flex-col gap-1.5">
         <Label for="p-desc">Description</Label>
-        <Textarea id="p-desc" placeholder="What's this project about?" bind:value={projectForm.description} rows={3} />
+        <Textarea
+          id="p-desc"
+          placeholder="What's this project about?"
+          bind:value={projectForm.description}
+          rows={3}
+        />
       </div>
       <div class="flex flex-col gap-1.5">
         <Label for="p-status">Status</Label>
@@ -336,7 +380,9 @@
       </div>
     </div>
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (projectDialog = false)}>Cancel</Button>
+      <Button variant="outline" onclick={() => (projectDialog = false)}
+        >Cancel</Button
+      >
       <Button onclick={saveProject} disabled={!projectForm.name}>
         {editingProject ? "Save Changes" : "Create Project"}
       </Button>
@@ -350,7 +396,9 @@
     <Dialog.Header>
       <Dialog.Title>{editingTask ? "Edit Task" : "New Task"}</Dialog.Title>
       <Dialog.Description>
-        {editingTask ? "Update task details." : `Adding task to "${selectedProject?.name}".`}
+        {editingTask
+          ? "Update task details."
+          : `Adding task to "${selectedProject?.name}".`}
       </Dialog.Description>
     </Dialog.Header>
     <div class="flex flex-col gap-4 py-2">
@@ -360,7 +408,12 @@
       </div>
       <div class="flex flex-col gap-1.5">
         <Label for="t-desc">Description</Label>
-        <Textarea id="t-desc" placeholder="Details…" bind:value={taskForm.description} rows={3} />
+        <Textarea
+          id="t-desc"
+          placeholder="Details…"
+          bind:value={taskForm.description}
+          rows={3}
+        />
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1.5">
@@ -382,7 +435,9 @@
       </div>
     </div>
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (taskDialog = false)}>Cancel</Button>
+      <Button variant="outline" onclick={() => (taskDialog = false)}
+        >Cancel</Button
+      >
       <Button onclick={saveTask} disabled={!taskForm.name}>
         {editingTask ? "Save Changes" : "Add Task"}
       </Button>
@@ -396,21 +451,34 @@
     <Dialog.Header>
       <Dialog.Title>{editingIdea ? "Edit Idea" : "Capture Idea"}</Dialog.Title>
       <Dialog.Description>
-        {editingIdea ? "Refine your idea." : "Jot down a thought before it slips away."}
+        {editingIdea
+          ? "Refine your idea."
+          : "Jot down a thought before it slips away."}
       </Dialog.Description>
     </Dialog.Header>
     <div class="flex flex-col gap-4 py-2">
       <div class="flex flex-col gap-1.5">
         <Label for="i-name">Title</Label>
-        <Input id="i-name" placeholder="Idea title" bind:value={ideaForm.name} />
+        <Input
+          id="i-name"
+          placeholder="Idea title"
+          bind:value={ideaForm.name}
+        />
       </div>
       <div class="flex flex-col gap-1.5">
         <Label for="i-desc">Notes</Label>
-        <Textarea id="i-desc" placeholder="Describe the idea…" bind:value={ideaForm.description} rows={4} />
+        <Textarea
+          id="i-desc"
+          placeholder="Describe the idea…"
+          bind:value={ideaForm.description}
+          rows={4}
+        />
       </div>
     </div>
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (ideaDialog = false)}>Cancel</Button>
+      <Button variant="outline" onclick={() => (ideaDialog = false)}
+        >Cancel</Button
+      >
       <Button onclick={saveIdea} disabled={!ideaForm.name}>
         {editingIdea ? "Save Changes" : "Capture"}
       </Button>
@@ -424,7 +492,9 @@
   <div class="mb-6 flex items-end justify-between">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight">Workspace</h1>
-      <p class="text-muted-foreground mt-0.5 text-sm">Manage your projects, tasks, and ideas in one place.</p>
+      <p class="text-muted-foreground mt-0.5 text-sm">
+        Manage your projects, tasks, and ideas in one place.
+      </p>
     </div>
   </div>
 
@@ -463,10 +533,14 @@
           {/each}
         </div>
       {:else if projects.length === 0}
-        <div class="border-border flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
+        <div
+          class="border-border flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center"
+        >
           <IconFolder class="text-muted-foreground mb-3 size-10 opacity-40" />
           <p class="font-medium">No projects yet</p>
-          <p class="text-muted-foreground mt-1 text-sm">Create a project to get started.</p>
+          <p class="text-muted-foreground mt-1 text-sm">
+            Create a project to get started.
+          </p>
           <Button class="mt-4" size="sm" onclick={openAddProject}>
             <IconPlus class="mr-1.5 size-4" />
             New Project
@@ -476,7 +550,10 @@
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {#each projects as project (project.project_id)}
             <Card.Root
-              class="group relative cursor-pointer transition-shadow hover:shadow-md {selectedProject?.project_id === project.project_id ? 'ring-primary ring-2' : ''}"
+              class="group relative cursor-pointer transition-shadow hover:shadow-md {selectedProject?.project_id ===
+              project.project_id
+                ? 'ring-primary ring-2'
+                : ''}"
               onclick={() => {
                 selectProject(project);
                 activeTab = "tasks";
@@ -484,8 +561,14 @@
             >
               <Card.Header class="pb-2">
                 <div class="flex items-start justify-between gap-2">
-                  <Card.Title class="text-base leading-snug">{project.name}</Card.Title>
-                  <span class="border text-xs font-medium px-2 py-0.5 rounded-full {statusColor(project.status)} whitespace-nowrap">
+                  <Card.Title class="text-base leading-snug"
+                    >{project.name}</Card.Title
+                  >
+                  <span
+                    class="border text-xs font-medium px-2 py-0.5 rounded-full {statusColor(
+                      project.status,
+                    )} whitespace-nowrap"
+                  >
                     {project.status}
                   </span>
                 </div>
@@ -496,9 +579,13 @@
                 </p>
               </Card.Content>
               <Card.Footer class="flex items-center justify-between pt-0">
-                <span class="text-muted-foreground text-xs">{fmtDate(project.created_at)}</span>
-                <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100"
-                  onclick={(e) => e.stopPropagation()}>
+                <span class="text-muted-foreground text-xs"
+                  >{fmtDate(project.created_at)}</span
+                >
+                <div
+                  class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                  onclick={(e) => e.stopPropagation()}
+                >
                   <Button
                     variant="ghost"
                     size="icon"
@@ -535,7 +622,9 @@
               Projects
             </button>
             <IconChevronRight class="text-muted-foreground size-3.5 shrink-0" />
-            <span class="text-sm font-medium truncate">{selectedProject.name}</span>
+            <span class="text-sm font-medium truncate"
+              >{selectedProject.name}</span
+            >
           </div>
           <Button size="sm" onclick={openAddTask}>
             <IconPlus class="mr-1.5 size-4" />
@@ -550,10 +639,16 @@
             {/each}
           </div>
         {:else if tasks.length === 0}
-          <div class="border-border flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
-            <IconListCheck class="text-muted-foreground mb-3 size-10 opacity-40" />
+          <div
+            class="border-border flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center"
+          >
+            <IconListCheck
+              class="text-muted-foreground mb-3 size-10 opacity-40"
+            />
             <p class="font-medium">No tasks yet</p>
-            <p class="text-muted-foreground mt-1 text-sm">Add a task to start making progress.</p>
+            <p class="text-muted-foreground mt-1 text-sm">
+              Add a task to start making progress.
+            </p>
             <Button class="mt-4" size="sm" onclick={openAddTask}>
               <IconPlus class="mr-1.5 size-4" />
               Add Task
@@ -562,31 +657,59 @@
         {:else}
           <div class="flex flex-col gap-2">
             {#each tasks as task (task.task_id)}
-              <div class="border-border group flex items-center gap-3 rounded-lg border bg-card px-4 py-3 transition-shadow hover:shadow-sm">
+              <div
+                class="border-border group flex items-center gap-3 rounded-lg border bg-card px-4 py-3 transition-shadow hover:shadow-sm"
+              >
                 <!-- Status dot -->
-                <div class="shrink-0 size-2 rounded-full {task.status === 'done' ? 'bg-emerald-500' : task.status === 'in-progress' ? 'bg-violet-500' : 'bg-slate-400'}"></div>
+                <div
+                  class="shrink-0 size-2 rounded-full {task.status === 'done'
+                    ? 'bg-emerald-500'
+                    : task.status === 'in-progress'
+                      ? 'bg-violet-500'
+                      : 'bg-slate-400'}"
+                ></div>
 
                 <div class="min-w-0 flex-1">
-                  <p class="text-sm font-medium leading-tight {task.status === 'done' ? 'line-through text-muted-foreground' : ''}">
+                  <p
+                    class="text-sm font-medium leading-tight {task.status ===
+                    'done'
+                      ? 'line-through text-muted-foreground'
+                      : ''}"
+                  >
                     {task.name}
                   </p>
                   {#if task.description}
-                    <p class="text-muted-foreground mt-0.5 truncate text-xs">{task.description}</p>
+                    <p class="text-muted-foreground mt-0.5 truncate text-xs">
+                      {task.description}
+                    </p>
                   {/if}
                 </div>
 
                 <div class="flex shrink-0 items-center gap-3">
                   {#if task.due_at}
-                    <span class="text-muted-foreground flex items-center gap-1 text-xs">
+                    <span
+                      class="text-muted-foreground flex items-center gap-1 text-xs"
+                    >
                       <IconClock class="size-3" />
                       {fmtDate(task.due_at)}
                     </span>
                   {/if}
-                  <span class="border text-xs font-medium px-2 py-0.5 rounded-full {statusColor(task.status)}">
+                  <span
+                    class="border text-xs font-medium px-2 py-0.5 rounded-full {statusColor(
+                      task.status,
+                    )}"
+                  >
                     {task.status}
                   </span>
-                  <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Button variant="ghost" size="icon" class="size-7" onclick={() => openEditTask(task)}>
+                  <div
+                    class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="size-7"
+                      onclick={() => openEditTask(task)}
+                    >
                       <IconEdit class="size-3.5" />
                     </Button>
                     <Button
@@ -619,10 +742,14 @@
       </div>
 
       {#if ideas.length === 0}
-        <div class="border-border flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
+        <div
+          class="border-border flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center"
+        >
           <IconBulb class="text-muted-foreground mb-3 size-10 opacity-40" />
           <p class="font-medium">No ideas yet</p>
-          <p class="text-muted-foreground mt-1 text-sm">Capture a thought before it slips away.</p>
+          <p class="text-muted-foreground mt-1 text-sm">
+            Capture a thought before it slips away.
+          </p>
           <Button class="mt-4" size="sm" onclick={openAddIdea}>
             <IconPlus class="mr-1.5 size-4" />
             Capture Idea
@@ -634,7 +761,9 @@
             <Card.Root class="group relative">
               <Card.Header class="pb-2">
                 <div class="flex items-start justify-between gap-2">
-                  <Card.Title class="text-base leading-snug">{idea.name}</Card.Title>
+                  <Card.Title class="text-base leading-snug"
+                    >{idea.name}</Card.Title
+                  >
                 </div>
               </Card.Header>
               <Card.Content class="pb-3">
@@ -643,9 +772,18 @@
                 </p>
               </Card.Content>
               <Card.Footer class="flex items-center justify-between pt-0">
-                <span class="text-muted-foreground text-xs">{fmtDate(idea.created_at)}</span>
-                <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button variant="ghost" size="icon" class="size-7" onclick={() => openEditIdea(idea)}>
+                <span class="text-muted-foreground text-xs"
+                  >{fmtDate(idea.created_at)}</span
+                >
+                <div
+                  class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="size-7"
+                    onclick={() => openEditIdea(idea)}
+                  >
                     <IconEdit class="size-3.5" />
                   </Button>
                   <Button
