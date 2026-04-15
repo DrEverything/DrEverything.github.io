@@ -9,11 +9,11 @@
 
   // This should be `Component` after @lucide/svelte updates types
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let { apps }: { apps: { name: string; icon: any; href: string }[] } =
+  let { apps }: { apps: { name: string; icon: any; href: string, description: string }[] } =
     $props();
   const sidebar = useSidebar();
   // svelte-ignore state_referenced_locally
-  let activeTeam = $state(apps[0]);
+  let activeApp = $state(apps[0]);
 </script>
 
 <Sidebar.Menu>
@@ -29,13 +29,13 @@
             <div
               class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
             >
-              <activeTeam.icon class="size-4" />
+              <activeApp.icon class="size-4" />
             </div>
             <div class="grid flex-1 text-start text-sm leading-tight">
               <span class="truncate font-medium">
-                {activeTeam.name}
+                {activeApp.name}
               </span>
-              <!-- <span class="truncate text-xs">{activeTeam.plan}</span> -->
+              <span class="truncate text-xs">{activeApp.description}</span>
             </div>
             <ChevronsUpDownIcon class="ms-auto" />
           </Sidebar.MenuButton>
@@ -54,7 +54,7 @@
         {#each apps as app, index (app.name)}
           <DropdownMenu.Item
             onSelect={() => {
-              activeTeam = app;
+              activeApp = app;
               // currentIndex = index;
 
               localStorage.setItem("previousApp", app.href);

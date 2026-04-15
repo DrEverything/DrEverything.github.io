@@ -30,6 +30,7 @@
     },
   ]}
 />
+
 <div class="px-4 lg:px-6">
   <ChartAreaInteractive
     title="Budget Over Time"

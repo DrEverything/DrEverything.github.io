@@ -3,6 +3,8 @@
   import AppSidebar from "$lib/components/app-sidebar.svelte";
   import SiteHeader from "$lib/components/site-header.svelte";
   import CompassIcon from "@tabler/icons-svelte/icons/compass";
+  import UsersIcon from "@tabler/icons-svelte/icons/users";
+  import TrendingUpIcon from "@tabler/icons-svelte/icons/trending-up";
   import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
   // import BuildingIcon from "@tabler/icons-svelte/icons/building";
   // import BrainIcon from "@tabler/icons-svelte/icons/brain";
@@ -32,8 +34,9 @@
   });
 
   const apps: any[] = [
-    { name: "Meridian", icon: CompassIcon, href: "/meridian" },
-    { name: "Fitness", icon: ActivityIcon, href: "/fitness" },
+    { name: "Meridian", icon: CompassIcon, href: "/meridian", description: "Planning & Ideas" },
+    { name: "Apex", icon: TrendingUpIcon, href: "/apex", description: "Fitness & Peak Performance"},
+    { name: "Agora", icon: UsersIcon, href: "/agora", description: "Audience Interaction"},
     // { name: "Finance", icon: BuildingIcon, href: "/finance" },
     // { name: "Travel", icon: PlaneIcon, href: "/travel" },
     // { name: "AI", icon: BrainIcon, href: "/ai" },

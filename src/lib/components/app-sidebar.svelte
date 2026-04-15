@@ -8,12 +8,14 @@
   // import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import type { ComponentProps } from "svelte";
   import type { Component } from "svelte";
+    import Separator from "./ui/separator/separator.svelte";
   // import { goto } from "$app/navigation";
 
   type App = {
     name: string;
     icon: Component;
     href: string;
+    description: string;
   };
 
   type User = {
@@ -43,6 +45,8 @@
   <Sidebar.Header>
     <AppSwitcher {apps} />
   </Sidebar.Header>
+
+  <Separator />
 
   <Sidebar.Content>
     <NavMain items={navMain} />
