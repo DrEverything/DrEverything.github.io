@@ -21,7 +21,7 @@
   import IconX from "@tabler/icons-svelte/icons/x";
   import IconClock from "@tabler/icons-svelte/icons/clock";
   import IconListCheck from "@tabler/icons-svelte/icons/list-check";
-  import Markdown from "./markdown.svelte";
+  // import Markdown from "./markdown.svelte";
 
   // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -321,18 +321,18 @@
   onMount(loadProjects);
 </script>
 
-<Markdown
-  src={`
-# Hello
-
-Inline math: $E = mc^2$
-
-Block math:
-$$
-\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}
-$$
-`}
-/>
+<!-- <Markdown -->
+<!--   src={` -->
+<!-- # Hello -->
+<!---->
+<!-- Inline math: $E = mc^2$ -->
+<!---->
+<!-- Block math: -->
+<!-- $$ -->
+<!-- \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2} -->
+<!-- $$ -->
+<!-- `} -->
+<!-- /> -->
 
 <!-- ── Project Dialog ───────────────────────────────────────────────────────── -->
 <Dialog.Root bind:open={projectDialog}>
