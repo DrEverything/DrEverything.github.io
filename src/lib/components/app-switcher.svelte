@@ -23,6 +23,7 @@
         {#snippet child({ props })}
           <Sidebar.MenuButton
             {...props}
+            tooltipContent={activeApp.description}
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >

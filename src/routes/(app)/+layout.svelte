@@ -35,8 +35,9 @@
 
   const apps: any[] = [
     { name: "Meridian", icon: CompassIcon, href: "/meridian", description: "Planning & Ideas" },
-    { name: "Apex", icon: TrendingUpIcon, href: "/apex", description: "Fitness & Peak Performance"},
-    { name: "Agora", icon: UsersIcon, href: "/agora", description: "Audience Interaction"},
+    // { name: "Apex", icon: TrendingUpIcon, href: "/apex", description: "Fitness & Peak Performance"},
+    // { name: "Agora", icon: UsersIcon, href: "/agora", description: "Audience Interaction"},
+    { name: "Dashboard", icon: DashboardIcon, href: "/", description: "dashboard"},
     // { name: "Finance", icon: BuildingIcon, href: "/finance" },
     // { name: "Travel", icon: PlaneIcon, href: "/travel" },
     // { name: "AI", icon: BrainIcon, href: "/ai" },
@@ -49,14 +50,16 @@
   };
 
   let navMain: any[] = [
-    { title: "Dashboard", url: "/", icon: DashboardIcon },
-    { title: "Projects", url: "/projects", icon: FolderIcon },
-    { title: "Analytics", url: "/analytics", icon: ChartBarIcon },
+    // { title: "Dashboard", url: "/", icon: DashboardIcon },
+    // { title: "Projects", url: "/projects", icon: FolderIcon },
+    // { title: "Analytics", url: "/analytics", icon: ChartBarIcon },
   ];
 
   let navSecondary: any[] = [
-    { title: "Settings", url: "/settings", icon: SettingsIcon },
+    // { title: "Settings", url: "/settings", icon: SettingsIcon },
   ];
+
+  console.log("Chrisde")
 </script>
 
 {#if status === 0}
