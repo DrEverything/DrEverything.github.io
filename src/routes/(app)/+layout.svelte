@@ -11,6 +11,7 @@
   import FolderIcon from "@tabler/icons-svelte/icons/folder";
   import ChartBarIcon from "@tabler/icons-svelte/icons/chart-bar";
   import SettingsIcon from "@tabler/icons-svelte/icons/settings";
+  import Menubar from "./menubar.svelte";
 
   import ActivityIcon from "@tabler/icons-svelte/icons/activity";
 
@@ -34,10 +35,20 @@
   });
 
   const apps: any[] = [
-    { name: "Meridian", icon: CompassIcon, href: "/meridian", description: "Planning & Ideas" },
+    {
+      name: "Meridian",
+      icon: CompassIcon,
+      href: "/meridian",
+      description: "Planning & Ideas",
+    },
     // { name: "Apex", icon: TrendingUpIcon, href: "/apex", description: "Fitness & Peak Performance"},
     // { name: "Agora", icon: UsersIcon, href: "/agora", description: "Audience Interaction"},
-    { name: "Dashboard", icon: DashboardIcon, href: "/", description: "dashboard"},
+    {
+      name: "Dashboard",
+      icon: DashboardIcon,
+      href: "/",
+      description: "dashboard",
+    },
     // { name: "Finance", icon: BuildingIcon, href: "/finance" },
     // { name: "Travel", icon: PlaneIcon, href: "/travel" },
     // { name: "AI", icon: BrainIcon, href: "/ai" },
@@ -58,8 +69,6 @@
   let navSecondary: any[] = [
     // { title: "Settings", url: "/settings", icon: SettingsIcon },
   ];
-
-  console.log("Chrisde")
 </script>
 
 {#if status === 0}
@@ -67,26 +76,36 @@
     <Spinner class="size-8" />
   </div>
 {:else}
-  <Sidebar.Provider
-    style="--sidebar-width: calc(var(--spacing) * 45); --header-height: calc(var(--spacing) * 10);"
+  <header
+    class="fixed top-0 inset-x-0 z-50 h-(--menubar-height) [--menubar-height:2.5rem]
+               flex items-center px-4 gap-3"
   >
-    <AppSidebar
-      class="select-none"
-      variant="inset"
-      {apps}
-      {user}
-      {navMain}
-      {navSecondary}
-    />
-    <Sidebar.Inset>
-      <SiteHeader />
-      <div class="flex flex-1 flex-col">
-        <div class="@container/main flex flex-1 flex-col gap-2">
-          <div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-            {@render children()}
-          </div>
-        </div>
-      </div>
-    </Sidebar.Inset>
-  </Sidebar.Provider>
+    <Menubar />
+  </header>
+  <main class="pt-(--menubar-height)">
+    {@render children()}
+  </main>
+
+  <!-- <Sidebar.Provider -->
+  <!--   style="--sidebar-width: calc(var(--spacing) * 45); --header-height: calc(var(--spacing) * 10);" -->
+  <!-- > -->
+  <!--   <AppSidebar -->
+  <!--     class="select-none" -->
+  <!--     variant="inset" -->
+  <!--     {apps} -->
+  <!--     {user} -->
+  <!--     {navMain} -->
+  <!--     {navSecondary} -->
+  <!--   /> -->
+  <!--   <Sidebar.Inset> -->
+  <!--     <SiteHeader /> -->
+  <!--     <div class="flex flex-1 flex-col"> -->
+  <!--       <div class="@container/main flex flex-1 flex-col gap-2"> -->
+  <!--         <div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6"> -->
+  <!--           {@render children()} -->
+  <!--         </div> -->
+  <!--       </div> -->
+  <!--     </div> -->
+  <!--   </Sidebar.Inset> -->
+  <!-- </Sidebar.Provider> -->
 {/if}
