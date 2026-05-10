@@ -5,6 +5,7 @@
   import UserIcon from "@tabler/icons-svelte/icons/user";
   import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
   import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
   import Separator from "$lib/components/ui/separator/separator.svelte";
 
   const apps: any[] = [
@@ -27,7 +28,11 @@
     icon: UserIcon,
   };
 
-  let currentApp = $state(apps[0]);
+  let currentApp = $state(
+    apps.find(
+      (a) => a.href === (browser ? localStorage.getItem("currentApp") : null),
+    ) ?? apps[0],
+  );
 
   async function logout() {
     await fetch(`/api/auth/logout`, { method: "POST", credentials: "include" });
@@ -47,10 +52,10 @@
           <Menubar.RadioItem
             class="cursor-default"
             value={app.name}
-            onclick={() => {
+            onSelect={() => {
               currentApp = app;
 
-              localStorage.setItem("previousApp", app.href);
+              localStorage.setItem("currentApp", app.href);
 
               goto(app.href);
             }}

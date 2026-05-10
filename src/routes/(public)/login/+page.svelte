@@ -18,10 +18,10 @@
       credentials: "include",
     });
     if (res.ok) {
-      let previousApp = localStorage.getItem("previousApp");
+      let currentApp = localStorage.getItem("currentApp");
 
-      if (previousApp) {
-        goto(previousApp);
+      if (currentApp) {
+        goto(currentApp);
       } else {
         goto("/");
       }
