@@ -1,98 +1,81 @@
 <script lang="ts">
   import * as Menubar from "$lib/components/ui/menubar/index.js";
   import CompassIcon from "@tabler/icons-svelte/icons/compass";
+  import LogoutIcon from "@tabler/icons-svelte/icons/logout";
+  import UserIcon from "@tabler/icons-svelte/icons/user";
+  import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
+  import { goto } from "$app/navigation";
+  import Separator from "$lib/components/ui/separator/separator.svelte";
 
-  let bookmarks = $state(false);
-  let fullUrls = $state(true);
-  let profileRadioValue = $state("benoit");
+  const apps: any[] = [
+    {
+      name: "Meridian",
+      icon: CompassIcon,
+      href: "/meridian",
+      description: "Planning & Ideas",
+    },
+    {
+      name: "Dashboard",
+      icon: DashboardIcon,
+      href: "/",
+      description: "dashboard",
+    },
+  ];
+
+  const user = {
+    name: "myName",
+    icon: UserIcon,
+  };
+
+  let currentApp = $state(apps[0]);
+
+  async function logout() {
+    await fetch(`/api/auth/logout`, { method: "POST", credentials: "include" });
+    location.reload();
+  }
 </script>
 
-  <Menubar.Root>
-    <Menubar.Menu>
-      <Menubar.Trigger><CompassIcon />File</Menubar.Trigger>
-      <Menubar.Content>
-        <Menubar.Item>
-          New Tab <Menubar.Shortcut>⌘T</Menubar.Shortcut>
-        </Menubar.Item>
-        <Menubar.Item>
-          New Window <Menubar.Shortcut>⌘N</Menubar.Shortcut>
-        </Menubar.Item>
-        <Menubar.Item>New Incognito Window</Menubar.Item>
-        <Menubar.Separator />
-        <Menubar.Sub>
-          <Menubar.SubTrigger>Share</Menubar.SubTrigger>
-          <Menubar.SubContent>
-            <Menubar.Item>Email link</Menubar.Item>
-            <Menubar.Item>Messages</Menubar.Item>
-            <Menubar.Item>Notes</Menubar.Item>
-          </Menubar.SubContent>
-        </Menubar.Sub>
-        <Menubar.Separator />
-        <Menubar.Item>
-          Print... <Menubar.Shortcut>⌘P</Menubar.Shortcut>
-        </Menubar.Item>
-      </Menubar.Content>
-    </Menubar.Menu>
-    <Menubar.Menu>
-      <Menubar.Trigger>Edit</Menubar.Trigger>
-      <Menubar.Content>
-        <Menubar.Item>
-          Undo <Menubar.Shortcut>⌘Z</Menubar.Shortcut>
-        </Menubar.Item>
-        <Menubar.Item>
-          Redo <Menubar.Shortcut>⇧⌘Z</Menubar.Shortcut>
-        </Menubar.Item>
-        <Menubar.Separator />
-        <Menubar.Sub>
-          <Menubar.SubTrigger>Find</Menubar.SubTrigger>
-          <Menubar.SubContent>
-            <Menubar.Item>Search the web</Menubar.Item>
-            <Menubar.Separator />
-            <Menubar.Item>Find...</Menubar.Item>
-            <Menubar.Item>Find Next</Menubar.Item>
-            <Menubar.Item>Find Previous</Menubar.Item>
-          </Menubar.SubContent>
-        </Menubar.Sub>
-        <Menubar.Separator />
-        <Menubar.Item>Cut</Menubar.Item>
-        <Menubar.Item>Copy</Menubar.Item>
-        <Menubar.Item>Paste</Menubar.Item>
-      </Menubar.Content>
-    </Menubar.Menu>
-    <Menubar.Menu>
-      <Menubar.Trigger>View</Menubar.Trigger>
-      <Menubar.Content>
-        <Menubar.CheckboxItem bind:checked={bookmarks}
-          >Always Show Bookmarks Bar</Menubar.CheckboxItem
-        >
-        <Menubar.CheckboxItem bind:checked={fullUrls}>
-          Always Show Full URLs
-        </Menubar.CheckboxItem>
-        <Menubar.Separator />
-        <Menubar.Item inset>
-          Reload <Menubar.Shortcut>⌘R</Menubar.Shortcut>
-        </Menubar.Item>
-        <Menubar.Item inset>
-          Force Reload <Menubar.Shortcut>⇧⌘R</Menubar.Shortcut>
-        </Menubar.Item>
-        <Menubar.Separator />
-        <Menubar.Item inset>Toggle Fullscreen</Menubar.Item>
-        <Menubar.Separator />
-        <Menubar.Item inset>Hide Sidebar</Menubar.Item>
-      </Menubar.Content>
-    </Menubar.Menu>
-    <Menubar.Menu>
-      <Menubar.Trigger>Profiles</Menubar.Trigger>
-      <Menubar.Content>
-        <Menubar.RadioGroup bind:value={profileRadioValue}>
-          <Menubar.RadioItem value="andy">Andy</Menubar.RadioItem>
-          <Menubar.RadioItem value="benoit">Benoit</Menubar.RadioItem>
-          <Menubar.RadioItem value="Luis">Luis</Menubar.RadioItem>
-        </Menubar.RadioGroup>
-        <Menubar.Separator />
-        <Menubar.Item inset>Edit...</Menubar.Item>
-        <Menubar.Separator />
-        <Menubar.Item inset>Add Profile...</Menubar.Item>
-      </Menubar.Content>
-    </Menubar.Menu>
-  </Menubar.Root>
+<Menubar.Root class="bg-background h-auto shadow-lg">
+  <Menubar.Menu>
+    <Menubar.Trigger class="h-auto px-2 py-1">
+      {@const Icon = currentApp.icon}
+      <Icon class="size-6" />
+    </Menubar.Trigger>
+    <Menubar.Content>
+      <Menubar.RadioGroup value={currentApp.name}>
+        {#each apps as app}
+          <Menubar.RadioItem
+            class="cursor-default"
+            value={app.name}
+            onclick={() => {
+              currentApp = app;
+
+              localStorage.setItem("previousApp", app.href);
+
+              goto(app.href);
+            }}
+          >
+            {@const Icon = app.icon}
+            <Icon class="mr-2 size-4" />
+            {app.name}
+          </Menubar.RadioItem>
+        {/each}
+      </Menubar.RadioGroup>
+    </Menubar.Content>
+  </Menubar.Menu>
+
+  <Separator orientation="vertical" class="h-6 mx-1" />
+
+  <Menubar.Menu>
+    <Menubar.Trigger class="h-auto px-2 py-1">
+      {@const Icon = user.icon}
+      <Icon class="size-6" />
+    </Menubar.Trigger>
+    <Menubar.Content>
+      <Menubar.Item onclick={logout}>
+        <LogoutIcon class="size-4" />
+        Logout</Menubar.Item
+      >
+    </Menubar.Content>
+  </Menubar.Menu>
+</Menubar.Root>

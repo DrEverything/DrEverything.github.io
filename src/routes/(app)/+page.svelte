@@ -31,7 +31,7 @@
   ]}
 />
 
-<div class="px-4 lg:px-6">
+<div class="px-4 lg:px-6 lg:py-4">
   <ChartAreaInteractive
     title="Budget Over Time"
     description="Spend vs remaining across all projects"
