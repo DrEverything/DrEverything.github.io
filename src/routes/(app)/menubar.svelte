@@ -71,6 +71,8 @@
 
   <Separator orientation="vertical" class="h-6 mx-1" />
 
+  <Separator orientation="vertical" class="h-6 mx-1" />
+
   <Menubar.Menu>
     <Menubar.Trigger class="h-auto px-2 py-1">
       {@const Icon = user.icon}
