@@ -1,7 +1,6 @@
 <script lang="ts">
   import Menubar from "./menubar.svelte";
   import { Spinner } from "$lib/components/ui/spinner";
-
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
 
@@ -26,14 +25,15 @@
     <Spinner class="size-8" />
   </div>
 {:else}
-  <div class="[--mh:2.5rem] [--mt:0.5rem] [--top:3.5rem]">
-    <header
-      class="fixed top-(--mt) inset-x-0 z-50 h-(--mh)
-                   flex items-center px-4 gap-3"
-    >
+  <!-- pt-2 acts as your initial 'top-2' offset so the menu sits 8px from the top -->
+  <div class="pt-2">
+    <!-- Changed 'fixed' to 'sticky'. Added 'bg-background' so text doesn't overlap on scroll -->
+    <header class="sticky top-2 z-50 flex items-center px-4">
       <Menubar />
     </header>
-    <main class="pt-(--top)">
+
+    <!-- pt-2 creates exactly 2 units (8px) of space below the menu -->
+    <main class="mx-4 pt-2">
       {@render children()}
     </main>
   </div>
