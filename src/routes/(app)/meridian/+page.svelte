@@ -7,7 +7,7 @@
   console.log("meridian");
 </script>
 
-<Card.Root class="w-full max-w-sm">
+<Card.Root class="w-full">
   <Card.Header>
     <Card.Title>Login to your account</Card.Title>
     <Card.Description
@@ -17,8 +17,44 @@
       <Button variant="link">Sign Up</Button>
     </Card.Action>
   </Card.Header>
-  <Card.Content>
-    <Button>HAHA</Button>
+  <Card.Content class="flex flex-row gap-2 overflow-hidden">
+    <Card.Root class="w-full">
+      <Card.Header>
+        <Card.Title>Login to your account</Card.Title>
+        <Card.Description
+          >Enter your email below to login to your account</Card.Description
+        >
+        <Card.Action>
+          <Button variant="link">Sign Up</Button>
+        </Card.Action>
+      </Card.Header>
+      <Card.Content>
+        <Button>HAHA</Button>
+      </Card.Content>
+      <Card.Footer class="flex-col gap-2">
+        <Button type="submit" class="w-full">Login</Button>
+        <Button variant="outline" class="w-full">Login with Google</Button>
+      </Card.Footer>
+    </Card.Root>
+
+    <Card.Root class="w-full">
+      <Card.Header>
+        <Card.Title>Login to your account</Card.Title>
+        <Card.Description
+          >Enter your email below to login to your account</Card.Description
+        >
+        <Card.Action>
+          <Button variant="link">Sign Up</Button>
+        </Card.Action>
+      </Card.Header>
+      <Card.Content>
+        <Button>HAHA</Button>
+      </Card.Content>
+      <Card.Footer class="flex-col gap-2">
+        <Button type="submit" class="w-full">Login</Button>
+        <Button variant="outline" class="w-full">Login with Google</Button>
+      </Card.Footer>
+    </Card.Root>
   </Card.Content>
   <Card.Footer class="flex-col gap-2">
     <Button type="submit" class="w-full">Login</Button>
