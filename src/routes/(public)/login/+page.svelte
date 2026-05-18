@@ -12,19 +12,20 @@
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
 
   let status = $state<-1 | 0 | 1>(0);
+
+  function route() {
+    let currentApp = localStorage.getItem("currentApp");
+
+    goto(currentApp ?? "/");
+  }
+
   onMount(async () => {
     const res = await fetch("/api/auth/check", {
       method: "POST",
       credentials: "include",
     });
     if (res.ok) {
-      let currentApp = localStorage.getItem("currentApp");
-
-      if (currentApp) {
-        goto(currentApp);
-      } else {
-        goto("/");
-      }
+      route();
     } else {
       status = -1;
     }
@@ -66,13 +67,7 @@
       const cred = await startAuthentication({ optionsJSON: publicKey });
       await post("login/finish", { challenge_id, cred });
 
-      let previousApp = localStorage.getItem("previousApp");
-
-      if (previousApp) {
-        goto(previousApp);
-      } else {
-        goto("/");
-      }
+      route();
     } catch (err: any) {
       error =
         err.name === "NotAllowedError"
