@@ -4,6 +4,7 @@
   import LogoutIcon from "@tabler/icons-svelte/icons/logout";
   import UserIcon from "@tabler/icons-svelte/icons/user";
   import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
+  import HeartRateMonitorIcon from "@tabler/icons-svelte/icons/heart-rate-monitor";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
   import Separator from "$lib/components/ui/separator/separator.svelte";
@@ -20,6 +21,12 @@
       icon: DashboardIcon,
       href: "/",
       description: "dashboard",
+    },
+    {
+      name: "Health",
+      icon: HeartRateMonitorIcon,
+      href: "/health",
+      description: "Labs and Body monitoring",
     },
   ];
 
