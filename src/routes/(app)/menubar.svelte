@@ -5,6 +5,7 @@
   import UserIcon from "@tabler/icons-svelte/icons/user";
   import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
   import HeartRateMonitorIcon from "@tabler/icons-svelte/icons/heart-rate-monitor";
+  import BusinessPlanIcon from "@tabler/icons-svelte/icons/businessplan";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
   import Separator from "$lib/components/ui/separator/separator.svelte";
@@ -16,17 +17,24 @@
       href: "/meridian",
       description: "Planning & Ideas",
     },
-    {
-      name: "Dashboard",
-      icon: DashboardIcon,
-      href: "/",
-      description: "dashboard",
-    },
+    // {
+    //   name: "Dashboard",
+    //   icon: DashboardIcon,
+    //   href: "/",
+    //   description: "dashboard",
+    // },
     {
       name: "Health",
       icon: HeartRateMonitorIcon,
       href: "/health",
       description: "Labs and Body monitoring",
+    },
+    {
+      name: "Business",
+      icon: BusinessPlanIcon,
+      href: "/business",
+      description:
+        "Calculations and Plans for starting and operating a business",
     },
   ];
 

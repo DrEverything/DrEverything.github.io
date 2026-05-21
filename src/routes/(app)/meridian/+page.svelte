@@ -3,9 +3,17 @@
   import * as Card from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
   import { Button } from "$lib/components/ui/button";
-  import Meridian from "./meridian.svelte";
+  import { post } from "$lib/utils";
+
+  post("meridian/top_tasks", {
+    whatever: "something",
+  });
+
+  // import Meridian from "./meridian.svelte";
 
   console.log("meridian");
+
+  let top_ten_next_tasks_for_user = [];
 </script>
 
 <Card.Root class="w-full">
@@ -27,4 +35,4 @@
   </Card.Footer>
 </Card.Root>
 
-<Meridian />
+<!-- <Meridian /> -->
