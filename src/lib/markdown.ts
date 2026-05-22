@@ -1,4 +1,5 @@
 import MarkdownIt from 'markdown-it';
+// @ts-expect-error markdown-it-texmath doesn't have official TS definitions
 import texmath from 'markdown-it-texmath';
 import katex from 'katex';
 
