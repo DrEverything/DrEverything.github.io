@@ -12,18 +12,6 @@
 
   const apps: any[] = [
     {
-      name: "Meridian",
-      icon: CompassIcon,
-      href: "/meridian",
-      description: "Planning & Ideas",
-    },
-    // {
-    //   name: "Dashboard",
-    //   icon: DashboardIcon,
-    //   href: "/",
-    //   description: "dashboard",
-    // },
-    {
       name: "Health",
       icon: HeartRateMonitorIcon,
       href: "/health",
@@ -36,6 +24,18 @@
       description:
         "Calculations and Plans for starting and operating a business",
     },
+    {
+      name: "Meridian",
+      icon: CompassIcon,
+      href: "/meridian",
+      description: "Planning & Ideas",
+    },
+    // {
+    //   name: "Dashboard",
+    //   icon: DashboardIcon,
+    //   href: "/",
+    //   description: "dashboard",
+    // },
   ];
 
   const user = {
