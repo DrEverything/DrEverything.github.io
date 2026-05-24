@@ -1,3 +1,4 @@
+// This whole component file is experimental. Is not going to be used for now!
 <script lang="ts">
   import ChartAreaInteractive from "$lib/components/chart-area-interactive.svelte";
   

@@ -22,3 +22,22 @@ export interface Order {
   results?: Record<string, string>;
   updatedAt: string;
 }
+
+interface BusinessPlanBaseEntry {
+  id: string;
+  category: string;
+  vendor?: string;
+  amount: number;
+  cost_for_each: number;
+  currency: string;
+  projectCode?: string;
+  notes?: string;
+}
+
+export interface CapexEntry extends BusinessPlanBaseEntry {
+
+}
+
+export interface OpexEntry extends BusinessPlanBaseEntry {
+
+}
