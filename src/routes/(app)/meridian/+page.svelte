@@ -4,6 +4,7 @@
   import { Badge } from "$lib/components/ui/badge";
   import { Button } from "$lib/components/ui/button";
   import { post } from "$lib/utils";
+  import { onMount } from "svelte";
 
   post("meridian/top_tasks", {
     whatever: "something",
@@ -11,9 +12,20 @@
 
   // import Meridian from "./meridian.svelte";
 
-  console.log("meridian");
+  let goals;
+  let projects;
+  let tasks;
 
-  let top_ten_next_tasks_for_user = [];
+  onMount(async () => {
+    goals = await post("/meridian/goals");
+    projects = await post("/meridian/projects");
+    tasks = await post("/meridian/tasks");
+  });
+
+  function top10PriortyThings() {
+
+  }
+  let top10PriorityThings = [];
 </script>
 
 <Card.Root class="w-full">
