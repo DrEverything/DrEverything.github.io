@@ -1,4 +1,3 @@
-// This whole component file is experimental. Is not going to be used for now!
 <script lang="ts">
   import ChartAreaInteractive from "$lib/components/chart-area-interactive.svelte";
   
@@ -514,7 +513,6 @@
         <CalculatorIcon class="size-6 text-primary animate-pulse" />
         Business Ledger Simulator
       </h1>
-      <p class="text-xs text-muted-foreground font-medium">Model capital financing, loan amortization, and dynamic expenses in real-time.</p>
     </div>
 
     <!-- Toggle Controls -->
