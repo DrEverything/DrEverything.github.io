@@ -25,9 +25,11 @@ export interface Order {
 
 export interface BusinessPlanBaseEntry {
   id: string;
+  userId?: string;
   name: string;
   price: number;
   amount: number;
+  createdAt?: number;
 }
 
 export interface CapexEntry extends BusinessPlanBaseEntry {
@@ -38,10 +40,15 @@ export interface OpexEntry extends BusinessPlanBaseEntry {
 
 }
 
+interface CostOfThingThatPeopleBuy {
+  name: string;
+  cost: number;
+}
+
 export interface ThingThatPeopleBuy {
   name: string;
   price: number;
-  unit_cost: number;
+  costs: CostOfThingThatPeopleBuy[];
   projected_sales_per_month: number;
 }
 
