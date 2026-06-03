@@ -34,8 +34,16 @@
   }
 
   let calculatedTotals = $derived([
-    { name: "Capital Ex", value: calculateTotal(capexEntries) },
-    { name: "Operational Ex", value: calculateTotal(opexEntries) },
+    {
+      name: "Capital Ex",
+      value: calculateTotal(capexEntries),
+      entries: capexEntries,
+    },
+    {
+      name: "Operational Ex",
+      value: calculateTotal(opexEntries),
+      entries: opexEntries,
+    },
   ]);
 </script>
 
@@ -69,31 +77,36 @@
 
           <Separator />
 
-          {#each capexEntries as entry}
-            <div class="flex flex-row gap-4 items-center">
-              <Dialog.Root>
-                <Dialog.Trigger
-                  type="button"
-                  class={buttonVariants({ variant: "outline" })}
-                >
-                  {entry.amount}
-                  {entry.name} for {entry.price}$ each
-                </Dialog.Trigger>
-                <Dialog.Content>
-                  <Dialog.Header>
-                    <Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
-                    <Dialog.Description>
-                      This action cannot be undone. This will permanently delete
-                      your account and remove your data from our servers.
-                    </Dialog.Description>
-                  </Dialog.Header>
-                </Dialog.Content>
-              </Dialog.Root>
-              <Button variant="outline" size="icon" class="rounded-full">
-                <X />
-              </Button>
-            </div>
-          {/each}
+          {#if total.entries.length === 0}
+            <p>No Entries Yet!</p>
+          {:else}
+            {#each total.entries as entry}
+              <div class="flex flex-row gap-4 items-center">
+                <Dialog.Root>
+                  <Dialog.Trigger
+                    type="button"
+                    class={buttonVariants({ variant: "outline" })}
+                  >
+                    {entry.amount}
+                    {entry.name} for {entry.price}$ each
+                  </Dialog.Trigger>
+                  <Dialog.Content>
+                    <Dialog.Header>
+                      <Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
+                      <Dialog.Description>
+                        This action cannot be undone. This will permanently
+                        delete your account and remove your data from our
+                        servers.
+                      </Dialog.Description>
+                    </Dialog.Header>
+                  </Dialog.Content>
+                </Dialog.Root>
+                <Button variant="outline" size="icon" class="rounded-full">
+                  <X />
+                </Button>
+              </div>
+            {/each}
+          {/if}
 
           <Separator />
 
