@@ -30,21 +30,21 @@
       href: "/health",
       description: "Labs and Body monitoring",
     },
-    {
-      id: "business",
-      name: "Business",
-      icon: BusinessPlanIcon,
-      href: "/business",
-      description:
-        "Calculations and Plans for starting and operating a business",
-    },
-    {
-      id: "meridian",
-      name: "Meridian",
-      icon: CompassIcon,
-      href: "/meridian",
-      description: "Planning & Ideas",
-    },
+    // {
+    //   id: "business",
+    //   name: "Business",
+    //   icon: BusinessPlanIcon,
+    //   href: "/business",
+    //   description:
+    //     "Calculations and Plans for starting and operating a business",
+    // },
+    // {
+    //   id: "meridian",
+    //   name: "Meridian",
+    //   icon: CompassIcon,
+    //   href: "/meridian",
+    //   description: "Planning & Ideas",
+    // },
   ];
 
   // 1. Safe reactive extraction of local storage metadata
