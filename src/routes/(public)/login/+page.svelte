@@ -22,16 +22,7 @@
   interface UserMetadata {
     user_id: string;
     email: string;
-    apps: Record<string, string[]>;
   }
-
-  let requestedApps = $state<
-    Record<string, { enabled: boolean; role: string }>
-  >({
-    health: { enabled: true, role: "patient" },
-    business: { enabled: false, role: "member" },
-    meridian: { enabled: false, role: "planner" },
-  });
 
   function route(user?: UserMetadata) {
     if (user) {
@@ -120,17 +111,9 @@
       const options = await post("register/start", { email });
       const cred = await startRegistration({ optionsJSON: options.publicKey });
 
-      const apps: Record<string, string[]> = {};
-      for (const [appId, config] of Object.entries(requestedApps)) {
-        if (config.enabled) {
-          apps[appId] = [config.role];
-        }
-      }
-
       const user: UserMetadata = await post("register/finish", {
         email,
         cred,
-        apps,
       });
 
       route(user);
@@ -218,168 +201,6 @@
               onkeydown={(e) => e.key === "Enter" && register()}
               class="h-10"
             />
-          </div>
-
-          <div class="border-t border-border/80 pt-4 space-y-3">
-            <div class="flex items-center justify-between pb-1">
-              <h3
-                class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-              >
-                Requested Apps
-              </h3>
-              <span
-                class="text-[10px] text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full font-medium"
-                >Select apps to unlock</span
-              >
-            </div>
-
-            <div class="space-y-3">
-              <!-- Health App Card -->
-              <Label
-                class="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950"
-              >
-                <Checkbox
-                  id="toggle-2"
-                  bind:checked={requestedApps.health.enabled}
-                  class="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                />
-                <div class="flex items-start justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition-transform duration-300 {requestedApps
-                        .health.enabled
-                        ? 'scale-110'
-                        : ''}"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="size-5"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                          d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-sm font-bold text-foreground">
-                        Health
-                      </div>
-                      <div class="text-[11px] text-muted-foreground">
-                        Labs and body monitoring
-                      </div>
-                    </div>
-                  </div>
-                </div></Label
-              >
-
-              <!-- Business App Card -->
-
-              <Label
-                class="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950"
-              >
-                <Checkbox
-                  id="toggle-2"
-                  bind:checked={requestedApps.business.enabled}
-                  class="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                />
-                <div class="flex items-start justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 transition-transform duration-300 {requestedApps
-                        .business.enabled
-                        ? 'scale-110'
-                        : ''}"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="size-5"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M3 21l18 0" />
-                        <path d="M9 8l1 0" />
-                        <path d="M9 12l1 0" />
-                        <path d="M9 16l1 0" />
-                        <path d="M14 8l1 0" />
-                        <path d="M14 12l1 0" />
-                        <path d="M14 16l1 0" />
-                        <path
-                          d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-sm font-bold text-foreground">
-                        Business
-                      </div>
-                      <div class="text-[11px] text-muted-foreground">
-                        Operating plans & calculations
-                      </div>
-                    </div>
-                  </div>
-                </div></Label
-              >
-
-              <!-- Meridian App Card -->
-              <Label
-                class="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950"
-              >
-                <Checkbox
-                  id="toggle-2"
-                  bind:checked={requestedApps.meridian.enabled}
-                  class="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                />
-                <div class="flex items-start justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10 text-green-500 transition-transform duration-300 {requestedApps
-                        .meridian.enabled
-                        ? 'scale-110'
-                        : ''}"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="size-5"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                        <path d="M12 3l0 3" />
-                        <path d="M12 18l0 3" />
-                        <path d="M3 12l3 0" />
-                        <path d="M18 12l3 0" />
-                        <path d="M12 12l3 -3" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-sm font-bold text-foreground">
-                        Meridian
-                      </div>
-                      <div class="text-[11px] text-muted-foreground">
-                        Planning & Ideas mapping
-                      </div>
-                    </div>
-                  </div>
-                </div></Label
-              >
-            </div>
           </div>
 
           {#if error}

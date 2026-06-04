@@ -20,7 +20,6 @@
   interface UserMetadata {
     user_id: string;
     email: string;
-    apps: Record<string, string[]>;
   }
 
   const apps: AppConfig[] = [
@@ -62,27 +61,16 @@
     }
   }
 
-  // 2. O(1) performance lookup helper
-  function hasAccess(appId: string): boolean {
-    if (!userData || !userData.apps) return false;
-    return appId in userData.apps;
-  }
-
-  // Retrieve roles helper (useful when rendering app-specific views)
-  function getRoles(appId: string): string[] {
-    return userData?.apps?.[appId] ?? [];
-  }
-
   // 3. Graceful fallback logic for currentApp initialization
   function getInitialApp(): AppConfig {
     const cachedHref = browser ? localStorage.getItem("currentApp") : null;
     const matched = apps.find((a) => a.href === cachedHref);
 
     // Fallback to the first unlocked app if they lack access to the cached one
-    if (matched && hasAccess(matched.id)) {
+    if (matched) {
       return matched;
     }
-    return apps.find((app) => hasAccess(app.id)) ?? apps[0];
+    return apps[0];
   }
 
   let currentApp = $state<AppConfig>(getInitialApp());
@@ -107,32 +95,21 @@
     <Menubar.Content>
       <Menubar.RadioGroup value={currentApp.name}>
         {#each apps as app}
-          {@const isUnlocked = hasAccess(app.id)}
           <Menubar.RadioItem
             class="cursor-default"
-            disabled={!isUnlocked}
             value={app.name}
             onSelect={() => {
-              if (isUnlocked) {
-                currentApp = app;
-                localStorage.setItem("currentApp", app.href);
-                goto(app.href);
-              }
+              currentApp = app;
+              localStorage.setItem("currentApp", app.href);
+              goto(app.href);
             }}
           >
             {@const Icon = app.icon}
             <Icon class="mr-2 size-4" />
             <div class="flex flex-col text-left">
-              <span
-                class={!isUnlocked ? "text-muted-foreground line-through" : ""}
-              >
+              <span>
                 {app.name}
               </span>
-              {#if !isUnlocked}
-                <span class="text-[10px] text-destructive font-medium"
-                  >Locked</span
-                >
-              {/if}
             </div>
           </Menubar.RadioItem>
         {/each}
