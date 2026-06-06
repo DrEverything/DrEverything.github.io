@@ -222,7 +222,7 @@
                     autocomplete="email"
                     disabled={loading}
                     onkeydown={(e) => e.key === "Enter" && register()}
-                    class="h-10 border-border/80 bg-background/40 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    class="h-10 border-border/80 bg-background/40"
                   />
                 </div>
 
