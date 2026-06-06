@@ -3,7 +3,7 @@
   import favicon from "$lib/assets/favicon.svg";
 
   import { onMount } from "svelte";
-  import { toast } from "svelte-sonner";
+  import { toast, Toaster } from "svelte-sonner";
 
   onMount(() => {
     function handleInvalid(e: Event) {
@@ -21,4 +21,24 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<Toaster
+  theme="dark"
+  position="top-center"
+  class="toaster group"
+  toastOptions={{
+    classes: {
+      toast:
+        "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg group-[.toaster]:rounded-xl group-[.toaster]:p-4 group-[.toaster]:border",
+      description: "group-[.toast]:text-muted-foreground",
+      actionButton:
+        "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+      cancelButton:
+        "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+      error:
+        "group-[.toast]:bg-destructive/10 group-[.toast]:!text-destructive group-[.toast]:border-destructive/20 [&_*]:!text-destructive",
+      success:
+        "group-[.toast]:bg-emerald-500/10 group-[.toast]:!text-emerald-500 group-[.toast]:border-emerald-500/20 [&_*]:!text-emerald-500",
+    },
+  }}
+/>
 {@render children()}
