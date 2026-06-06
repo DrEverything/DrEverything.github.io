@@ -1,472 +1,439 @@
 <script lang="ts">
-  // Reactive state using Svelte 5 runes
-  let activeTab = $state('labs');
-  let comparePanel = $state('anemia');
-  let selectedLocation = $state('helsinki');
-  let trackingCycleDay = $state(14);
+  // State for the interactive baseline comparison widget
+  let selectedMarker = $state("hr");
+  let customValue = $state(60);
 
-  // Hard statistical data for the comparison module
-  const comparisonData = {
-    anemia: {
-      title: "Anemia & Iron Panel",
-      assays: ["PVK (Complete Blood Count)", "Ferritin (Iron Storage)", "Active Vitamin B12"],
-      monadaPrice: 49,
-      puhtiPrice: 170, // Individual sum equivalent
-      mehilaeinenPrice: 230,
-      saving: "78%"
+  const markers: any = {
+    hr: {
+      name: "Resting Heart Rate",
+      unit: "bpm",
+      popMin: 50,
+      popMax: 90,
+      personalBaseline: 36,
+      standardVerdict: "Normal Range (Within 50-90)",
+      monadaVerdict: "Critical: 4.8 SD Deviation from Personal Baseline",
+      initialVal: 60,
+      minLimit: 30,
+      maxLimit: 100
     },
-    performance: {
-      title: "Comprehensive Biometric Panel",
-      assays: ["25 Core Biomarkers", "Metabolic Marker Set", "Thyroid Profile", "Hormonal Health Baseline"],
-      monadaPrice: 89,
-      puhtiPrice: 169,
-      mehilaeinenPrice: 380,
-      saving: "47%"
+    testo: {
+      name: "Total Testosterone",
+      unit: "nmol/l",
+      popMin: 8.0,
+      popMax: 29.0,
+      personalBaseline: 24.5,
+      standardVerdict: "Normal Range (Within 8.0-29.0)",
+      monadaVerdict: "Warning: 3.1 SD Drop. Systemic Recovery Failure.",
+      initialVal: 11.2,
+      minLimit: 5,
+      maxLimit: 35
+    },
+    ferritin: {
+      name: "Ferritin (Iron Storage)",
+      unit: "µg/l",
+      popMin: 20,
+      popMax: 300,
+      personalBaseline: 150,
+      standardVerdict: "Normal Range (Within 20-300)",
+      monadaVerdict: "Warning: 2.8 SD Drop. Cellular Depletion Underway.",
+      initialVal: 45,
+      minLimit: 10,
+      maxLimit: 350
     }
   };
 
-  const syncOmaKanta = () => {
-    alert("Initiating secure OAuth2 handshake with Kanta (PHR Sandbox)... Instantly building 5-year longitudinal baseline.");
-  };
+  // React to marker change to set reasonable starting points on the slider
+  $effect(() => {
+    customValue = markers[selectedMarker].initialVal;
+  });
+
+  // Calculate where the slider value falls relative to the population & personal ranges
+  let currentMarkerData = $derived(markers[selectedMarker]);
+  let isWithinPopulation = $derived(customValue >= currentMarkerData.popMin && customValue <= currentMarkerData.popMax);
+  let deviationFromPersonal = $derived(Math.abs(customValue - currentMarkerData.personalBaseline));
 </script>
 
-<div class="min-h-screen bg-background text-foreground transition-colors duration-300 font-sans antialiased">
-  <!-- 1. NAVIGATION -->
-  <header class="sticky top-0 z-50 w-full border-b border-border/80 bg-background/95 backdrop-blur-md">
-    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center gap-8">
-        <span class="text-xl font-black tracking-widest text-primary uppercase">Monada</span>
-        <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-          <a href="#diagnostics" class="hover:text-primary transition-colors">Diagnostics</a>
-          <a href="#unification" class="hover:text-primary transition-colors">OS Architecture</a>
-          <a href="#pricing" class="hover:text-primary transition-colors">Pricing Matrix</a>
-          <a href="#sovereignty" class="hover:text-primary transition-colors">Sovereignty</a>
-        </nav>
+<div class="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans antialiased">
+  <!-- Navigation Header -->
+  <header class="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
+    <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-lg font-black tracking-widest text-primary">MONADA</span>
       </div>
-      
-      <div class="flex items-center gap-4">
-        <button 
-          onclick={syncOmaKanta} 
-          class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wider uppercase border border-border rounded-lg bg-secondary text-secondary-foreground hover:bg-accent transition-all cursor-pointer"
-        >
-          <svg class="h-4 w-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-          </svg>
-          Sync with OmaKanta
-        </button>
-        <a href="#pricing" class="px-4 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-all">
-          Book Panel
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+        <a href="#problem" class="transition-colors hover:text-foreground">The Arbitrage</a>
+        <a href="#interactive" class="transition-colors hover:text-foreground">Simulation</a>
+        <a href="#panel" class="transition-colors hover:text-foreground">The Panel</a>
+        <a href="#logistics" class="transition-colors hover:text-foreground">Logistics</a>
+        <a href="#pricing" class="transition-colors hover:text-foreground">Pricing</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <!-- <a href="/login" class="inline-flex h-9 items-center justify-center rounded-md border border-border bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"> -->
+        <!--   Log In -->
+        <!-- </a> -->
+        <a href="/login" class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+          Login
         </a>
       </div>
     </div>
   </header>
 
-  <!-- 2. HERO SECTION -->
-  <section class="relative py-20 lg:py-32 overflow-hidden border-b border-border">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 items-center">
-      <div class="lg:col-span-7 flex flex-col gap-6 text-left">
-        <div class="inline-flex max-w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-          <span>Phase 0.5 Launch: National Finland Lab Network Live</span>
-        </div>
-        <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl text-balance">
-          The Operating System for Human Biology
-        </h1>
-        <p class="text-lg text-muted-foreground text-balance">
-          Longitudinal biomarker analysis, real-time wearable correlation, and 3D medical imaging. No bloated corporate clinical fees. 100% data sovereign. Managed completely by Svelte-native architecture.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 mt-4">
-          <a href="#pricing" class="flex items-center justify-center px-6 py-3 font-semibold rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-all text-sm tracking-wide uppercase">
-            Order Biomarker Panel
-          </a>
-          <button 
-            onclick={syncOmaKanta} 
-            class="flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg bg-card text-card-foreground border border-border hover:bg-accent transition-all text-sm tracking-wide uppercase cursor-pointer"
-          >
-            <svg class="h-4 w-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-            </svg>
-            Import Historical Kanta Data
-          </button>
-        </div>
-        <div class="flex items-center gap-6 mt-6 text-xs text-muted-foreground border-t border-border pt-6">
-          <div class="flex items-center gap-2">
-            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            35+ SYNLAB Draw Points in Finland
-          </div>
-          <div>•</div>
-          <div>0% Corporate Tax Retention Structure</div>
-          <div>•</div>
-          <div>GDPR Private Storage (Tallinn OÜ)</div>
-        </div>
+  <!-- Hero Section -->
+  <section class="mx-auto max-w-4xl px-4 py-16 md:py-24 text-center">
+    <div class="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground mb-6">
+      <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>Direct-to-Consumer Diagnostic Network</span>
+    </div>
+    
+    <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl text-balance">
+      Your hospital does not know your <span class="text-primary font-mono font-bold">baseline</span>.
+    </h1>
+    
+    <p class="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+      Standard clinical pathology compares your unique biochemistry against sweeping, static population averages. If your biomarkers double or halve but remain inside their wide, arbitrary buckets, you are dismissed as "healthy." 
+    </p>
+
+    <p class="mx-auto mt-4 max-w-2xl text-md font-mono text-primary/80">
+      We bypass the clinical noise. We track your true biological trajectories using personalized Bayesian Z-scores.
+    </p>
+
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <a href="#pricing" class="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+        Order Initial Panel
+      </a>
+    </div>
+  </section>
+
+  <!-- Interactive Section (The Problem Proof) -->
+  <section id="interactive" class="border-y border-border bg-muted/30 py-16">
+    <div class="mx-auto max-w-4xl px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-2xl font-bold tracking-tight">The Diagnostic Illusion</h2>
+        <p class="text-sm text-muted-foreground mt-2">See how easily conventional healthcare misses major systemic shifts in your body.</p>
       </div>
 
-      <!-- Hero Visual: Mock Dashboard -->
-      <div class="lg:col-span-5 bg-card border border-border rounded-xl p-6 shadow-2xl flex flex-col gap-6 relative">
-        <div class="absolute -top-3 -right-3 h-6 w-6 rounded-full bg-primary/20 border border-primary animate-ping"></div>
-        <div class="flex items-center justify-between border-b border-border pb-4">
-          <div class="flex items-center gap-3">
-            <span class="h-3 w-3 rounded-full bg-primary"></span>
-            <span class="text-xs font-mono font-bold tracking-widest text-muted-foreground uppercase">Biometric Real-Time Engine</span>
-          </div>
-          <span class="text-xs font-mono px-2 py-0.5 bg-secondary text-secondary-foreground rounded">ACTIVE CORRELATION</span>
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Marker Selector -->
+        <div class="flex flex-col gap-2 bg-card p-4 rounded-lg border border-border">
+          <span class="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Select Biomarker</span>
+          <button 
+            onclick={() => selectedMarker = "hr"} 
+            class="flex items-center justify-between p-3 rounded-md text-sm font-medium transition-colors border text-left {selectedMarker === 'hr' ? 'bg-primary/10 border-primary text-primary' : 'border-border bg-transparent hover:bg-muted'}"
+          >
+            <span>Resting Heart Rate</span>
+            <span class="text-xs font-mono">bpm</span>
+          </button>
+          <button 
+            onclick={() => selectedMarker = "testo"} 
+            class="flex items-center justify-between p-3 rounded-md text-sm font-medium transition-colors border text-left {selectedMarker === 'testo' ? 'bg-primary/10 border-primary text-primary' : 'border-border bg-transparent hover:bg-muted'}"
+          >
+            <span>Total Testosterone</span>
+            <span class="text-xs font-mono">nmol/l</span>
+          </button>
+          <button 
+            onclick={() => selectedMarker = "ferritin"} 
+            class="flex items-center justify-between p-3 rounded-md text-sm font-medium transition-colors border text-left {selectedMarker === 'ferritin' ? 'bg-primary/10 border-primary text-primary' : 'border-border bg-transparent hover:bg-muted'}"
+          >
+            <span>Ferritin (Iron)</span>
+            <span class="text-xs font-mono">µg/l</span>
+          </button>
         </div>
 
-        <!-- Metric 1: Kinetic Progression Rate -->
-        <div class="flex flex-col gap-2">
-          <div class="flex justify-between text-xs font-mono text-muted-foreground">
-            <span>STRENGTH DEGRADATION DEVIATION</span>
-            <span class="text-primary">1RM MODEL - KINETIC</span>
-          </div>
-          <div class="h-24 bg-background border border-border rounded flex items-end justify-between p-2 gap-1 overflow-hidden">
-            {#each [34, 45, 60, 52, 40, 30, 25, 18, 12, 8] as bar}
-              <div class="w-full bg-primary/15 rounded-t hover:bg-primary transition-colors" style="height: {bar}%"></div>
-            {/each}
-          </div>
-          <span class="text-[10px] text-destructive font-mono">WARNING: Progesterone-luteal phase shift correlates to -8.5% recovery rate.</span>
-        </div>
+        <!-- Simulator Core -->
+        <div class="md:col-span-2 flex flex-col justify-between bg-card p-6 rounded-lg border border-border">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-lg">{currentMarkerData.name}</h3>
+              <span class="font-mono text-sm bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                Current Value: {customValue} {currentMarkerData.unit}
+              </span>
+            </div>
 
-        <!-- Metric 2: Raw Lab Assay Delta -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="border border-border p-3 rounded bg-background/50">
-            <span class="text-[10px] text-muted-foreground block font-mono">S-FERRITIN (BASELINE)</span>
-            <span class="text-lg font-bold">14.2 µg/l</span>
-            <span class="text-[10px] text-destructive font-mono block">Optimal Target &gt; 50</span>
+            <!-- Custom Value Slider -->
+            <div class="space-y-2 mb-6">
+              <label for="value-slider" class="text-xs text-muted-foreground font-mono">Simulate Measured Blood Result:</label>
+              <input 
+                id="value-slider"
+                type="range" 
+                min={currentMarkerData.minLimit} 
+                max={currentMarkerData.maxLimit} 
+                step={selectedMarker === "testo" ? "0.1" : "1"}
+                bind:value={customValue}
+                class="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary" 
+              />
+              <div class="flex justify-between text-[10px] text-muted-foreground font-mono">
+                <span>Min ({currentMarkerData.minLimit})</span>
+                <span>Your Baseline: {currentMarkerData.personalBaseline} {currentMarkerData.unit}</span>
+                <span>Max ({currentMarkerData.maxLimit})</span>
+              </div>
+            </div>
           </div>
-          <div class="border border-border p-3 rounded bg-background/50">
-            <span class="text-[10px] text-muted-foreground block font-mono">S-B12-TC2 (ACTIVE)</span>
-            <span class="text-lg font-bold">135 pmol/l</span>
-            <span class="text-[10px] text-primary font-mono block">Optimal Zone</span>
+
+          <!-- The Real-time Verdict Comparison -->
+          <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-4 border-t border-border">
+            <div class="p-3 rounded bg-zinc-100 dark:bg-zinc-900 border border-border">
+              <div class="text-xs font-bold text-amber-600 dark:text-amber-500 font-mono uppercase tracking-wider mb-1">Standard Lab Verdict</div>
+              <p class="text-sm font-semibold {isWithinPopulation ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}">
+                {isWithinPopulation ? "✅ " + currentMarkerData.standardVerdict : "⚠️ Out of Range"}
+              </p>
+              <p class="text-[11px] text-muted-foreground mt-1 leading-snug">
+                {isWithinPopulation ? "The doctor dismisses you. No anomalies detected because you fall within broad population parameters." : "Flagged only because the marker crossed the extreme population threshold."}
+              </p>
+            </div>
+
+            <div class="p-3 rounded bg-primary/5 border border-primary/25">
+              <div class="text-xs font-bold text-primary font-mono uppercase tracking-wider mb-1">Monada Trajectory Engine</div>
+              <p class="text-sm font-semibold text-primary">
+                {deviationFromPersonal === 0 ? "Perfect Baseline" : "🚨 " + currentMarkerData.monadaVerdict}
+              </p>
+              <p class="text-[11px] text-muted-foreground mt-1 leading-snug">
+                Monada isolates your mathematical variance. A deviation this fast indicates structural stress, regardless of general population scores.
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 3. HOW THE PLATFORM WORKS (INTEGRATION DEMONSTRATOR) -->
-  <section id="diagnostics" class="py-20 border-b border-border">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16">
-        <h2 class="text-3xl font-extrabold tracking-tight">One Unified Engine, Domain-Segmented Interfaces</h2>
-        <p class="text-muted-foreground">We compile physical training logs, deep lab biology, and hardware imaging slices into a single database. Zero data-selling, zero institutional control.</p>
-        
-        <!-- App switcher simulating user selection -->
-        <div class="flex justify-center gap-2 mt-4 bg-card border border-border rounded-lg p-1 max-w-fit mx-auto">
-          <button 
-            onclick={() => activeTab = 'labs'} 
-            class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all cursor-pointer {activeTab === 'labs' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
-          >
-            Diagnostics
-          </button>
-          <button 
-            onclick={() => activeTab = 'kinetic'} 
-            class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all cursor-pointer {activeTab === 'kinetic' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
-          >
-            Kinetic Engine
-          </button>
-          <button 
-            onclick={() => activeTab = 'dicom'} 
-            class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all cursor-pointer {activeTab === 'dicom' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
-          >
-            3D DICOM Viewer
-          </button>
-          <button 
-            onclick={() => activeTab = 'cycle'} 
-            class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all cursor-pointer {activeTab === 'cycle' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
-          >
-            Monada Cycle
-          </button>
+  <!-- Biomarkers System Grid -->
+  <section id="panel" class="mx-auto max-w-6xl px-4 py-16">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <h2 class="text-3xl font-bold tracking-tight">The Universal Health Radar</h2>
+      <p class="text-muted-foreground mt-2">To prevent acute disease, you must screen the underlying chemistry. Our Phase 0 default panel isolates the 6 core systems of functional biology.</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- Card 1 -->
+      <div class="flex flex-col justify-between bg-card p-5 rounded-lg border border-border hover:border-primary/50 transition-colors">
+        <div>
+          <div class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-1">01. Cardiovascular / Lipids</div>
+          <h3 class="font-bold text-lg mb-2">ApoB & Basic Lipids</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Measures Apolipoprotein B alongside standard LDL/HDL. ApoB dictates the exact concentration of atherogenic particles, tracking cardiovascular risk with absolute precision compared to calculated LDL.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex flex-wrap gap-1">
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">ApoB</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Total Chol</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Triglycerides</span>
         </div>
       </div>
 
-      <!-- Dynamic Tab content cards -->
-      <div class="bg-card border border-border rounded-xl p-8 shadow-sm">
-        {#if activeTab === 'labs'}
-          <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div class="flex flex-col gap-6">
-              <h3 class="text-2xl font-bold">Direct-To-Consumer Lab Access (No GP Paywall)</h3>
-              <p class="text-muted-foreground">
-                In Finland, private hospital networks block diagnostic panels behind an expensive doctor’s appointment [4]. Monada bypasses this gatekeeping. You purchase the panel online, walk into any of our 35+ partner SYNLAB drawing locations, and get drew immediately [4].
-              </p>
-              <ul class="flex flex-col gap-3 font-mono text-xs text-muted-foreground">
-                <li class="flex items-center gap-3">
-                  <span class="h-2 w-2 rounded-full bg-primary"></span>
-                  Raw XML, HL7, and PDF results ingested and normalized instantly.
-                </li>
-                <li class="flex items-center gap-3">
-                  <span class="h-2 w-2 rounded-full bg-primary"></span>
-                  Dynamic tracking: Your data compares against your personal baseline, not broad averages.
-                </li>
-              </ul>
-            </div>
-            <div class="border border-border bg-background p-6 rounded-lg flex flex-col gap-4">
-              <span class="text-xs font-mono text-primary uppercase block">Lab Process Flow</span>
-              <div class="flex flex-col gap-3">
-                <div class="flex items-center gap-4 border border-border p-3 rounded bg-card">
-                  <div class="h-8 w-8 rounded-full bg-secondary flex items-center justify-center font-mono text-sm font-bold text-secondary-foreground">1</div>
-                  <div>
-                    <h4 class="text-sm font-bold">Order panel on Monada</h4>
-                    <p class="text-xs text-muted-foreground">Your Svelte client instantly generates a digital referral (lähete) [4].</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-4 border border-border p-3 rounded bg-card">
-                  <div class="h-8 w-8 rounded-full bg-secondary flex items-center justify-center font-mono text-sm font-bold text-secondary-foreground">2</div>
-                  <div>
-                    <h4 class="text-sm font-bold">Venous Draw at SYNLAB</h4>
-                    <p class="text-xs text-muted-foreground">No booking required for standard walk-ins. Premium home-draw available.</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-4 border border-border p-3 rounded bg-card">
-                  <div class="h-8 w-8 rounded-full bg-secondary flex items-center justify-center font-mono text-sm font-bold text-secondary-foreground">3</div>
-                  <div>
-                    <h4 class="text-sm font-bold">Ingest & Track</h4>
-                    <p class="text-xs text-muted-foreground">Biomarkers parsed and mapped directly into your longitudinal engine.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        {:else if activeTab === 'kinetic'}
-          <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div class="flex flex-col gap-6">
-              <h3 class="text-2xl font-bold">Kinetic Engine: 1RM and Velocity Tracking</h3>
-              <p class="text-muted-foreground">
-                We track training intensity with a physics-based approach. Monada uses longitudinal velocity progression rate to map your neuro-motor recovery curve instead of relying on standard single-session formulas.
-              </p>
-              <p class="text-muted-foreground">
-                This physical performance matrix overlays your raw chemical blood markers to isolate exactly where overtraining, low iron, or caloric restriction is degrading your power.
-              </p>
-            </div>
-            <div class="border border-border bg-background p-6 rounded-lg flex flex-col gap-4">
-              <span class="text-xs font-mono text-primary uppercase block">1RM Longitudinal Estimate</span>
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between text-xs font-mono text-muted-foreground">
-                  <span>BARBELL SPEED VS. HEMOGLOBIN</span>
-                  <span>PREDICTION PROFILE</span>
-                </div>
-                <div class="p-4 bg-card border border-border rounded flex flex-col gap-2 font-mono text-xs">
-                  <div class="flex justify-between">
-                    <span>95% Confidence Interval:</span>
-                    <span class="text-primary">[ 132.5kg - 138.0kg ]</span>
-                  </div>
-                  <div class="w-full bg-secondary h-4 rounded-full overflow-hidden">
-                    <div class="bg-primary h-full w-4/5"></div>
-                  </div>
-                  <div class="text-[10px] text-muted-foreground mt-2">
-                    Model shows direct systemic decay correlated with a 12% drop in Ferritin levels logged in the Diagnostics Module [2, 3].
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        {:else if activeTab === 'dicom'}
-          <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div class="flex flex-col gap-6">
-              <h3 class="text-2xl font-bold">Zero-Footprint HTML5 3D DICOM Viewer</h3>
-              <p class="text-muted-foreground">
-                In traditional medical networks, you are handed archaic physical CDs or USB drives of your MRIs or CT scans [2]. You cannot open them without legacy computer hardware.
-              </p>
-              <p class="text-muted-foreground">
-                Monada integrates a web-native 3D HTML5 rendering engine. When you get an MRI through Monada's network, the raw DICOM slices are pushed directly to your personal vault [2]. Render, manipulate, and share high-resolution interactive cross-sections directly on your phone with any specialist worldwide [2].
-              </p>
-            </div>
-            <div class="border border-border bg-background p-4 rounded-lg flex flex-col items-center justify-center min-h-[250px] relative overflow-hidden">
-              <div class="absolute inset-0 bg-radial from-primary/10 to-transparent"></div>
-              <svg class="h-24 w-24 text-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-              </svg>
-              <span class="text-xs font-mono tracking-widest text-primary uppercase mt-4 z-10">DICOM Engine Online</span>
-              <span class="text-[10px] text-muted-foreground font-mono z-10">HTML5 3D Orthogonal Render Ready</span>
-            </div>
-          </div>
-        {:else if activeTab === 'cycle'}
-          <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div class="flex flex-col gap-6">
-              <h3 class="text-2xl font-bold">Monada Cycle: Scientific Hormone Synchronization</h3>
-              <p class="text-muted-foreground">
-                Standard menstrual trackers rely on simple calendar predictions [4]. Monada is different. We combine your cycle logs with sleep skin-temperature trends (from Garmin/Oura) and raw blood diagnostics to dynamically predict hormonal shifts.
-              </p>
-              <p class="text-muted-foreground">
-                <strong>Precision Diagnostics:</strong> Standard doctors often draw hormone panels (FSH, LH, Progesterone) on the wrong days, rendering results useless [4]. Monada dynamically calculates your exact peak cycle days and reminds you to get drawn, guaranteeing precise data [4].
-              </p>
-            </div>
-            <div class="border border-border bg-background p-6 rounded-lg flex flex-col gap-4">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-mono text-primary uppercase block">Dynamic Hormone Calibration</span>
-                <span class="text-xs font-mono px-2 py-0.5 bg-destructive/10 text-destructive border border-destructive/20 rounded">Cycle Day {trackingCycleDay}</span>
-              </div>
-              <div class="space-y-4 font-mono text-xs">
-                <div class="flex justify-between items-center border-b border-border pb-2">
-                  <span>FSH/LH Draw Window:</span>
-                  <span class="text-muted-foreground">Ended (Day 3-5 optimal)</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-border pb-2">
-                  <span>Progesterone Peak Window:</span>
-                  <span class="text-emerald-500 font-bold">Active (Target Day 21)</span>
-                </div>
-                <div class="p-3 bg-secondary rounded text-[11px] text-secondary-foreground leading-relaxed">
-                  Your Garmin core body temperature shows a +0.41°C deviation logged yesterday, validating post-ovulatory luteal phase shift. Schedule your Progesterone assay now.
-                </div>
-              </div>
-            </div>
-          </div>
-        {/if}
+      <!-- Card 2 -->
+      <div class="flex flex-col justify-between bg-card p-5 rounded-lg border border-border hover:border-primary/50 transition-colors">
+        <div>
+          <div class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-1">02. Metabolic Function</div>
+          <h3 class="font-bold text-lg mb-2">Insulin & Glucose Control</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Fasting Insulin and HbA1c screening. Catches sub-clinical insulin resistance and metabolic dysfunction up to a decade before fasting glucose alone triggers clinical diabetes alerts.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex flex-wrap gap-1">
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">HbA1c</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Fasting Insulin</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Glucose</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flex flex-col justify-between bg-card p-5 rounded-lg border border-border hover:border-primary/50 transition-colors">
+        <div>
+          <div class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-1">03. Inflammation & Immune</div>
+          <h3 class="font-bold text-lg mb-2">hs-CRP & Complete Blood Count</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            High-sensitivity C-reactive protein (hs-CRP) captures systemic low-grade vascular inflammation. Coupled with a full cellular profile (PVK) to index chronic stress, recovery capacity, or overtraining.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex flex-wrap gap-1">
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">hs-CRP</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">PVK (CBC)</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="flex flex-col justify-between bg-card p-5 rounded-lg border border-border hover:border-primary/50 transition-colors">
+        <div>
+          <div class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-1">04. Organ Resilience</div>
+          <h3 class="font-bold text-lg mb-2">Liver & Kidney Filtration</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Tracks ALAT (ALT) and Creatinine (eGFR) to screen hepatic cellular stress (fatty liver indices) and glomerular filtration efficiency. Essential baseline metrics for active athletes consuming high-protein loads.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex flex-wrap gap-1">
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">ALAT</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Creatinine</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">eGFR</span>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="flex flex-col justify-between bg-card p-5 rounded-lg border border-border hover:border-primary/50 transition-colors">
+        <div>
+          <div class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-1">05. Hormonal & Thyroid</div>
+          <h3 class="font-bold text-lg mb-2">Testosterone & TSH Baseline</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Total Testosterone and Thyroid-Stimulating Hormone (TSH). Evaluates endocrine output, metabolic pacing, and systemic recovery velocity. Essential for detecting physical adaptation failure and thyroid stress.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex flex-wrap gap-1">
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Total Testo</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">TSH</span>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="flex flex-col justify-between bg-card p-5 rounded-lg border border-border hover:border-primary/50 transition-colors">
+        <div>
+          <div class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-1">06. Cellular Micronutrient</div>
+          <h3 class="font-bold text-lg mb-2">Ferritin, D, B12 & Magnesium</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Identifies cellular energy blockades. Measures iron storage (Ferritin), active transport pathways (Active B12), skeletal and metabolic pacing markers (Vitamin D, Serum Magnesium).
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex flex-wrap gap-1">
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Ferritin</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Vitamin D</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">B12</span>
+          <span class="text-[10px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">Magnesium</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. COMPARISON MATRIX (THE WEAPON) -->
-  <section id="pricing" class="py-20 border-b border-border bg-muted/40">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16">
-        <h2 class="text-3xl font-extrabold tracking-tight">Decimating Corporate Pricing Structures</h2>
-        <p class="text-muted-foreground">Because we do not run physical hospital networks with heavy administrator salaries, we offer the raw price of chemical analysis with clean, digital margins [5].</p>
-        
-        <!-- Tab selector for comparison products -->
-        <div class="flex justify-center gap-2 mt-4 bg-card border border-border rounded-lg p-1 max-w-fit mx-auto">
-          <button 
-            onclick={() => comparePanel = 'anemia'} 
-            class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all cursor-pointer {comparePanel === 'anemia' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
-          >
-            Anemia & Iron Panel
-          </button>
-          <button 
-            onclick={() => comparePanel = 'performance'} 
-            class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all cursor-pointer {comparePanel === 'performance' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
-          >
-            Comprehensive Performance
-          </button>
-        </div>
+  <!-- Logistics Section -->
+  <section id="logistics" class="border-t border-border bg-muted/25 py-16">
+    <div class="mx-auto max-w-4xl px-4">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h2 class="text-2xl font-bold tracking-tight">Standardized Cross-Border Logistics</h2>
+        <p class="text-sm text-muted-foreground mt-2">Zero clinical bureaucracy. We leverage existing high-density infrastructures for immediate, professional sampling.</p>
       </div>
 
-      <!-- Live Pricing Calculator / Contrast Panel -->
-      <div class="grid lg:grid-cols-12 gap-8 items-stretch">
-        
-        <!-- The Product Card -->
-        <div class="lg:col-span-5 bg-card border border-border rounded-xl p-8 flex flex-col justify-between shadow-sm">
-          <div class="flex flex-col gap-6">
-            <span class="text-xs font-mono text-primary uppercase block tracking-widest">Active Monada Panel</span>
-            <h3 class="text-2xl font-black">{comparisonData[comparePanel].title}</h3>
-            
-            <div class="border-t border-b border-border py-4">
-              <span class="text-[10px] text-muted-foreground block font-mono mb-2 uppercase">Included Assays & Markers:</span>
-              <ul class="flex flex-col gap-2 font-mono text-xs text-muted-foreground">
-                {#each comparisonData[comparePanel].assays as assay}
-                  <li class="flex items-center gap-2">
-                    <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-                    {assay}
-                  </li>
-                {/each}
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-8">
-            <div class="flex items-baseline gap-2 mb-4">
-              <span class="text-4xl font-black tracking-tight">€{comparisonData[comparePanel].monadaPrice}.00</span>
-              <span class="text-xs text-muted-foreground uppercase font-mono">All-inclusive draw fee</span>
-            </div>
-            <a href="#booking" class="w-full inline-flex items-center justify-center py-3 text-xs font-bold tracking-widest uppercase rounded bg-primary text-primary-foreground hover:opacity-95 transition-all">
-              Book Referral Now
-            </a>
-          </div>
-        </div>
-
-        <!-- The Corporate Comparison -->
-        <div class="lg:col-span-7 bg-card border border-border rounded-xl p-8 flex flex-col justify-between shadow-sm">
-          <div class="flex flex-col gap-6">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-mono text-destructive uppercase block tracking-widest">Market Comparison Matrix</span>
-              <span class="text-xs font-mono px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded">Monada saves you {comparisonData[comparePanel].saving}</span>
-            </div>
-
-            <!-- Price comparison lines -->
-            <div class="space-y-4">
-              <div class="flex justify-between items-center border-b border-border pb-3">
-                <div>
-                  <h4 class="text-sm font-bold">Mehiläinen (Individual Clinic Request)</h4>
-                  <p class="text-xs text-muted-foreground">Excludes initial GP referral fee of €120 [4].</p>
-                </div>
-                <span class="text-lg font-mono font-bold text-destructive">€{comparisonData[comparePanel].mehilaeinenPrice}.00</span>
-              </div>
-
-              <div class="flex justify-between items-center border-b border-border pb-3">
-                <div>
-                  <h4 class="text-sm font-bold">Puhti (Retail Storefront)</h4>
-                  <p class="text-xs text-muted-foreground">Owned by Mehiläinen. Restricts raw imaging and data integration [5].</p>
-                </div>
-                <span class="text-lg font-mono font-bold text-destructive/80">€{comparisonData[comparePanel].puhtiPrice}.00</span>
-              </div>
-
-              <div class="flex justify-between items-center pb-3">
-                <div>
-                  <h4 class="text-sm font-bold text-primary">Monada Core Network</h4>
-                  <p class="text-xs text-muted-foreground">Direct-to-consumer B2B pricing model at SYNLAB clinics [4, 5].</p>
-                </div>
-                <span class="text-lg font-mono font-bold text-primary">€{comparisonData[comparePanel].monadaPrice}.00</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Micro comparison note -->
-          <p class="text-[11px] font-mono text-muted-foreground leading-relaxed mt-8 border-t border-border pt-4">
-            Under EU Directive 2011/24/EU, if you are a Finnish citizen seeking diagnostics across cross-border hubs (like our primary Tallinn infrastructure), you may claim Kela reimbursement, dropping Monada's net cost significantly [6].
+      <div class="grid gap-8 sm:grid-cols-3">
+        <div class="space-y-2">
+          <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground font-mono font-bold text-sm">1</div>
+          <h4 class="font-bold text-base">Digital Referral Generation</h4>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Order your panel instantly via Monada OS. Our automated referral partner pipeline immediately routes the electronic laboratory referral (läheteyhteistyö) straight into the Finnish partner network.
           </p>
         </div>
 
-      </div>
-    </div>
-  </section>
+        <div class="space-y-2">
+          <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground font-mono font-bold text-sm">2</div>
+          <h4 class="font-bold text-base">5-Min Draw at Partner Locations</h4>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Walk into any of the 35+ professional SYNLAB Suomi blood draw centers across Finland. A certified laboratory nurse draws your panel in minutes. No clinic fees, no doctor's appointments.
+          </p>
+        </div>
 
-  <!-- 5. SECURITY & SOVEREIGNTY -->
-  <section id="sovereignty" class="py-20 border-b border-border">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-      <div class="flex flex-col gap-6">
-        <span class="text-xs font-mono text-primary uppercase block tracking-widest">Sovereignty Protocol</span>
-        <h2 class="text-3xl font-extrabold tracking-tight">Your Biology is Your Own.</h2>
-        <p class="text-muted-foreground">
-          Traditional healthcare applications operate on a surveillance business model. They sell aggregate biometric statistics to health insurance providers and medical advertising agencies to increase their valuations [5].
-        </p>
-        <p class="text-muted-foreground">
-          <strong>The Monada Promise:</strong> Your data sits under strict GDPR jurisdiction managed through our Tallinn OÜ operating entity [4, 9]. We do not run ads, we do not package datasets, and we do not sell insights [4]. If you close your account, your entire biological record, PACS raw images, and biometric baseline models are completely wiped from our S3 and PostgreSQL nodes within 60 seconds [4, 9].
-        </p>
-      </div>
-      <div class="bg-card border border-border rounded-xl p-8 flex flex-col gap-6 font-mono text-xs">
-        <span class="text-xs font-mono text-primary uppercase block">System Architecture Integrity</span>
-        <div class="space-y-3">
-          <div class="flex justify-between border-b border-border pb-2">
-            <span>Corporate Jurisdiction:</span>
-            <span class="text-primary">Estonian OÜ (0% Retained Income Tax)</span>
-          </div>
-          <div class="flex justify-between border-b border-border pb-2">
-            <span>Physical Lab Logistics:</span>
-            <span class="text-primary">UN3373 Temperature-Controlled Chain</span>
-          </div>
-          <div class="flex justify-between border-b border-border pb-2">
-            <span>Server Framework:</span>
-            <span class="text-primary">Svelte 5 / Node Serverless</span>
-          </div>
-          <div class="flex justify-between border-b border-border pb-2">
-            <span>Encryption Standard:</span>
-            <span class="text-primary">AES-GCM Authenticated Storage</span>
-          </div>
+        <div class="space-y-2">
+          <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground font-mono font-bold text-sm">3</div>
+          <h4 class="font-bold text-base">Real-time Bayesian Baseline Analysis</h4>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Raw results route directly from the laboratory into your Monada database. We clean the values, calculate your personalized Z-score offsets, and update your trajectory modeling vectors instantly.
+          </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 6. FOOTER -->
-  <footer class="py-12 bg-card border-t border-border text-xs text-muted-foreground">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between gap-6 items-center">
-      <div class="flex flex-col gap-2 text-center md:text-left">
-        <span class="text-lg font-black tracking-widest text-primary uppercase">Monada</span>
-        <span>© 2026 Monada. All rights reserved. Built for biometric agency.</span>
-      </div>
-      <div class="flex gap-6 font-mono">
-        <a href="#diagnostics" class="hover:text-primary">Diagnostics</a>
-        <a href="#unification" class="hover:text-primary">OS Core</a>
-        <a href="#pricing" class="hover:text-primary">Pricing</a>
-        <a href="#sovereignty" class="hover:text-primary">Privacy</a>
-      </div>
+  <!-- Pricing Section -->
+  <section id="pricing" class="mx-auto max-w-4xl px-4 py-16 text-center">
+    <div class="max-w-2xl mx-auto mb-10">
+      <h2 class="text-3xl font-extrabold tracking-tight">Predictable, Cost-Disrupted Tracking</h2>
+      <p class="text-muted-foreground mt-2 text-sm">No clinical markups. We charge a flat membership fee that covers operations, pipeline software, and the raw chemical assays at cost.</p>
     </div>
-  </footer>
+
+    <div class="mx-auto max-w-sm rounded-xl border border-border bg-card p-8 text-left shadow-sm relative overflow-hidden">
+      <!-- Badge -->
+      <div class="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-bl-lg font-bold">
+        Phase 0 Flagship
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="font-bold text-xl font-mono tracking-wide text-primary">UNIVERSAL HEALTH RADAR</h3>
+        <p class="text-xs text-muted-foreground">Comprehensive longitudinal wellness monitoring with no administrative overhead.</p>
+      </div>
+
+      <div class="mt-6 flex items-baseline gap-2">
+        <span class="text-4xl font-extrabold tracking-tight font-mono">€90</span>
+        <span class="text-sm font-medium text-muted-foreground">/ month</span>
+      </div>
+      <p class="text-[10px] text-muted-foreground mt-1 font-mono">Billed quarterly (€270 per cycle, including professional blood draw fees)</p>
+
+      <ul class="mt-6 space-y-3 text-xs">
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <span>4 Complete 17-Assay Blood Draws Per Year</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <span>Dynamic Bayesian Z-Score Baseline Calculations</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <span>Asymptotic Performance Forecasting (ACT Engine)</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <span>DIAAS Bioavailability Protein & Macro Tracking</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <span>Wearable API Correlation (Garmin, Oura, Apple Health)</span>
+        </li>
+      </ul>
+
+      <div class="mt-8">
+        <a href="/login?checkout=universal" class="flex h-10 w-full items-center justify-center rounded-md bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+          Initialize Profile & Schedule Draw
+        </a>
+      </div>
+      
+      <p class="mt-3 text-center text-[10px] text-muted-foreground leading-snug">
+        No long-term commitments. Cancel anytime. All samples compiled in standard sterile clinical chains.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <!-- <footer class="border-t border-border bg-background py-10"> -->
+  <!--   <div class="mx-auto max-w-6xl px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground"> -->
+  <!--     <div class="flex items-center gap-2 font-mono"> -->
+  <!--       <span class="font-black text-primary">MONADA</span> -->
+  <!--       <span>© 2026</span> -->
+  <!--     </div> -->
+  <!--     <div class="flex gap-6"> -->
+  <!--       <a href="#problem" class="hover:text-foreground">Clinical Arbitrage</a> -->
+  <!--       <a href="https://monada.foundation" class="hover:text-foreground">monada.foundation</a> -->
+  <!--       <a href="/login" class="hover:text-foreground">Console Access</a> -->
+  <!--     </div> -->
+  <!--   </div> -->
+  <!-- </footer> -->
 </div>
+
+<style>
+  /* Custom slider styling fallback */
+  input[type="range"]::-webkit-slider-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 9999px;
+    background: var(--primary);
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s ease;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+</style>
