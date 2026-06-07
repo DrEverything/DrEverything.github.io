@@ -1,200 +1,87 @@
 <script lang="ts">
+  import Dashboard from "./dashboard.svelte";
   import { onMount } from "svelte";
-  import { post } from "$lib/utils";
-  // import LabPanel from "./LabPanel.svelte";
-  import LandingPage from "./landingPage.svelte";
 
-  // post("health/profile", {
-  //   whatever: "something",
-  // });
-
-  // 1. Structural Typings for Database/Frontend Integrity
-  interface Biomarker {
-    loinc: string;
-    name: string;
-    unit: string;
-    category: "hormone" | "lipid" | "metabolic" | "inflammation" | "vitamin";
-    description: string;
-  }
-
-  interface Panel {
-    id: string;
-    name: string;
-    description: string;
-    wholesaleCostEur: number; // Synlab wholesale cost estimate
-    retailPriceEur: number; // Under-cutting Finnish market price
-    targetAudience: string[];
-    biomarkers: Biomarker[];
-  }
-
-  // 2. High-Intent Launch Panels (The Core Offer)
-  const activePanels: Panel[] = [
+  // Mock lab test data satisfying LabTest type
+  // Date values are Unix timestamps in seconds (approx. 2-month intervals in 2024-2026)
+  const mockTests = [
     {
-      id: "panel_performance_male",
-      name: "Male Performance & HRT Profile",
-      description:
-        "Optimized for athletes, powerlifters, and men on Testosterone Replacement Therapy (TRT). Tracks hormonal baseline, androgen status, and cardiovascular risk vectors.",
-      wholesaleCostEur: 42.0,
-      retailPriceEur: 119.0,
-      targetAudience: ["powerlifting", "TRT", "bodybuilding", "athletics"],
-      biomarkers: [
-        {
-          loinc: "2986-8",
-          name: "Testosterone (Total)",
-          unit: "nmol/l",
-          category: "hormone",
-          description:
-            "Primary male sex hormone. Baseline for anabolic state and energy.",
-        },
-        {
-          loinc: "13967-5",
-          name: "Sex Hormone-Binding Globulin (SHBG)",
-          unit: "nmol/l",
-          category: "hormone",
-          description:
-            "Carrier protein. Determines the ratio of free (active) testosterone.",
-        },
-        {
-          loinc: "2243-4",
-          name: "Estradiol (E2)",
-          unit: "pmol/l",
-          category: "hormone",
-          description:
-            "Estrogen baseline. Critical for bone density, libido, and joint health.",
-        },
-        {
-          loinc: "2276-4",
-          name: "Ferritin",
-          unit: "µg/l",
-          category: "metabolic",
-          description:
-            "Iron storage. Essential for oxygen transport, energy, and detecting cellular damage.",
-        },
-      ],
+      id: "apob",
+      name: "Apolipoprotein B (ApoB)",
+      description: "Direct measurement of the total number of atherogenic particles in your blood. Highly superior to standard LDL cholesterol for predicting cardiovascular disease risk.",
+      price: 25.0,
+      past_values: [
+        { date: 1704067200, number: 0.72 }, // Jan 1, 2024
+        { date: 1709251200, number: 0.70 }, // Mar 1, 2024
+        { date: 1714521650, number: 0.73 }, // May 1, 2024
+        { date: 1719792000, number: 0.71 }, // Jul 1, 2024
+        { date: 1725148800, number: 1.15 }  // Sep 1, 2024 - Massive jump (+4.2σ) but technically still within the "standard population normal range" of 0.6 - 1.2 g/l
+      ]
     },
     {
-      id: "panel_metabolic_cardio",
-      name: "Advanced Longevity & Cardiovascular Profile",
-      description:
-        "Engineered for biohackers and longevity-focused individuals. Bypasses standard population averages to trace actual atherosclerotic and metabolic risk factors.",
-      wholesaleCostEur: 38.0,
-      retailPriceEur: 99.0,
-      targetAudience: [
-        "biohacking",
-        "longevity",
-        "cardiovascular",
-        "dietary-tracking",
-      ],
-      biomarkers: [
-        {
-          loinc: "1871-3",
-          name: "Apolipoprotein B (ApoB)",
-          unit: "g/l",
-          category: "lipid",
-          description:
-            "Direct count of all atherogenic particles. Highly superior to standard LDL-C.",
-        },
-        {
-          loinc: "4548-4",
-          name: "HbA1c (Glycated Hemoglobin)",
-          unit: "mmol/mol",
-          category: "metabolic",
-          description:
-            "Standard IFCC marker for 3-month average glucose levels and insulin sensitivity.",
-        },
-        {
-          loinc: "30522-7",
-          name: "High-Sensitivity CRP (hs-CRP)",
-          unit: "mg/l",
-          category: "inflammation",
-          description:
-            "Ultra-sensitive systemic inflammation marker. Predicts vascular risk.",
-        },
-        {
-          loinc: "20436-2",
-          name: "Fasting Insulin",
-          unit: "mU/l",
-          category: "metabolic",
-          description:
-            "Detects early insulin resistance years before HbA1c or fasting glucose flags it.",
-        },
-      ],
+      id: "hba1c",
+      name: "HbA1c (Glycated Hemoglobin)",
+      description: "Reflects your average blood sugar levels over the past 3 months. Essential for detecting pre-diabetes and monitoring metabolic health.",
+      price: 18.0,
+      past_values: [
+        { date: 1704067200, number: 32.5 },
+        { date: 1709251200, number: 33.1 },
+        { date: 1714521650, number: 31.8 },
+        { date: 1719792000, number: 32.4 },
+        { date: 1725148800, number: 32.8 }  // Perfectly stable
+      ]
     },
     {
-      id: "panel_essential_baseline",
-      name: "Essential Health Baseline",
-      description:
-        "The low-cost starting point for general health tracking. Establishes clean baselines for lipid profiles and thyroid output.",
-      wholesaleCostEur: 22.0,
-      retailPriceEur: 59.0,
-      targetAudience: ["general-health", "beginners", "vegetarians"],
-      biomarkers: [
-        {
-          loinc: "2093-3",
-          name: "Total Cholesterol",
-          unit: "mmol/l",
-          category: "lipid",
-          description: "Standard lipid marker.",
-        },
-        {
-          loinc: "2085-9",
-          name: "HDL Cholesterol",
-          unit: "mmol/l",
-          category: "lipid",
-          description: "High-density lipoprotein baseline.",
-        },
-        {
-          loinc: "18262-6",
-          name: "LDL Cholesterol",
-          unit: "mmol/l",
-          category: "lipid",
-          description: "Low-density lipoprotein baseline.",
-        },
-        {
-          loinc: "11579-0",
-          name: "Thyroid Stimulating Hormone (TSH)",
-          unit: "mU/l",
-          category: "hormone",
-          description: "Primary feedback marker for thyroid metabolic rate.",
-        },
-        {
-          loinc: "62292-8",
-          name: "Vitamin D (25-OH)",
-          unit: "nmol/l",
-          category: "vitamin",
-          description:
-            "Essential hormone precursor for immunity, bone strength, and mood in northern latitudes.",
-        },
-      ],
+      id: "hscrp",
+      name: "High-Sensitivity CRP (hs-CRP)",
+      description: "Sensitive marker of systemic low-grade inflammation. Elevated levels are linked to cardiovascular risk, overtraining, and metabolic stress.",
+      price: 15.0,
+      past_values: [
+        { date: 1704067200, number: 0.25 },
+        { date: 1709251200, number: 0.22 },
+        { date: 1714521650, number: 0.30 },
+        { date: 1719792000, number: 0.27 },
+        { date: 1725148800, number: 2.15 }  // Spiking high (+3.9σ) and clinical normal is < 1.0 mg/l
+      ]
     },
+    {
+      id: "alat",
+      name: "ALAT (ALT / Alanine Aminotransferase)",
+      description: "Liver enzyme. Elevated levels indicate liver cellular stress, fatty liver, or potential damage.",
+      price: 12.0,
+      past_values: [
+        { date: 1719792000, number: 22.0 },
+        { date: 1725148800, number: 24.0 }  // Only 2 values: calibration/establishing baseline
+      ]
+    },
+    {
+      id: "testosterone",
+      name: "Total Testosterone",
+      description: "Primary sex hormone. Vital for protein synthesis, muscle mass, energy, bone density, and nervous system recovery.",
+      price: 35.0,
+      past_values: [
+        { date: 1704067200, number: 12.1 },
+        { date: 1709251200, number: 12.4 },
+        { date: 1714521650, number: 11.9 },
+        { date: 1719792000, number: 12.2 },
+        { date: 1725148800, number: 12.0 }  // Stable, but clinically low (normal population range: 10 - 30 nmol/l)
+      ]
+    },
+    {
+      id: "vitamind",
+      name: "Vitamin D (25-OH)",
+      description: "Crucial for bone health, immune function, and overall hormonal balance. Particularly important in northern latitudes like Finland.",
+      price: 22.0,
+      past_values: [
+        { date: 1704067200, number: 55.0 }, // Deficient
+        { date: 1709251200, number: 68.0 },
+        { date: 1714521650, number: 80.0 }, // Normal
+        { date: 1719792000, number: 95.0 },
+        { date: 1725148800, number: 112.0 } // Optimal trend upwards
+      ]
+    }
   ];
-
-  let date = new Date().toISOString();
-
-  console.log(date);
-
-  // 3. Automated On-Mount Payload Sync
-  // onMount(async () => {
-  //   try {
-  //     const response = await post("health/profile", {
-  //       client_timestamp: new Date().toISOString(),
-  //       supported_loinc_codes: activePanels.flatMap((p) =>
-  //         p.biomarkers.map((b) => b.loinc),
-  //       ),
-  //       configured_panels: activePanels.map((p) => ({
-  //         id: p.id,
-  //         name: p.name,
-  //         retail_price: p.retailPriceEur,
-  //         unit_schema: "SI_METRIC_FI", // Enforces standard Finnish clinical units (e.g. mmol/mol for HbA1c)
-  //       })),
-  //     });
-  //     console.log("Monada OS: Lab profiles synced successfully.", response);
-  //   } catch (error) {
-  //     console.error("Monada OS: Lab profiles failed to sync.", error);
-  //   }
-  // });
 </script>
 
-<!-- <LandingPage /> -->
-
-<!-- <LabPanel /> -->
+<!-- Render the health dashboard component with mock lab tests -->
+<Dashboard biomarkers={mockTests} />

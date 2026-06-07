@@ -142,28 +142,32 @@
     <Spinner class="size-8 animate-spin text-muted-foreground" />
   </div>
 {:else}
-  <div class="relative flex min-h-svh items-center justify-center p-4 overflow-hidden bg-radial from-background via-background/95 to-background/80">
-    <!-- Glowing background elements -->
-    <!-- <div class="absolute -top-[30%] left-[10%] h-[70%] w-[70%] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div> -->
-    <!-- <div class="absolute -bottom-[30%] right-[10%] h-[70%] w-[70%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none"></div> -->
-
+  <div
+    class="relative flex min-h-svh items-center justify-center p-4 overflow-hidden bg-radial from-background via-background/95 to-background/80"
+  >
     <div class="relative w-full max-w-sm">
-      <!-- Outer glow border -->
-      <!-- <div class="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-primary/30 via-blue-500/20 to-indigo-500/30 opacity-60 blur-sm"></div> -->
-
-      <Card.Root class="relative w-full max-w-sm overflow-hidden border border-border/40 bg-card/70 backdrop-blur-md shadow-2xl rounded-xl">
+      <Card.Root
+        class="relative w-full max-w-sm overflow-hidden border border-border/40 bg-card/70 backdrop-blur-md shadow-2xl rounded-xl"
+      >
         <div class="grid grid-cols-1 grid-rows-1">
           {#if view === "home"}
-            <div in:fade={{ delay: 150, duration: 150 }} out:fade={{ duration: 150 }} class="col-start-1 row-start-1 flex flex-col">
+            <div
+              in:fade={{ delay: 150, duration: 150 }}
+              out:fade={{ duration: 150 }}
+              class="col-start-1 row-start-1 flex flex-col"
+            >
               <Card.Header class="text-center pb-2">
-                <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-blue-500/10 to-indigo-500/5 border border-primary/20 text-primary shadow-sm">
+                <div
+                  class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-blue-500/10 to-indigo-500/5 border border-primary/20 text-primary shadow-sm"
+                >
                   <Fingerprint class="h-6 w-6 stroke-[1.5]" />
                 </div>
                 <Card.Title
                   class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-blue-600 to-indigo-600 bg-clip-text text-transparent pb-1"
                   >Monada</Card.Title
                 >
-                <Card.Description class="text-xs text-muted-foreground/90 font-medium"
+                <Card.Description
+                  class="text-xs text-muted-foreground/90 font-medium"
                   >Sign in securely using your device passkey.</Card.Description
                 >
               </Card.Header>
@@ -194,16 +198,24 @@
               </Card.Content>
             </div>
           {:else}
-            <div in:fade={{ delay: 150, duration: 150 }} out:fade={{ duration: 150 }} class="col-start-1 row-start-1 flex flex-col">
+            <div
+              in:fade={{ delay: 150, duration: 150 }}
+              out:fade={{ duration: 150 }}
+              class="col-start-1 row-start-1 flex flex-col"
+            >
               <Card.Header class="text-center pb-3">
-                <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-blue-500/10 to-indigo-500/5 border border-primary/20 text-primary shadow-sm">
+                <div
+                  class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-blue-500/10 to-indigo-500/5 border border-primary/20 text-primary shadow-sm"
+                >
                   <Fingerprint class="h-6 w-6 stroke-[1.5]" />
                 </div>
                 <Card.Title
                   class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-blue-600 to-indigo-600 bg-clip-text text-transparent pb-1"
                   >Create account</Card.Title
                 >
-                <Card.Description class="text-xs text-muted-foreground/90 font-medium">
+                <Card.Description
+                  class="text-xs text-muted-foreground/90 font-medium"
+                >
                   Register a secure passkey to unlock your super app.
                 </Card.Description>
               </Card.Header>
