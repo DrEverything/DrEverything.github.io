@@ -1,6 +1,8 @@
 <script lang="ts">
   import Menubar from "./menubar.svelte";
   import { Spinner } from "$lib/components/ui/spinner";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
 
@@ -34,7 +36,9 @@
 
     <!-- pt-2 creates exactly 2 units (8px) of space below the menu -->
     <main class="mx-4 pt-2">
-      {@render children()}
+      <Tooltip.Provider delayDuration={0}>
+        {@render children()}
+      </Tooltip.Provider>
     </main>
   </div>
 {/if}
