@@ -10,10 +10,12 @@
     class: className,
     lowerLimit = 90,
     upperLimit = 160,
+    unit = "g/mL",
   }: {
     class?: string;
     lowerLimit?: number;
     upperLimit?: number;
+    unit?: string;
   } = $props();
 
   const chartData = [
@@ -58,7 +60,25 @@
                 month: "long",
               });
             }}
-          />
+          >
+            {#snippet formatter({ value, item })}
+              <div class="flex items-center gap-1.5">
+                <!-- Indicator Dot -->
+                <div
+                  style="background-color: {item.color || 'var(--color-primary)'};"
+                  class="size-2.5 shrink-0 rounded-[2px]"
+                ></div>
+                <div class="flex items-baseline gap-1 leading-none">
+                  <span class="text-foreground font-mono font-semibold tabular-nums text-xs">
+                    {Number(value).toLocaleString()}
+                  </span>
+                  <span class="text-muted-foreground font-medium text-[10px]">
+                    {unit}
+                  </span>
+                </div>
+              </div>
+            {/snippet}
+          </Chart.Tooltip>
         {/snippet}
         {#snippet marks({ context, visibleSeries, getAreaProps })}
           <defs>
@@ -99,7 +119,7 @@
             text-anchor="end"
             class="fill-green-600/70 dark:fill-green-400/70 text-[9px] font-medium"
           >
-            Upper limit: {upperLimit}
+            High: {upperLimit} {unit}
           </text>
 
           <!-- Lower Reference Limit Line -->
@@ -119,7 +139,7 @@
             text-anchor="end"
             class="fill-green-600/70 dark:fill-green-400/70 text-[9px] font-medium"
           >
-            Lower limit: {lowerLimit}
+            Low: {lowerLimit} {unit}
           </text>
 
           {#each visibleSeries as s, i (s.key)}
