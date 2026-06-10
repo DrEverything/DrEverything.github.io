@@ -5,18 +5,32 @@
 
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   let { children } = $props();
-  let status = $state<-1 | 0 | 1>(0);
+
+  // Optimistic initial check: if they have user metadata, show the page content immediately
+  // while we verify session validity in the background (avoiding the spinner flash).
+  const hasLocalSession = browser && localStorage.getItem("monada_user") !== null;
+  let status = $state<-1 | 0 | 1>(hasLocalSession ? 1 : 0);
 
   onMount(async () => {
-    const res = await fetch("/api/auth/check", {
-      method: "POST",
-      credentials: "include",
-    });
-    if (res.ok) {
-      status = 1;
-    } else {
+    try {
+      const res = await fetch("/api/auth/check", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        status = 1;
+      } else {
+        throw new Error("Unauthorized");
+      }
+    } catch (err) {
+      status = -1;
+      if (browser) {
+        localStorage.removeItem("monada_user");
+        localStorage.removeItem("currentApp");
+      }
       goto("/login");
     }
   });

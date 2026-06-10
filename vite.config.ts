@@ -14,7 +14,21 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      "/api": "http://localhost:3000",
+      "/api": "http://127.0.0.1:3000",
     },
+  },
+  optimizeDeps: {
+    include: [
+      "@tabler/icons-svelte",
+      "@lucide/svelte",
+      "layerchart",
+      "bits-ui",
+      "katex",
+      "markdown-it",
+      "d3-scale",
+      "d3-shape",
+      "d3-array",
+      "d3-time",
+    ],
   },
 });

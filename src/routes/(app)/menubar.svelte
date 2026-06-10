@@ -7,6 +7,7 @@
   import BusinessPlanIcon from "@tabler/icons-svelte/icons/businessplan";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
+  import { page } from "$app/stores";
   import Separator from "$lib/components/ui/separator/separator.svelte";
 
   interface AppConfig {
@@ -61,19 +62,10 @@
     }
   }
 
-  // 3. Graceful fallback logic for currentApp initialization
-  function getInitialApp(): AppConfig {
-    const cachedHref = browser ? localStorage.getItem("currentApp") : null;
-    const matched = apps.find((a) => a.href === cachedHref);
-
-    // Fallback to the first unlocked app if they lack access to the cached one
-    if (matched) {
-      return matched;
-    }
-    return apps[0];
-  }
-
-  let currentApp = $state<AppConfig>(getInitialApp());
+  // 2. Reactively derive currentApp from SvelteKit's active URL path
+  let currentApp = $derived(
+    apps.find((app) => $page.url.pathname.startsWith(app.href)) || apps[0]
+  );
 
   async function logout() {
     await fetch(`/api/auth/logout`, { method: "POST", credentials: "include" });
@@ -85,7 +77,7 @@
   }
 </script>
 
-<Menubar.Root class="bg-background h-auto shadow-lg">
+<Menubar.Root class="bg-background h-auto shadow-lg w-full">
   <Menubar.Menu>
     <Menubar.Trigger class="h-auto px-2 py-1">
       {@const Icon = currentApp.icon}
@@ -99,7 +91,8 @@
             class="cursor-default"
             value={app.name}
             onSelect={() => {
-              currentApp = app;
+              // No need to set currentApp manually anymore, as goto() will update the URL
+              // and currentApp will reactively re-evaluate!
               localStorage.setItem("currentApp", app.href);
               goto(app.href);
             }}
@@ -117,7 +110,7 @@
     </Menubar.Content>
   </Menubar.Menu>
 
-  <Separator orientation="vertical" class="h-6 mx-1" />
+  <!-- <Separator orientation="vertical" class="h-6 mx-1" /> -->
 
   <Menubar.Menu>
     <Menubar.Trigger class="h-auto px-2 py-1 ml-auto">
