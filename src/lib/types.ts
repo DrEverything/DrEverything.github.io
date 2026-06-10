@@ -14,6 +14,9 @@ export interface LabTest {
   description: string;
   price: number;
   past_values: LabTestValue[];
+  lowerLimit?: number;
+  upperLimit?: number;
+  unit?: string;
 }
 
 export type FulfillmentMethod = 'home_kit' | 'home_visit' | 'partner_clinic';

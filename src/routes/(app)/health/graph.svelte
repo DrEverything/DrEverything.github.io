@@ -3,34 +3,37 @@
   import * as Chart from "$lib/components/ui/chart/index.js";
   import { scaleUtc } from "d3-scale";
   import { curveNatural } from "d3-shape";
-  import { Area, AreaChart, LinearGradient } from "layerchart";
-  import TrendingUpIcon from "@lucide/svelte/icons/trending-up";
+  import { Area, AreaChart } from "layerchart";
+  import type { LabTest } from "$lib/types.js";
 
   let {
     class: className,
-    lowerLimit = 90,
-    upperLimit = 160,
-    unit = "g/mL",
+    test,
+    lowerLimit,
+    upperLimit,
+    unit,
   }: {
     class?: string;
+    test: LabTest;
     lowerLimit?: number;
     upperLimit?: number;
     unit?: string;
   } = $props();
 
-  const chartData = [
-    { date: new Date("2024-01-01"), desktop: 186, mobile: 80 },
-    { date: new Date("2024-02-01"), desktop: 305, mobile: 200 },
-    { date: new Date("2024-03-01"), desktop: 237, mobile: 120 },
-    { date: new Date("2024-04-01"), desktop: 73, mobile: 190 },
-    { date: new Date("2024-05-01"), desktop: 209, mobile: 130 },
-    { date: new Date("2024-06-01"), desktop: 214, mobile: 140 },
-  ];
+  const chartData = $derived(
+    test.past_values.map((v) => ({
+      date: new Date(v.date * 1000),
+      value: v.number,
+    }))
+  );
 
-  const chartConfig = {
-    desktop: { label: "Desktop", color: "var(--chart-1)" },
-    mobile: { label: "Mobile", color: "var(--chart-2)" },
-  } satisfies Chart.ChartConfig;
+  const activeLowerLimit = $derived(lowerLimit ?? test.lowerLimit ?? 90);
+  const activeUpperLimit = $derived(upperLimit ?? test.upperLimit ?? 160);
+  const activeUnit = $derived(unit ?? test.unit ?? "g/mL");
+
+  const chartConfig = $derived({
+    value: { label: test.name, color: "var(--color-primary)" },
+  } satisfies Chart.ChartConfig);
 </script>
 
 <Card.Root class={className}>
@@ -40,13 +43,13 @@
         data={chartData}
         x="date"
         xScale={scaleUtc()}
-        yDomain={[0, Math.max(...chartData.map((d) => d.mobile), upperLimit) * 1.15]}
+        yDomain={[0, Math.max(...chartData.map((d) => d.value), activeUpperLimit) * 1.15]}
         padding={{ left: 0, right: 0, top: 20, bottom: 20 }}
         axis={false}
         series={[
           {
-            key: "mobile",
-            label: "Mobile",
+            key: "value",
+            label: test.name,
             color: "var(--color-primary)",
           },
         ]}
@@ -73,7 +76,7 @@
                     {Number(value).toLocaleString()}
                   </span>
                   <span class="text-muted-foreground font-medium text-[10px]">
-                    {unit}
+                    {activeUnit}
                   </span>
                 </div>
               </div>
@@ -95,9 +98,9 @@
           <!-- Shaded Reference Range Band -->
           <rect
             x={context.xRange[0]}
-            y={context.yScale(upperLimit)}
+            y={context.yScale(activeUpperLimit)}
             width={context.xRange[1] - context.xRange[0]}
-            height={context.yScale(lowerLimit) - context.yScale(upperLimit)}
+            height={context.yScale(activeLowerLimit) - context.yScale(activeUpperLimit)}
             fill="currentColor"
             class="fill-green-500/10 dark:fill-green-400/10"
           />
@@ -106,8 +109,8 @@
           <line
             x1={context.xRange[0]}
             x2={context.xRange[1]}
-            y1={context.yScale(upperLimit)}
-            y2={context.yScale(upperLimit)}
+            y1={context.yScale(activeUpperLimit)}
+            y2={context.yScale(activeUpperLimit)}
             stroke="currentColor"
             class="stroke-green-500/30 dark:stroke-green-400/30"
             stroke-dasharray="4 4"
@@ -115,19 +118,19 @@
           />
           <text
             x={context.xRange[1] - 8}
-            y={context.yScale(upperLimit) - 4}
+            y={context.yScale(activeUpperLimit) - 4}
             text-anchor="end"
             class="fill-green-600/70 dark:fill-green-400/70 text-[9px] font-medium"
           >
-            High: {upperLimit} {unit}
+            Upper limit: {activeUpperLimit} {activeUnit}
           </text>
 
           <!-- Lower Reference Limit Line -->
           <line
             x1={context.xRange[0]}
             x2={context.xRange[1]}
-            y1={context.yScale(lowerLimit)}
-            y2={context.yScale(lowerLimit)}
+            y1={context.yScale(activeLowerLimit)}
+            y2={context.yScale(activeLowerLimit)}
             stroke="currentColor"
             class="stroke-green-500/30 dark:stroke-green-400/30"
             stroke-dasharray="4 4"
@@ -135,11 +138,11 @@
           />
           <text
             x={context.xRange[1] - 8}
-            y={context.yScale(lowerLimit) + 10}
+            y={context.yScale(activeLowerLimit) + 10}
             text-anchor="end"
             class="fill-green-600/70 dark:fill-green-400/70 text-[9px] font-medium"
           >
-            Low: {lowerLimit} {unit}
+            Lower limit: {activeLowerLimit} {activeUnit}
           </text>
 
           {#each visibleSeries as s, i (s.key)}
