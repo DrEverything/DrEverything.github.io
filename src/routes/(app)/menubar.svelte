@@ -3,12 +3,15 @@
   import CompassIcon from "@tabler/icons-svelte/icons/compass";
   import LogoutIcon from "@tabler/icons-svelte/icons/logout";
   import UserIcon from "@tabler/icons-svelte/icons/user";
+  import SunIcon from "@tabler/icons-svelte/icons/sun";
+  import MoonIcon from "@tabler/icons-svelte/icons/moon";
   import HeartRateMonitorIcon from "@tabler/icons-svelte/icons/heart-rate-monitor";
   import BusinessPlanIcon from "@tabler/icons-svelte/icons/businessplan";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import Separator from "$lib/components/ui/separator/separator.svelte";
+  import { themeState } from "$lib/theme.svelte";
 
   interface AppConfig {
     id: string;
@@ -122,6 +125,16 @@
       >
         {userData?.email ?? "Not logged in"}
       </div>
+      <Separator class="my-1" />
+      <Menubar.Item onclick={() => themeState.toggle()}>
+        {#if themeState.current === "dark"}
+          <SunIcon class="size-4 mr-2" />
+          Light Mode
+        {:else}
+          <MoonIcon class="size-4 mr-2" />
+          Dark Mode
+        {/if}
+      </Menubar.Item>
       <Separator class="my-1" />
       <Menubar.Item
         onclick={logout}

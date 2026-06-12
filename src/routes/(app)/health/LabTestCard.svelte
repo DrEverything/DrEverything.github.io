@@ -34,16 +34,16 @@
   );
 
   const statusColorClass = $derived(
-    status === "low" ? "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20" :
-    status === "high" ? "text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20" :
-    "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+    status === "low" ? "text-warning bg-warning/10 border-warning/20" :
+    status === "high" ? "text-destructive bg-destructive/10 border-destructive/20" :
+    "text-success bg-success/10 border-success/20"
   );
 
   // Safe color values for chart rendering
   const strokeColor = $derived(
-    status === "low" ? "#d97706" :
-    status === "high" ? "#e11d48" :
-    "var(--primary)"
+    status === "low" ? "var(--warning)" :
+    status === "high" ? "var(--destructive)" :
+    "var(--success)"
   );
 
   const hasLimits = $derived(test.lowerLimit !== undefined || test.upperLimit !== undefined);
@@ -140,16 +140,16 @@
         <div class="relative w-full h-1.5 bg-muted rounded-full overflow-visible">
           <!-- Highlighted Normal Range segment -->
           <div
-            class="absolute top-0 bottom-0 bg-emerald-500/20 dark:bg-emerald-400/20 rounded-full"
+            class="absolute top-0 bottom-0 bg-success/20 rounded-full"
             style="left: {gaugeMetrics.lowerPct}%; width: {gaugeMetrics.upperPct - gaugeMetrics.lowerPct}%;"
           ></div>
 
           <!-- Indicator dot for the latest value -->
           <div
             class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-3 rounded-full border border-background shadow-sm transition-all duration-300
-              {status === 'low' ? 'bg-amber-500' : ''}
-              {status === 'high' ? 'bg-rose-500' : ''}
-              {status === 'normal' ? 'bg-emerald-500 dark:bg-emerald-400' : ''}
+              {status === 'low' ? 'bg-warning' : ''}
+              {status === 'high' ? 'bg-destructive' : ''}
+              {status === 'normal' ? 'bg-success' : ''}
             "
             style="left: {gaugeMetrics.latestPct}%;"
           ></div>

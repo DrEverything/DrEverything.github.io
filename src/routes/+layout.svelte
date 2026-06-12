@@ -4,8 +4,11 @@
 
   import { onMount } from "svelte";
   import { toast, Toaster } from "svelte-sonner";
+  import { themeState } from "$lib/theme.svelte";
 
   onMount(() => {
+    themeState.init();
+
     function handleInvalid(e: Event) {
       e.preventDefault();
 
@@ -22,7 +25,7 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <Toaster
-  theme="dark"
+  theme={themeState.current}
   position="top-center"
   class="toaster group"
   toastOptions={{

@@ -67,7 +67,7 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Content class="max-w-2xl sm:max-w-3xl overflow-y-auto max-h-[90vh] p-6 rounded-2xl">
+  <Dialog.Content class="w-[calc(100%-2rem)] sm:w-full max-w-2xl sm:max-w-3xl overflow-y-auto max-h-[90vh] p-6 rounded-2xl">
     <Dialog.Header class="text-left">
       <Dialog.Title class="text-2xl font-bold flex items-baseline gap-2">
         {test.name}
@@ -92,7 +92,7 @@
           </div>
           <div class="border-x border-border">
             <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Normal Range</span>
-            <span class="text-xs text-muted-foreground mt-1 block px-2 py-0.5 rounded bg-green-500/10 text-green-500 dark:text-green-400 max-w-fit mx-auto font-medium">
+            <span class="text-xs text-muted-foreground mt-1 block px-2 py-0.5 rounded bg-success/10 text-success max-w-fit mx-auto font-medium">
               {test.lowerLimit !== undefined && test.upperLimit !== undefined
                 ? `${test.lowerLimit} - ${test.upperLimit} ${unit}`
                 : "Standard range"}
@@ -166,7 +166,7 @@
                       width={context.xRange[1] - context.xRange[0]}
                       height={context.yScale(test.lowerLimit) - context.yScale(test.upperLimit)}
                       fill="currentColor"
-                      class="fill-green-500/5 dark:fill-green-400/5"
+                      class="fill-success/5"
                     />
                     <!-- Upper limit dashline -->
                     <line
@@ -175,7 +175,7 @@
                       y1={context.yScale(test.upperLimit)}
                       y2={context.yScale(test.upperLimit)}
                       stroke="currentColor"
-                      class="stroke-green-500/20 dark:stroke-green-400/20"
+                      class="stroke-success/20"
                       stroke-dasharray="4 4"
                       stroke-width="1"
                     />
@@ -186,7 +186,7 @@
                       y1={context.yScale(test.lowerLimit)}
                       y2={context.yScale(test.lowerLimit)}
                       stroke="currentColor"
-                      class="stroke-green-500/20 dark:stroke-green-400/20"
+                      class="stroke-success/20"
                       stroke-dasharray="4 4"
                       stroke-width="1"
                     />
@@ -241,9 +241,9 @@
                   </TableCell>
                   <TableCell class="py-2.5 text-right">
                     <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full
-                      {status === 'low' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : ''}
-                      {status === 'high' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : ''}
-                      {status === 'normal' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : ''}
+                      {status === 'low' ? 'bg-warning/10 text-warning' : ''}
+                      {status === 'high' ? 'bg-destructive/10 text-destructive' : ''}
+                      {status === 'normal' ? 'bg-success/10 text-success' : ''}
                     ">
                       {#if status === 'low'}
                         <ArrowDownIcon class="size-3" /> Low

@@ -167,12 +167,12 @@
       class={cn(
         "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
         activeFilter === "normal"
-          ? "border-emerald-500 ring-1 ring-emerald-500/20 bg-emerald-500/5"
-          : "border-border/80 hover:border-emerald-500/30"
+          ? "border-success ring-1 ring-success/20 bg-success/5"
+          : "border-border/80 hover:border-success/30"
       )}
     >
-      <div class="p-3 bg-emerald-500/10 rounded-xl">
-        <ShieldCheckIcon class="size-6 text-emerald-500 dark:text-emerald-400" />
+      <div class="p-3 bg-success/10 rounded-xl">
+        <ShieldCheckIcon class="size-6 text-success" />
       </div>
       <div>
         <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Normal</span>
@@ -190,12 +190,12 @@
       class={cn(
         "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
         activeFilter === "out-of-range"
-          ? "border-rose-500 ring-1 ring-rose-500/20 bg-rose-500/5"
-          : "border-border/80 hover:border-rose-500/30"
+          ? "border-destructive ring-1 ring-destructive/20 bg-destructive/5"
+          : "border-border/80 hover:border-destructive/30"
       )}
     >
-      <div class="p-3 bg-rose-500/10 rounded-xl">
-        <AlertCircleIcon class="size-6 text-rose-500 dark:text-rose-400" />
+      <div class="p-3 bg-destructive/10 rounded-xl">
+        <AlertCircleIcon class="size-6 text-destructive" />
       </div>
       <div>
         <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Out of Range</span>
