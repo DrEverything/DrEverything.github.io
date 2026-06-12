@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { Button } from "$lib/components/ui/button";
-  import Graph from "./graph.svelte";
-  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+  import { cn } from "$lib/utils.js";
+  import LabTestCard from "./LabTestCard.svelte";
   import type { LabTest } from "$lib/types";
+  import HeartRateMonitorIcon from "@tabler/icons-svelte/icons/heart-rate-monitor";
+  import AlertCircleIcon from "@tabler/icons-svelte/icons/alert-circle";
+  import ShieldCheckIcon from "@tabler/icons-svelte/icons/shield-check";
+  import ActivityIcon from "@tabler/icons-svelte/icons/activity";
 
   // Mock lab test data satisfying LabTest type
   // Date values are Unix timestamps in seconds (approx. 2-month intervals in 2024-2026)
@@ -104,40 +107,119 @@
       ]
     }
   ];
+
+  let activeFilter = $state<"all" | "normal" | "out-of-range">("all");
+
+  // Status statistics helper
+  function checkOutOfRange(test: LabTest): boolean {
+    const latest = test.past_values[test.past_values.length - 1]?.number;
+    if (latest === undefined) return false;
+    const isLow = test.lowerLimit !== undefined && latest < test.lowerLimit;
+    const isHigh = test.upperLimit !== undefined && latest > test.upperLimit;
+    return isLow || isHigh;
+  }
+
+  const outOfRangeCount = $derived(mockTests.filter(checkOutOfRange).length);
+  const inRangeCount = $derived(mockTests.length - outOfRangeCount);
+
+  // Filtered tests based on active filter button
+  const filteredTests = $derived(
+    mockTests.filter((test) => {
+      const isOutOfRange = checkOutOfRange(test);
+      if (activeFilter === "normal") return !isOutOfRange;
+      if (activeFilter === "out-of-range") return isOutOfRange;
+      return true;
+    })
+  );
 </script>
 
-<div class="flex flex-col gap-6 p-8 items-center max-w-4xl mx-auto">
-  <div class="text-center mb-4">
-    <h1 class="text-2xl font-bold tracking-tight">Blood Lab Test History</h1>
-    <p class="text-sm text-muted-foreground mt-1">
-      Hover over any biomarker to view its historical trend and reference ranges.
-    </p>
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+  <!-- Summary Statistics acting as Interactive Filter Tabs -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Total Biomarkers Card -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      onclick={() => (activeFilter = "all")}
+      class={cn(
+        "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
+        activeFilter === "all"
+          ? "border-primary ring-1 ring-primary/20 bg-primary/5"
+          : "border-border/80 hover:border-primary/30"
+      )}
+    >
+      <div class="p-3 bg-primary/10 rounded-xl">
+        <HeartRateMonitorIcon class="size-6 text-primary" />
+      </div>
+      <div>
+        <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Tracked</span>
+        <span class="text-2xl font-extrabold font-mono text-foreground mt-0.5 block">
+          {mockTests.length}
+        </span>
+      </div>
+    </div>
+
+    <!-- Normal/In Range Card -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      onclick={() => (activeFilter = "normal")}
+      class={cn(
+        "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
+        activeFilter === "normal"
+          ? "border-emerald-500 ring-1 ring-emerald-500/20 bg-emerald-500/5"
+          : "border-border/80 hover:border-emerald-500/30"
+      )}
+    >
+      <div class="p-3 bg-emerald-500/10 rounded-xl">
+        <ShieldCheckIcon class="size-6 text-emerald-500 dark:text-emerald-400" />
+      </div>
+      <div>
+        <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Normal</span>
+        <span class="text-2xl font-extrabold font-mono text-foreground mt-0.5 block">
+          {inRangeCount}
+        </span>
+      </div>
+    </div>
+
+    <!-- Out of Range Card -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      onclick={() => (activeFilter = "out-of-range")}
+      class={cn(
+        "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
+        activeFilter === "out-of-range"
+          ? "border-rose-500 ring-1 ring-rose-500/20 bg-rose-500/5"
+          : "border-border/80 hover:border-rose-500/30"
+      )}
+    >
+      <div class="p-3 bg-rose-500/10 rounded-xl">
+        <AlertCircleIcon class="size-6 text-rose-500 dark:text-rose-400" />
+      </div>
+      <div>
+        <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Out of Range</span>
+        <span class="text-2xl font-extrabold font-mono text-foreground mt-0.5 block">
+          {outOfRangeCount}
+        </span>
+      </div>
+    </div>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full justify-center">
-    {#each mockTests as test (test.id)}
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            {#snippet child({ props })}
-              <Button
-                variant="outline"
-                class="w-full h-18 flex flex-col justify-center items-center gap-1 p-4"
-                {...props}
-              >
-                <span class="font-semibold text-sm text-center">{test.name}</span>
-                <span class="text-xs text-muted-foreground font-mono">
-                  Latest: {test.past_values[test.past_values.length - 1].number} {test.unit}
-                </span>
-              </Button>
-            {/snippet}
-          </Tooltip.Trigger>
-          <Tooltip.Content
-            class="w-[500px] p-0 bg-card! text-card-foreground! border! border-border! shadow-xl! rounded-xl! overflow-visible"
-            arrowClasses="bg-card! border-r! border-b! border-border!"
-          >
-            <Graph {test} class="border-0! shadow-none! bg-transparent! py-0!" />
-          </Tooltip.Content>
-        </Tooltip.Root>
-    {/each}
-  </div>
+  <!-- Biomarkers Grid -->
+  {#if filteredTests.length > 0}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {#each filteredTests as test (test.id)}
+        <LabTestCard {test} />
+      {/each}
+    </div>
+  {:else}
+    <div class="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/5 text-center">
+      <ActivityIcon class="size-8 text-muted-foreground mb-3" />
+      <h3 class="font-bold text-base text-foreground">No biomarkers found</h3>
+      <p class="text-sm text-muted-foreground mt-1 max-w-xs">
+        No lab tests match the current filter selection.
+      </p>
+    </div>
+  {/if}
 </div>
