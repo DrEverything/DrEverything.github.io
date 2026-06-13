@@ -5,7 +5,7 @@
   import { scaleUtc } from "d3-scale";
   import { curveNatural } from "d3-shape";
   import { Area, AreaChart } from "layerchart";
-  import type { LabTest } from "$lib/types.js";
+  import type { BloodMarker } from "$lib/types.js";
   import ArrowUpIcon from "@tabler/icons-svelte/icons/arrow-up";
   import ArrowDownIcon from "@tabler/icons-svelte/icons/arrow-down";
   import CheckIcon from "@tabler/icons-svelte/icons/check";
@@ -15,28 +15,27 @@
     test,
   }: {
     open: boolean;
-    test: LabTest;
+    test: BloodMarker;
   } = $props();
 
   const chartData = $derived(
-    test.past_values.map((v) => ({
+    test.values.map((v) => ({
       date: new Date(v.date * 1000),
       value: v.number,
     }))
   );
 
-  const hasLimits = $derived(test.lowerLimit !== undefined || test.upperLimit !== undefined);
-  const lowerLimit = $derived(test.lowerLimit ?? 0);
-  const upperLimit = $derived(test.upperLimit ?? 0);
-  const unit = $derived(test.unit ?? "");
+  const lowerLimit = $derived(test.lowerLimit);
+  const upperLimit = $derived(test.upperLimit);
+  const unit = $derived(test.unit);
 
-  // Reverse past values for the table view (newest first)
-  const reversedValues = $derived([...test.past_values].sort((a, b) => b.date - a.date));
+  // Reverse values for the table view (newest first)
+  const reversedValues = $derived([...test.values].sort((a, b) => b.date - a.date));
 
   // Determine status of a specific value
   function getValueStatus(val: number) {
-    if (test.lowerLimit !== undefined && val < test.lowerLimit) return "low";
-    if (test.upperLimit !== undefined && val > test.upperLimit) return "high";
+    if (val < test.lowerLimit) return "low";
+    if (val > test.upperLimit) return "high";
     return "normal";
   }
 
@@ -55,9 +54,9 @@
 
   // Y-axis bounds configuration - defined cleanly as a derived array
   const yDomain = $derived.by(() => {
-    const values = test.past_values.map((d) => d.number);
-    const maxVal = Math.max(...values, test.upperLimit ?? 0);
-    const minVal = Math.min(...values, test.lowerLimit ?? 0);
+    const values = test.values.map((d) => d.number);
+    const maxVal = Math.max(...values, test.upperLimit);
+    const minVal = Math.min(...values, test.lowerLimit);
     const range = maxVal - minVal;
     return [
       Math.max(0, minVal - (range || minVal) * 0.15),
@@ -71,9 +70,7 @@
     <Dialog.Header class="text-left">
       <Dialog.Title class="text-2xl font-bold flex items-baseline gap-2">
         {test.name}
-        {#if unit}
-          <span class="text-sm font-normal text-muted-foreground font-mono">({unit})</span>
-        {/if}
+        <span class="text-sm font-normal text-muted-foreground font-mono">({unit})</span>
       </Dialog.Title>
       <Dialog.Description class="text-sm text-muted-foreground mt-1 leading-relaxed">
         {test.description}
@@ -82,42 +79,38 @@
 
     <div class="mt-6 space-y-6">
       <!-- Reference Range Info Banner -->
-      {#if hasLimits}
-        <div class="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/40 border text-center">
-          <div>
-            <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Lower Limit</span>
-            <span class="text-lg font-bold font-mono text-foreground mt-0.5 block">
-              {test.lowerLimit !== undefined ? `${test.lowerLimit} ${unit}` : "N/A"}
-            </span>
-          </div>
-          <div class="border-x border-border">
-            <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Normal Range</span>
-            <span class="text-xs text-muted-foreground mt-1 block px-2 py-0.5 rounded bg-success/10 text-success max-w-fit mx-auto font-medium">
-              {test.lowerLimit !== undefined && test.upperLimit !== undefined
-                ? `${test.lowerLimit} - ${test.upperLimit} ${unit}`
-                : "Standard range"}
-            </span>
-          </div>
-          <div>
-            <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Upper Limit</span>
-            <span class="text-lg font-bold font-mono text-foreground mt-0.5 block">
-              {test.upperLimit !== undefined ? `${test.upperLimit} ${unit}` : "N/A"}
-            </span>
-          </div>
+      <div class="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/40 border text-center">
+        <div>
+          <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Lower Limit</span>
+          <span class="text-lg font-bold font-mono text-foreground mt-0.5 block">
+            {test.lowerLimit}
+          </span>
         </div>
-      {/if}
+        <div class="border-x border-border px-2">
+          <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Normal Range</span>
+          <span class="text-xs text-muted-foreground mt-1 block px-2 py-0.5 rounded bg-success/10 text-success max-w-fit mx-auto font-medium whitespace-nowrap">
+            {test.lowerLimit} - {test.upperLimit}
+          </span>
+        </div>
+        <div>
+          <span class="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Upper Limit</span>
+          <span class="text-lg font-bold font-mono text-foreground mt-0.5 block">
+            {test.upperLimit}
+          </span>
+        </div>
+      </div>
 
       <!-- Detailed Progression Chart -->
-      <div class="border rounded-2xl p-4 bg-muted/10 relative overflow-hidden h-[240px]">
-        {#if test.past_values.length > 0}
-          <div class="absolute inset-0 p-4">
+      <div class="border rounded-2xl bg-muted/10 relative overflow-hidden h-[240px]">
+        {#if test.values.length > 0}
+          <div class="absolute inset-0">
             <Chart.Container config={chartConfig} class="aspect-auto h-full w-full">
               <AreaChart
                 data={chartData}
                 x="date"
                 xScale={scaleUtc()}
                 yDomain={yDomain}
-                padding={{ left: 10, right: 10, top: 20, bottom: 20 }}
+                padding={{ left: 0, right: 0, top: 20, bottom: 20 }}
                 axis={false}
                 series={[
                   {
@@ -159,38 +152,36 @@
 
                 {#snippet marks({ context, visibleSeries, getAreaProps })}
                   <!-- Reference Range Shading -->
-                  {#if test.lowerLimit !== undefined && test.upperLimit !== undefined}
-                    <rect
-                      x={context.xRange[0]}
-                      y={context.yScale(test.upperLimit)}
-                      width={context.xRange[1] - context.xRange[0]}
-                      height={context.yScale(test.lowerLimit) - context.yScale(test.upperLimit)}
-                      fill="currentColor"
-                      class="fill-success/5"
-                    />
-                    <!-- Upper limit dashline -->
-                    <line
-                      x1={context.xRange[0]}
-                      x2={context.xRange[1]}
-                      y1={context.yScale(test.upperLimit)}
-                      y2={context.yScale(test.upperLimit)}
-                      stroke="currentColor"
-                      class="stroke-success/20"
-                      stroke-dasharray="4 4"
-                      stroke-width="1"
-                    />
-                    <!-- Lower limit dashline -->
-                    <line
-                      x1={context.xRange[0]}
-                      x2={context.xRange[1]}
-                      y1={context.yScale(test.lowerLimit)}
-                      y2={context.yScale(test.lowerLimit)}
-                      stroke="currentColor"
-                      class="stroke-success/20"
-                      stroke-dasharray="4 4"
-                      stroke-width="1"
-                    />
-                  {/if}
+                  <rect
+                    x={context.xRange[0]}
+                    y={context.yScale(test.upperLimit)}
+                    width={context.xRange[1] - context.xRange[0]}
+                    height={context.yScale(test.lowerLimit) - context.yScale(test.upperLimit)}
+                    fill="currentColor"
+                    class="fill-success/5"
+                  />
+                  <!-- Upper limit dashline -->
+                  <line
+                    x1={context.xRange[0]}
+                    x2={context.xRange[1]}
+                    y1={context.yScale(test.upperLimit)}
+                    y2={context.yScale(test.upperLimit)}
+                    stroke="currentColor"
+                    class="stroke-success/20"
+                    stroke-dasharray="4 4"
+                    stroke-width="1"
+                  />
+                  <!-- Lower limit dashline -->
+                  <line
+                    x1={context.xRange[0]}
+                    x2={context.xRange[1]}
+                    y1={context.yScale(test.lowerLimit)}
+                    y2={context.yScale(test.lowerLimit)}
+                    stroke="currentColor"
+                    class="stroke-success/20"
+                    stroke-dasharray="4 4"
+                    stroke-width="1"
+                  />
 
                   {#each visibleSeries as s, i (s.key)}
                     <Area
@@ -237,7 +228,7 @@
                     {formatDate(entry.date)}
                   </TableCell>
                   <TableCell class="py-2.5 text-right font-mono font-semibold text-sm">
-                    {entry.number} <span class="text-xs text-muted-foreground font-normal">{unit}</span>
+                    {entry.number}
                   </TableCell>
                   <TableCell class="py-2.5 text-right">
                     <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full

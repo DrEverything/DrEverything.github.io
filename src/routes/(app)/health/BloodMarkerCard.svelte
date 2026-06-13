@@ -4,28 +4,27 @@
   import { scaleUtc } from "d3-scale";
   import { curveNatural } from "d3-shape";
   import { Area, AreaChart } from "layerchart";
-  import type { LabTest } from "$lib/types.js";
+  import type { BloodMarker } from "$lib/types.js";
   import ArrowUpIcon from "@tabler/icons-svelte/icons/arrow-up";
   import ArrowDownIcon from "@tabler/icons-svelte/icons/arrow-down";
   import CheckIcon from "@tabler/icons-svelte/icons/check";
-  import LabTestDetails from "./LabTestDetails.svelte";
+  import BloodMarkerDetails from "./BloodMarkerDetails.svelte";
 
   let {
     test,
   }: {
-    test: LabTest;
+    test: BloodMarker;
   } = $props();
 
   let detailsOpen = $state(false);
 
-  const values = $derived(test.past_values.map((v) => v.number));
-  const latestValue = $derived(test.past_values[test.past_values.length - 1]?.number ?? 0);
-  const unit = $derived(test.unit ?? "");
+  const values = $derived(test.values.map((v) => v.number));
+  const latestValue = $derived(test.values[test.values.length - 1]?.number ?? 0);
 
   // Determine status
   const status = $derived(
-    test.lowerLimit !== undefined && latestValue < test.lowerLimit ? "low" :
-    test.upperLimit !== undefined && latestValue > test.upperLimit ? "high" : "normal"
+    latestValue < test.lowerLimit ? "low" :
+    latestValue > test.upperLimit ? "high" : "normal"
   );
 
   const statusLabel = $derived(
@@ -46,14 +45,9 @@
     "var(--success)"
   );
 
-  const hasLimits = $derived(test.lowerLimit !== undefined || test.upperLimit !== undefined);
-
   // Compute gauge range percentages
   const gaugeMetrics = $derived.by(() => {
-    if (!hasLimits) return null;
-    const allVals = [...values];
-    if (test.lowerLimit !== undefined) allVals.push(test.lowerLimit);
-    if (test.upperLimit !== undefined) allVals.push(test.upperLimit);
+    const allVals = [...values, test.lowerLimit, test.upperLimit];
 
     const minVal = Math.min(...allVals);
     const maxVal = Math.max(...allVals);
@@ -71,8 +65,8 @@
     };
 
     const latestPct = getPercent(latestValue);
-    const lowerPct = test.lowerLimit !== undefined ? getPercent(test.lowerLimit) : 0;
-    const upperPct = test.upperLimit !== undefined ? getPercent(test.upperLimit) : 100;
+    const lowerPct = getPercent(test.lowerLimit);
+    const upperPct = getPercent(test.upperLimit);
 
     return {
       latestPct,
@@ -83,7 +77,7 @@
 
   // Sparkline data
   const chartData = $derived(
-    test.past_values.map((v) => ({
+    test.values.map((v) => ({
       date: new Date(v.date * 1000),
       value: v.number,
     }))
@@ -124,46 +118,39 @@
   </Card.Header>
 
   <Card.Content class="px-5 py-2 flex-grow flex flex-col justify-end gap-3 min-h-[95px] shrink-0">
-    <!-- Value and Unit Display -->
+    <!-- Value Display -->
     <div class="flex items-baseline gap-1">
       <span class="text-3xl font-extrabold font-mono tracking-tight text-foreground">
         {latestValue}
       </span>
-      {#if unit}
-        <span class="text-xs font-semibold text-muted-foreground font-mono">{unit}</span>
-      {/if}
     </div>
 
     <!-- Reference Range Slider / Gauge -->
-    {#if hasLimits && gaugeMetrics}
-      <div class="space-y-1 w-full">
-        <div class="relative w-full h-1.5 bg-muted rounded-full overflow-visible">
-          <!-- Highlighted Normal Range segment -->
-          <div
-            class="absolute top-0 bottom-0 bg-success/20 rounded-full"
-            style="left: {gaugeMetrics.lowerPct}%; width: {gaugeMetrics.upperPct - gaugeMetrics.lowerPct}%;"
-          ></div>
+    <div class="space-y-1 w-full">
+      <div class="relative w-full h-1.5 bg-muted rounded-full overflow-visible">
+        <!-- Highlighted Normal Range segment -->
+        <div
+          class="absolute top-0 bottom-0 bg-success/20 rounded-full"
+          style="left: {gaugeMetrics.lowerPct}%; width: {gaugeMetrics.upperPct - gaugeMetrics.lowerPct}%;"
+        ></div>
 
-          <!-- Indicator dot for the latest value -->
-          <div
-            class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-3 rounded-full border border-background shadow-sm transition-all duration-300
-              {status === 'low' ? 'bg-warning' : ''}
-              {status === 'high' ? 'bg-destructive' : ''}
-              {status === 'normal' ? 'bg-success' : ''}
-            "
-            style="left: {gaugeMetrics.latestPct}%;"
-          ></div>
-        </div>
-
-        <!-- Reference Limit Labels -->
-        <div class="flex justify-between text-[9px] text-muted-foreground font-semibold font-mono tracking-wider font-semibold">
-          <span>{test.lowerLimit !== undefined ? `${test.lowerLimit} ${unit}` : ""}</span>
-          <span>{test.upperLimit !== undefined ? `${test.upperLimit} ${unit}` : ""}</span>
-        </div>
+        <!-- Indicator dot for the latest value -->
+        <div
+          class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-3 rounded-full border border-background shadow-sm transition-all duration-300
+            {status === 'low' ? 'bg-warning' : ''}
+            {status === 'high' ? 'bg-destructive' : ''}
+            {status === 'normal' ? 'bg-success' : ''}
+          "
+          style="left: {gaugeMetrics.latestPct}%;"
+        ></div>
       </div>
-    {:else}
-      <div class="h-6"></div> <!-- spacer to align cards -->
-    {/if}
+
+      <!-- Reference Limit Labels -->
+      <div class="flex justify-between text-[9px] text-muted-foreground font-semibold font-mono tracking-wider font-semibold">
+        <span>{test.lowerLimit}</span>
+        <span>{test.upperLimit}</span>
+      </div>
+    </div>
   </Card.Content>
 
   <!-- Sparkline at the bottom of the card -->
@@ -215,5 +202,5 @@
 
 <!-- Detail view dialog -->
 {#if detailsOpen}
-  <LabTestDetails bind:open={detailsOpen} {test} />
+  <BloodMarkerDetails bind:open={detailsOpen} {test} />
 {/if}

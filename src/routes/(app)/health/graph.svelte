@@ -4,7 +4,7 @@
   import { scaleUtc } from "d3-scale";
   import { curveNatural } from "d3-shape";
   import { Area, AreaChart } from "layerchart";
-  import type { LabTest } from "$lib/types.js";
+  import type { BloodMarker } from "$lib/types.js";
 
   let {
     class: className,
@@ -14,14 +14,14 @@
     unit,
   }: {
     class?: string;
-    test: LabTest;
+    test: BloodMarker;
     lowerLimit?: number;
     upperLimit?: number;
     unit?: string;
   } = $props();
 
   const chartData = $derived(
-    test.past_values.map((v) => ({
+    test.values.map((v) => ({
       date: new Date(v.date * 1000),
       value: v.number,
     }))

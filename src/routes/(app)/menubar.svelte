@@ -76,7 +76,8 @@
       localStorage.removeItem("monada_user");
       localStorage.removeItem("currentApp");
     }
-    location.reload();
+    // location.reload();
+    goto("/login");
   }
 </script>
 

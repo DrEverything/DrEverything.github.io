@@ -3,20 +3,20 @@ export interface UserProfile {
   role: "patient" | "operator";
 }
 
-interface LabTestValue {
+export interface BloodMarkerValue {
   number: number;
   date: number; // I am thinking of using the same time format as Linux is using because it's probably easier to short, store and handle instead of using the Data type. I may or may not be wrong on this.
 }
 
-export interface LabTest {
+export interface BloodMarker {
   id: string;
   name: string;
   description: string;
   price: number;
-  past_values: LabTestValue[];
-  lowerLimit?: number;
-  upperLimit?: number;
-  unit?: string;
+  values: BloodMarkerValue[];
+  lowerLimit: number;
+  upperLimit: number;
+  unit: string;
 }
 
 export type FulfillmentMethod = 'home_kit' | 'home_visit' | 'partner_clinic';
