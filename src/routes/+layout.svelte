@@ -3,7 +3,8 @@
   import favicon from "$lib/assets/favicon.svg";
 
   import { onMount } from "svelte";
-  import { toast, Toaster } from "svelte-sonner";
+  import { Toaster } from "svelte-sonner";
+  import { toast } from "$lib/components/ui/toast";
   import { themeState } from "$lib/theme.svelte";
 
   onMount(() => {
@@ -40,7 +41,9 @@
       error:
         "group-[.toast]:bg-destructive/10 group-[.toast]:!text-destructive group-[.toast]:border-destructive/20 [&_*]:!text-destructive",
       success:
-        "group-[.toast]:bg-emerald-500/10 group-[.toast]:!text-emerald-500 group-[.toast]:border-emerald-500/20 [&_*]:!text-emerald-500",
+        "group-[.toast]:bg-success/10 group-[.toast]:!text-success group-[.toast]:border-success/20 [&_*]:!text-success",
+      warning:
+        "group-[.toast]:bg-warning/10 group-[.toast]:!text-warning group-[.toast]:border-warning/20 [&_*]:!text-warning",
     },
   }}
 />

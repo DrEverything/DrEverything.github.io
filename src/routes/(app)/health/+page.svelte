@@ -2,6 +2,7 @@
   import { cn } from "$lib/utils.js";
   import LabTestCard from "./LabTestCard.svelte";
   import type { LabTest } from "$lib/types";
+  import { Tabs, TabsList, TabsTrigger } from "$lib/components/ui/tabs/index.js";
   import HeartRateMonitorIcon from "@tabler/icons-svelte/icons/heart-rate-monitor";
   import AlertCircleIcon from "@tabler/icons-svelte/icons/alert-circle";
   import ShieldCheckIcon from "@tabler/icons-svelte/icons/shield-check";
@@ -134,77 +135,81 @@
 </script>
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-  <!-- Summary Statistics acting as Interactive Filter Tabs -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <!-- Total Biomarkers Card -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      onclick={() => (activeFilter = "all")}
-      class={cn(
-        "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
-        activeFilter === "all"
-          ? "border-primary ring-1 ring-primary/20 bg-primary/5"
-          : "border-border/80 hover:border-primary/30"
-      )}
-    >
-      <div class="p-3 bg-primary/10 rounded-xl">
-        <HeartRateMonitorIcon class="size-6 text-primary" />
-      </div>
-      <div>
-        <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Tracked</span>
-        <span class="text-2xl font-extrabold font-mono text-foreground mt-0.5 block">
-          {mockTests.length}
-        </span>
-      </div>
-    </div>
+  <!-- Rich Tab Filter Bar -->
+  <Tabs bind:value={activeFilter} class="w-full">
+    <TabsList class="h-auto w-fit mx-auto flex gap-1 rounded-2xl p-1">
+      <TabsTrigger
+        value="all"
+        class={cn(
+          "flex items-center gap-2 rounded-xl px-3 py-2.5 h-auto transition-all duration-200 border border-transparent",
+          "data-[state=active]:bg-primary/10 dark:data-[state=active]:bg-primary/20 data-[state=active]:border-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm",
+          "hover:bg-muted/50"
+        )}
+      >
+        <div class={cn(
+          "p-1.5 rounded-lg transition-colors bg-primary/10 text-primary",
+          activeFilter === "all" ? "bg-primary/20" : ""
+        )}>
+          <HeartRateMonitorIcon class="size-3.5" />
+        </div>
+        <div class="text-left">
+          <span class="block text-[9px] font-semibold uppercase tracking-wider text-muted-foreground leading-none">All</span>
+          <span class={cn(
+            "text-sm font-extrabold font-mono leading-tight mt-0.5 block",
+            activeFilter === "all" ? "text-primary" : "text-foreground"
+          )}>{mockTests.length}</span>
+        </div>
+      </TabsTrigger>
 
-    <!-- Normal/In Range Card -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      onclick={() => (activeFilter = "normal")}
-      class={cn(
-        "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
-        activeFilter === "normal"
-          ? "border-success ring-1 ring-success/20 bg-success/5"
-          : "border-border/80 hover:border-success/30"
-      )}
-    >
-      <div class="p-3 bg-success/10 rounded-xl">
-        <ShieldCheckIcon class="size-6 text-success" />
-      </div>
-      <div>
-        <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Normal</span>
-        <span class="text-2xl font-extrabold font-mono text-foreground mt-0.5 block">
-          {inRangeCount}
-        </span>
-      </div>
-    </div>
+      <TabsTrigger
+        value="normal"
+        class={cn(
+          "flex items-center gap-2 rounded-xl px-3 py-2.5 h-auto transition-all duration-200 border border-transparent",
+          "data-[state=active]:bg-success/10 dark:data-[state=active]:bg-success/20 data-[state=active]:border-success/20 data-[state=active]:text-success data-[state=active]:shadow-sm",
+          "hover:bg-muted/50"
+        )}
+      >
+        <div class={cn(
+          "p-1.5 rounded-lg transition-colors bg-success/10 text-success",
+          activeFilter === "normal" ? "bg-success/20" : ""
+        )}>
+          <ShieldCheckIcon class="size-3.5" />
+        </div>
+        <div class="text-left">
+          <span class="block text-[9px] font-semibold uppercase tracking-wider text-muted-foreground leading-none">Normal</span>
+          <span class={cn(
+            "text-sm font-extrabold font-mono leading-tight mt-0.5 block",
+            activeFilter === "normal" ? "text-success" : "text-foreground"
+          )}>{inRangeCount}</span>
+        </div>
+      </TabsTrigger>
 
-    <!-- Out of Range Card -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      onclick={() => (activeFilter = "out-of-range")}
-      class={cn(
-        "flex items-center gap-4 p-5 rounded-2xl bg-card border shadow-sm transition-all duration-300 cursor-pointer hover:shadow-md select-none",
-        activeFilter === "out-of-range"
-          ? "border-destructive ring-1 ring-destructive/20 bg-destructive/5"
-          : "border-border/80 hover:border-destructive/30"
-      )}
-    >
-      <div class="p-3 bg-destructive/10 rounded-xl">
-        <AlertCircleIcon class="size-6 text-destructive" />
-      </div>
-      <div>
-        <span class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Out of Range</span>
-        <span class="text-2xl font-extrabold font-mono text-foreground mt-0.5 block">
-          {outOfRangeCount}
-        </span>
-      </div>
-    </div>
-  </div>
+      <TabsTrigger
+        value="out-of-range"
+        class={cn(
+          "flex items-center gap-2 rounded-xl px-3 py-2.5 h-auto transition-all duration-200 border border-transparent",
+          "data-[state=active]:bg-destructive/10 dark:data-[state=active]:bg-destructive/20 data-[state=active]:border-destructive/20 data-[state=active]:text-destructive data-[state=active]:shadow-sm",
+          "hover:bg-muted/50"
+        )}
+      >
+        <div class={cn(
+          "p-1.5 rounded-lg transition-colors",
+          outOfRangeCount > 0 
+            ? (activeFilter === "out-of-range" ? "bg-destructive/25 text-destructive" : "bg-destructive/15 text-destructive")
+            : "bg-muted text-muted-foreground"
+        )}>
+          <AlertCircleIcon class="size-3.5" />
+        </div>
+        <div class="text-left">
+          <span class="block text-[9px] font-semibold uppercase tracking-wider text-muted-foreground leading-none">Flagged</span>
+          <span class={cn(
+            "text-sm font-extrabold font-mono leading-tight mt-0.5 block",
+            outOfRangeCount > 0 ? "text-destructive" : "text-muted-foreground"
+          )}>{outOfRangeCount}</span>
+        </div>
+      </TabsTrigger>
+    </TabsList>
+  </Tabs>
 
   <!-- Biomarkers Grid -->
   {#if filteredTests.length > 0}

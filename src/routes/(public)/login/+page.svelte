@@ -10,7 +10,7 @@
   import * as Card from "$lib/components/ui/card";
   import { onMount } from "svelte";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
-  import { toast } from "svelte-sonner";
+  import { toast } from "$lib/components/ui/toast";
   import { fade } from "svelte/transition";
   import { Fingerprint } from "@lucide/svelte";
 
