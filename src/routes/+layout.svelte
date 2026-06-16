@@ -9,6 +9,7 @@
 
   onMount(() => {
     themeState.init();
+    document.documentElement.classList.remove("loading-app");
 
     function handleInvalid(e: Event) {
       e.preventDefault();

@@ -36,11 +36,7 @@
   });
 </script>
 
-{#if status === 0}
-  <div class="flex min-h-svh items-center justify-center">
-    <Spinner class="size-8" />
-  </div>
-{:else}
+{#if status === 1}
   <!-- pt-2 acts as your initial 'top-2' offset so the menu sits 8px from the top -->
   <div class="pt-2">
     <!-- Changed 'fixed' to 'sticky'. Added 'bg-background' so text doesn't overlap on scroll -->
@@ -54,5 +50,9 @@
         {@render children()}
       </Tooltip.Provider>
     </main>
+  </div>
+{:else}
+  <div class="flex min-h-svh items-center justify-center">
+    <Spinner class="size-8" />
   </div>
 {/if}

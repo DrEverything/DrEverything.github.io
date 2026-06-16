@@ -15,6 +15,7 @@
     <link rel="apple-touch-icon" href="/icon-192.png" />
 
     <script>
+      window.__initialPath = window.location.pathname;
       try {
         if (localStorage.getItem("theme") === "light") {
           document.documentElement.classList.remove("dark");
@@ -22,7 +23,40 @@
           document.documentElement.classList.add("dark");
         }
       } catch (e) {}
+
+      // Hide the body until SvelteKit hydrates to prevent FOUC and landing page flashes on subroutes
+      document.documentElement.classList.add("loading-app");
     </script>
+
+    <style>
+      html.dark {
+        background-color: #141316;
+        background-color: oklch(0.141 0.005 285.823);
+        color: #fdfcfd;
+        color: oklch(0.985 0 0);
+      }
+      html:not(.dark) {
+        background-color: #f8f8f9;
+        background-color: oklch(0.98 0.002 286);
+        color: #141316;
+        color: oklch(0.141 0.005 285.823);
+      }
+      body {
+        background-color: inherit;
+        color: inherit;
+      }
+      html.loading-app body {
+        opacity: 0 !important;
+        transition: none !important;
+      }
+    </style>
+    <noscript>
+      <style>
+        html.loading-app body {
+          opacity: 1 !important;
+        }
+      </style>
+    </noscript>
 
     %sveltekit.head%
   </head>
