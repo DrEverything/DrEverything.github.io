@@ -7,6 +7,7 @@
   import MoonIcon from "@tabler/icons-svelte/icons/moon";
   import HeartRateMonitorIcon from "@tabler/icons-svelte/icons/heart-rate-monitor";
   import BusinessPlanIcon from "@tabler/icons-svelte/icons/businessplan";
+  import AppleIcon from "@tabler/icons-svelte/icons/apple";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
@@ -33,6 +34,13 @@
       icon: HeartRateMonitorIcon,
       href: "/health",
       description: "Labs and Body monitoring",
+    },
+    {
+      id: "nutrition",
+      name: "Nutrition",
+      icon: AppleIcon,
+      href: "/nutrition",
+      description: "Daily calorie & nutrition tracking",
     },
     // {
     //   id: "business",

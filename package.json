@@ -57,6 +57,7 @@
 		"d3-shape": "^3.2.0",
 		"d3-time": "^3.1.0",
 		"d3-time-format": "^4.1.0",
+		"html5-qrcode": "^2.3.8",
 		"katex": "^0.16.45",
 		"markdown-it": "^14.1.1",
 		"markdown-it-texmath": "^1.0.0"
