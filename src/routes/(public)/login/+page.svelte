@@ -103,6 +103,20 @@
     }
   }
 
+  async function loginDemo() {
+    loading = true;
+    error = "";
+    try {
+      const user: UserMetadata = await post("demo");
+      route(user);
+    } catch (err: any) {
+      error = err.message || "Failed to enter demo mode.";
+      toast.error(error);
+    } finally {
+      loading = false;
+    }
+  }
+
   async function register() {
     if (!email.trim()) {
       error = "Enter your email.";
@@ -194,6 +208,19 @@
                   }}
                 >
                   Create account
+                </Button>
+                <Button
+                  class="w-full h-11 text-sm font-semibold transition-all duration-300 active:scale-[0.98] border-border/80 hover:bg-muted text-primary"
+                  variant="outline"
+                  disabled={loading}
+                  onclick={loginDemo}
+                >
+                  {#if loading}
+                    <Spinner class="mr-2 size-4 animate-spin text-primary" />
+                    Entering demo...
+                  {:else}
+                    Try Demo Account
+                  {/if}
                 </Button>
               </Card.Content>
             </div>

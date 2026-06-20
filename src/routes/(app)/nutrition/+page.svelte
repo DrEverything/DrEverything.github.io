@@ -200,15 +200,15 @@
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8 pb-24">
   <!-- Top Navigation & Settings -->
   <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-xl border border-border/40 p-4 rounded-3xl shadow-xl">
-    <div class="flex items-center gap-2">
-      <div class="p-2.5 rounded-2xl bg-primary/10 text-primary">
-        <AppleIcon class="size-6" />
-      </div>
-      <div>
-        <h1 class="text-xl font-black tracking-tight">Nutrition Tracker</h1>
-        <p class="text-xs text-muted-foreground">Log foods & monitor nutrition label details</p>
-      </div>
-    </div>
+    <!-- <div class="flex items-center gap-2"> -->
+    <!--   <div class="p-2.5 rounded-2xl bg-primary/10 text-primary"> -->
+    <!--     <AppleIcon class="size-6" /> -->
+    <!--   </div> -->
+    <!--   <div> -->
+    <!--     <h1 class="text-xl font-black tracking-tight">Nutrition Tracker</h1> -->
+    <!--     <p class="text-xs text-muted-foreground">Log foods & monitor nutrition label details</p> -->
+    <!--   </div> -->
+    <!-- </div> -->
 
     <!-- Date Swiper -->
     <div class="flex items-center bg-muted/40 rounded-2xl p-1 border border-border/20">

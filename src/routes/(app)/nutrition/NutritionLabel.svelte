@@ -13,7 +13,7 @@
 </script>
 
 <div class="lg:col-span-2 bg-card/40 backdrop-blur-xl border border-border/40 p-6 rounded-3xl shadow-xl flex flex-col justify-between space-y-4">
-  <h3 class="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/20 pb-2">Detailed Daily Intake Label</h3>
+  <!-- <h3 class="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/20 pb-2">Detailed Daily Intake Label</h3> -->
   
   <div class="grid grid-cols-1 gap-x-6 gap-y-3.5 text-sm">
     <!-- Protein -->

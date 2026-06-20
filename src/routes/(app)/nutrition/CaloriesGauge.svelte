@@ -10,7 +10,7 @@
 </script>
 
 <div class="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl border border-border/40 p-6 rounded-3xl shadow-xl flex flex-col items-center justify-center space-y-4">
-  <h3 class="text-xs font-bold uppercase tracking-widest text-muted-foreground">Calories Consumed</h3>
+  <!-- <h3 class="text-xs font-bold uppercase tracking-widest text-muted-foreground">Calories Consumed</h3> -->
   
   <div class="relative size-44 flex items-center justify-center">
     <svg class="size-full -rotate-90">
